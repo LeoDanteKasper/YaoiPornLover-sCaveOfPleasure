@@ -4,233 +4,278 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yaoi Porn Lover's Cave of Pleasure</title>
-	<style>
-       :root {
-    --bg-color: #0a0f0d;
-    --primary-green: #1b4d3e;
-    --light-green: #2d8a6b;
-    --neon-green: #39ff14;
-    --gold: #d4af37;
-    --gold-glow: #f3e5ab;
-    --white-sparkle: rgba(255, 255, 255, 0.9); /* Nuevo: Para el brillito */
-}
+    <style>
+        :root {
+            --bg-color: #050806;
+            --primary-green: #0f3427;
+            --light-green: #1d634d;
+            --neon-green: #39ff14;
+            --gold: #d4af37;
+            --gold-glow: #fff1be;
+            --dark-surface: rgba(15, 25, 20, 0.7);
+            --glass-border: rgba(214, 175, 55, 0.25);
+            --white-sparkle: rgba(255, 255, 255, 0.95);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-      body {
-    background-color: var(--bg-color);
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem;
-    overflow-x: hidden;
-    position: relative;
-    
-    /* Configuración por defecto del fondo */
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-attachment: fixed;
-    background-size: cover;
-}
-
-/* Capa oscura superpuesta (Overlay) para que el texto siga siendo legible */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 15, 13, 0.75); /* Oscurece el GIF/Imagen un 75% */
-    z-index: -1; /* Se queda detrás de todo el contenido */
-    pointer-events: none;
-}
-
-/* ==========================================================================
-   DETECCIÓN DE PC (Pantallas medianas y grandes)
-   ========================================================================== */
-@media (min-width: 769px) {
-    body {
-        /* REEMPLAZA ESTE ENLACE POR TU GIF DE MUGEN H PARA PC */
-        background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Y5b3ZiaGtzMzg0bnU4dnVpbmxxbWk4M3F0cnZ6dWpxN285Nnh6MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L13yI63s9D33G/giphy.gif');
-    }
-}
-
-/* ==========================================================================
-   DETECCIÓN DE MÓVIL (Pantallas pequeñas)
-   ========================================================================== */
-@media (max-width: 768px) {
-    body {
-        /* Enlace de Maradona con la copa para móviles que pasaste */
-        background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/500px-Maradona-Mundial_86_con_la_copa.JPG');
-    }
-}
-.header-container {
-    width: 100%;
-    max-width: 1000px;
-    margin-bottom: 3rem;
-    text-align: center;
-    position: relative;
-    padding: 2rem;
-    
-    /* 1. RESPLANDOR EN EL FONDO */
-    background: radial-gradient(circle, rgba(27,77,62,0.3) 0%, rgba(10,15,13,0) 70%);
-}
-
-.sparkle-glow-title {
-    font-size: 2.8rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--gold);
-    position: relative;
-    display: flex;
-    flex-direction: column; /* Apila las dos frases */
-    gap: 10px;
-    
-    /* 2. EFECTO DE BRILLO CONSTANTE EN LAS LETRAS */
-    text-shadow: 
-        0 0 10px rgba(212, 175, 55, 0.7),
-        0 0 20px rgba(212, 175, 55, 0.5),
-        0 0 30px var(--primary-green);
-}
-
-/* Base para el brillito que pasa */
-.phrase-1, .phrase-2 {
-    position: relative;
-    overflow: hidden; /* Necesario para que el brillito no se salga de las letras */
-    padding: 10px 0;
-}
-
-/* 3. EL BRILLITO QUE PASA (Sparkle sweep) */
-/* Usamos ::after para crear una línea de luz blanca */
-.phrase-1::after, .phrase-2::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%; /* Empieza fuera a la izquierda */
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        var(--white-sparkle),
-        transparent
-    );
-    transform: skewX(-20deg); /* Inclina la luz para que se vea más dinámica */
-    animation: sparkleSweep 5s infinite;
-}
-
-/* Retrasamos la animación de la segunda frase para que no vayan juntas */
-.phrase-2::after {
-    animation-delay: 2.5s;
-}
-
-/* Animación del barrido de luz */
-@keyframes sparkleSweep {
-    0% { left: -150%; }
-    20% { left: 100%; } /* Pasa rápido */
-    100% { left: 100%; } /* Espera antes de reiniciar */
-}
-
-/* 4. BASE FUEGOS ARTIFICIALES ( Fireworks) */
-/* Usamos ::before en cada frase para el inicio de la explosión */
-.phrase-1::before, .phrase-2::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    
-    /* Animación de fuegos artificiales */
-    animation: fireworkBurst 5s infinite;
-}
-
-/* Posiciones: Al inicio de cada frase */
-.phrase-1::before {
-    left: 0%;
-    background-color: var(--neon-green); /* Fuego verde */
-    box-shadow: 0 0 15px var(--neon-green);
-}
-
-.phrase-2::before {
-    left: 0%;
-    background-color: var(--gold-glow); /* Fuego dorado */
-    box-shadow: 0 0 15px var(--gold-glow);
-    animation-delay: 2.5s; /* Sincronizado con el brillito de la phrase-2 */
-}
-
-/* Animación de la explosión (Expansión y desvanecimiento) */
-@keyframes fireworkBurst {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0;
-        box-shadow: 0 0 0px transparent;
-    }
-    5% {
-        opacity: 1; /* Aparece el punto */
-    }
-    10% {
-        transform: translate(-50%, -50%) scale(10); /* Explota hacia afuera */
-        opacity: 0; /* Se desvanece */
-        box-shadow: 
-            0 0 20px var(--neon-green),
-            30px 30px 10px transparent,
-            -30px -30px 10px transparent,
-            30px -30px 10px transparent,
-            -30px 30px 10px transparent;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Ajustes Responsivos para el título nuevo */
-@media (max-width: 600px) {
-    .sparkle-glow-title {
-        font-size: 1.7rem;
-        gap: 5px;
-    }
-}
-        /* Grid de botones responsivo */
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 1200px;
-            padding: 1rem;
+        body {
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+            overflow-x: hidden;
+            position: relative;
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-attachment: fixed;
+            background-size: cover;
+            transition: background 0.5s ease;
         }
 
-        /* Estilo de los botones con efecto de brillo (Glow) */
-        .custom-btn {
-            background: linear-gradient(135deg, var(--dark-surface), var(--primary-green));
-            color: #ffffff;
-            border: 2px solid var(--gold);
-            padding: 1.2rem 1rem;
-            font-size: 1rem;
-            font-weight: 600;
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(5, 8, 6, 0.85) 0%, rgba(10, 15, 13, 0.95) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @media (min-width: 769px) {
+            body {
+                background-image: url('https://archive.org/download/ezgif-377fcbe0f4aa7ab3/ezgif-377fcbe0f4aa7ab3.gif');
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background-image: url('https://archive.org/download/cloud-wallpaper/Cloud%20wallpaper.mp4');
+            }
+        }
+
+        /* HEADER PREMIUM */
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 4rem;
+            text-align: center;
+            position: relative;
+            padding: 2.5rem;
+            background: radial-gradient(circle, rgba(29, 99, 77, 0.25) 0%, rgba(5, 8, 6, 0) 70%);
+        }
+
+        .sparkle-glow-title {
+            font-size: 3.2rem;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 8px;
+            letter-spacing: 4px;
+            color: var(--gold);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 30px var(--primary-green);
+        }
+
+        .phrase-1, .phrase-2 {
+            position: relative;
+            overflow: hidden;
+            padding: 8px 0;
+            display: inline-block;
+        }
+
+        .phrase-1::after, .phrase-2::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--white-sparkle), transparent);
+            transform: skewX(-25deg);
+            animation: sparkleSweep 6s infinite ease-in-out;
+        }
+
+        .phrase-2::after { animation-delay: 3s; }
+
+        @keyframes sparkleSweep {
+            0% { left: -150%; }
+            15% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        /* CUADRO DIGITAL RETRO */
+        .square-clock-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 4rem;
+            perspective: 1000px;
+        }
+
+        .square-clock {
+            width: 350px;
+            height: 230px;
+            background: linear-gradient(135deg, #0e1a14, #050806);
+            border: 4px solid var(--gold);
+            border-radius: 12px;
+            position: relative;
+            padding: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.9);
+            cursor: pointer;
+            user-select: none;
+            transform: rotateX(6deg);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+
+        .square-clock:hover {
+            transform: rotateX(0deg) scale(1.03);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.98), 0 0 45px rgba(212, 175, 55, 0.4);
+        }
+
+        .snooze-btn {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom, #ffffff, var(--gold) 60%, #7c6314);
+            border: 2px solid #000;
+            border-radius: 6px 6px 0 0;
+            padding: 2px 28px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #000;
+            text-transform: uppercase;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+        }
+
+        .clock-screen {
+            width: 100%;
+            height: 100%;
+            background-color: #030f08;
+            border: 3px solid #000;
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: inset 0 0 25px rgba(57, 255, 20, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clock-screen.glitch-flash { animation: screenGlitch 0.25s ease-out; }
+
+        @keyframes screenGlitch {
+            0% { opacity: 0.4; background-color: #0c3a1e; }
+            50% { opacity: 0.9; background-color: #175a32; }
+            100% { opacity: 1; background-color: #030f08; }
+        }
+
+        .screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        #clock-format { color: var(--light-green); font-weight: bold; }
+
+        .eye-spy {
+            color: var(--neon-green);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px var(--neon-green);
+            animation: digitalBlink 1.2s infinite alternate ease-in-out;
+        }
+
+        @keyframes digitalBlink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; text-shadow: 0 0 12px var(--neon-green), 0 0 20px var(--neon-green); }
+        }
+
+        #clock-time {
+            font-size: 3.1rem;
+            font-weight: 900;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.85);
+            text-align: center;
+        }
+
+        .screen-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-family: monospace;
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(45, 138, 107, 0.3);
+            padding-top: 6px;
+        }
+
+        #clock-location { color: #ffffff; max-width: 65%; line-height: 1.2; }
+        #clock-weather { color: var(--gold-glow); text-shadow: 0 0 6px rgba(212, 175, 55, 0.5); }
+
+        .stand-left, .stand-right {
+            position: absolute;
+            width: 14px;
+            height: 22px;
+            background: linear-gradient(to right, #111, var(--gold), #534310);
+            bottom: -16px;
+            z-index: -1;
+            border-radius: 3px;
+            border: 1.5px solid #000;
+        }
+        .stand-left { left: 50px; transform: rotate(18deg); }
+        .stand-right { right: 50px; transform: rotate(-18deg); }
+
+        /* GRID DE BOTONES */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .custom-btn {
+            background: linear-gradient(135deg, rgba(20, 35, 28, 0.7), var(--primary-green));
+            color: #ffffff;
+            border: 2px solid var(--glass-border);
+            padding: 1.4rem 1.2rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-radius: 10px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            outline: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* Efecto de brillo reflejo que pasa rápido */
         .custom-btn::before {
             content: '';
             position: absolute;
@@ -238,1316 +283,624 @@ body::before {
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            transition: 0.5s;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.6s ease;
         }
 
-        .custom-btn:hover::before {
-            left: 100%;
-        }
+        .custom-btn:hover::before { left: 100%; }
 
-        /* Estado Hover del botón */
         .custom-btn:hover {
-            color: var(--gold-glow);
             border-color: var(--neon-green);
-            transform: translateY(-4px);
-            box-shadow: 0 0 15px var(--light-green), 
-                        0 0 25px rgba(57, 255, 20, 0.4);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(57, 255, 20, 0.25), 0 0 15px rgba(29, 99, 77, 0.6);
+            color: var(--neon-green);
         }
 
-        .custom-btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 0 8px var(--light-green);
+        /* BOTONES EXCLUSIVOS */
+        .btn-grandes-exitos {
+            border-color: var(--gold);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+            animation: goldPulse 4s infinite alternate;
         }
 
-        /* Ajustes para pantallas pequeñas (Móviles) */
+        @keyframes goldPulse {
+            0% { border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+            100% { border-color: #ffffff; box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+        }
+
+        .btn-grandes-exitos .coin-icon {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #fff, #ffd700 60%, #866205);
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            transform: rotateY(-20deg) rotateZ(10deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6), 0 0 8px #ffd700;
+            z-index: 2;
+        }
+
+        .btn-grandes-exitos .coin-icon::after {
+            content: 'Y';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #614603;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .btn-grandes-exitos:hover { background: linear-gradient(135deg, var(--primary-green), #ffd700); color: #000000; font-weight: 800; }
+
+        .btn-plata .silver-sparkle {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            transform: rotate(45deg);
+            box-shadow: 0 0 12px 4px #ffffff;
+        }
+
+        .btn-donaciones { border-color: #ff416c; }
+        .btn-donaciones .heart-icon { margin-right: 8px; animation: heartbeat 1.4s infinite; display: inline-block; }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            20% { transform: scale(1.3); }
+            40% { transform: scale(1.15); }
+            60% { transform: scale(1.4); }
+        }
+
+        .btn-donaciones:hover { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #fff; }
+
+        .btn-motivacion .rose-book-icon { margin-right: 8px; animation: floatingMystic 3s infinite ease-in-out; display: inline-block; }
+
+        @keyframes floatingMystic {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(-6deg); }
+        }
+
+        /* SECCIONES NUMÉRICAS PREMIUM */
+        .btn-num {
+            font-family: monospace;
+            font-size: 0.95rem;
+            background: linear-gradient(135deg, #09110d, #0f1d18);
+            border: 1px solid rgba(57, 255, 20, 0.15);
+        }
+        .btn-num span { color: var(--gold); margin-right: 6px; font-weight: bold; }
+
+        /* LA ROCOLA PAGER JUKEBOX */
+        .pager-jukebox-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 4rem;
+            padding: 0 1rem;
+        }
+
+        .pager-body {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(135deg, #0f1612, #18241d);
+            border: 4px solid var(--gold);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.85), 0 0 25px rgba(212, 175, 55, 0.15);
+            position: relative;
+        }
+
+        .pager-top-buttons {
+            display: flex;
+            gap: 12px;
+            position: absolute;
+            top: -15px;
+            right: 30px;
+        }
+
+        .pager-phys-btn {
+            background: linear-gradient(to bottom, #333, #111);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            border-radius: 4px 4px 0 0;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 4px 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+        }
+
+        .pager-screen {
+            width: 100%;
+            height: 150px;
+            background-color: #04120a;
+            border: 4px solid #000;
+            border-radius: 8px;
+            display: flex;
+            padding: 12px;
+            box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .vinyl-area {
+            width: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-right: 2px dashed rgba(57, 255, 20, 0.2);
+            padding-right: 12px;
+        }
+
+        .vinyl-disk {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #000 35%, #222 40%, #111 50%, #222 60%, #000 70%);
+            border: 2px solid #222;
+            position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+            background-size: cover;
+            background-position: center;
+            transition: all 0.5s ease;
+        }
+
+        .vinyl-center {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background-color: var(--gold);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #000;
+            transition: background-color 0.5s ease;
+        }
+
+        .vinyl-disk.playing { animation: spinVinyl 2.5s linear infinite; }
+
+        @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
+
+        .pager-lcd-text {
+            flex-grow: 1;
+            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .pager-status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--light-green);
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            padding-bottom: 4px;
+        }
+
+        .pager-message {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+            text-transform: uppercase;
+            word-break: break-word;
+            line-height: 1.4;
+            margin-top: 8px;
+            height: 100%;
+        }
+
+        .pager-input-panel { display: flex; margin-top: 18px; gap: 12px; }
+
+        #pager-search {
+            flex-grow: 1;
+            background-color: #030605;
+            border: 2px solid var(--gold);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        #pager-search:focus { border-color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.4); }
+
+        #pager-submit-btn {
+            background: linear-gradient(135deg, var(--primary-green), #0a110e);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            border-radius: 6px;
+            padding: 0 18px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        #pager-submit-btn:hover { background: var(--gold); color: #000000; }
+
+        /* FOOTER SOCIAL */
+        .social-footer {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: auto;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            text-align: center;
+        }
+
+        .social-title {
+            font-size: 1.4rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+        }
+
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.9rem 1.8rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            background: #090f0c;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-x { border-color: rgba(212, 175, 55, 0.4); }
+        .btn-x:hover {
+            color: var(--gold-glow);
+            border-color: var(--gold);
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 0 25px var(--gold), 0 0 40px rgba(57, 255, 20, 0.4);
+        }
+
+        .btn-patreon { border-color: rgba(249, 104, 84, 0.4); }
+        .btn-patreon:hover {
+            color: #ff8b77;
+            border-color: #f96854;
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 0 25px #f96854;
+        }
+
+        .btn-r34 { border-color: rgba(57, 255, 20, 0.3); }
+        .btn-r34:hover {
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 0 25px var(--neon-green);
+        }
+
+        .r34-logo-box {
+            font-family: 'Impact', sans-serif;
+            font-size: 13px;
+            background: #ff4500;
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-discord {
+            border-color: rgba(114, 137, 218, 0.4);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .social-icon { width: 20px; height: 20px; }
+
         @media (max-width: 600px) {
-            .flag-title {
-                font-size: 1.6rem;
-                padding: 1rem 0.5rem;
-            }
-            
-            .button-grid {
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-                gap: 1rem;
-            }
-
-            .custom-btn {
-                padding: 1rem 0.5rem;
-                font-size: 0.85rem;
-            }
+            .sparkle-glow-title { font-size: 1.9rem; }
+            .button-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+            .square-clock { width: 300px; height: 210px; }
+            #clock-time { font-size: 2.5rem; }
         }
-		/* ==========================================================================
-   BOTÓN 1: GRANDES ÉXITOS (EDITS)
-   ========================================================================== */
-
-.btn-grandes-exitos {
-    background: linear-gradient(135deg, #1a1a1a, var(--primary-green));
-    border: 3px solid #ffd700; /* Marco de Oro Puro */
-    position: relative;
-    overflow: visible; /* Permitimos que la moneda sobresalga arriba */
-    
-    /* Efecto de brillo dorado constante (Glow) */
-    box-shadow: 
-        0 0 15px rgba(212, 175, 55, 0.4),
-        inset 0 0 15px rgba(212, 175, 55, 0.2);
-    animation: goldPulse 3s infinite alternate;
-}
-
-/* Animación de pulsación del brillo dorado del botón */
-@keyframes goldPulse {
-    0% {
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2);
-        border-color: #d4af37;
-    }
-    100% {
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.4);
-        border-color: #fff;
-    }
-}
-
-/* --- LA MONEDA DE ORO INCLINADA --- */
-.btn-grandes-exitos .coin-icon {
-    position: absolute;
-    top: -18px; /* Hace que flote sobre el marco superior */
-    left: 20px;
-    width: 32px;
-    height: 32px;
-    background: radial-gradient(circle at 30% 30%, #fff 0%, #ffd700 50%, #b8860b 100%);
-    border-radius: 50%;
-    border: 2px solid #fff;
-    
-    /* Inclinación 3D realista y sombra proyectada en el botón */
-    transform: rotateX(20deg) rotateY(-25deg) rotateZ(10deg);
-    box-shadow: 3px 5px 8px rgba(0, 0, 0, 0.7), 0 0 10px #ffd700;
-    z-index: 10;
-    transition: transform 0.3s ease;
-}
-
-/* Detalle interno de la moneda (el relieve del centro) */
-.btn-grandes-exitos .coin-icon::after {
-    content: '$'; /* Símbolo o relieve central */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #b8860b;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    text-shadow: 1px 1px 0px #fff;
-}
-
-/* --- EFECTO SPARKLES (PARTÍCULAS DE BRILLO FLOTANTES) --- */
-/* Usamos ::after del botón para generar destellos de luz brillantes */
-.btn-grandes-exitos::after {
-    content: '✦';
-    position: absolute;
-    color: #fff;
-    font-size: 14px;
-    text-shadow: 0 0 8px #ffd700, 0 0 15px #fff;
-    opacity: 0;
-    animation: sparkleFloat 4s infinite linear;
-}
-
-@keyframes sparkleFloat {
-    0% {
-        top: 80%;
-        left: 10%;
-        opacity: 0;
-        transform: scale(0.5) rotate(0deg);
-    }
-    30% {
-        opacity: 1;
-        transform: scale(1.2) rotate(90deg);
-    }
-    60% {
-        top: 20%;
-        left: 85%;
-        opacity: 1;
-        transform: scale(0.8) rotate(180deg);
-    }
-    100% {
-        top: -10%;
-        left: 50%;
-        opacity: 0;
-        transform: scale(0.2) rotate(360deg);
-    }
-}
-
-/* --- COMPORTAMIENTO HOVER (Al pasar el mouse) --- */
-.btn-grandes-exitos:hover {
-    transform: translateY(-5px);
-    background: linear-gradient(135deg, var(--primary-green), #ffd700);
-    color: #000; /* El texto cambia a negro para contrastar con el fondo dorado */
-    font-weight: bold;
-}
-
-/* Al pasar el mouse, la moneda reacciona e imita un giro */
-.btn-grandes-exitos:hover .coin-icon {
-    transform: rotateX(10deg) rotateY(-10deg) rotateZ(45deg) scale(1.1);
-    box-shadow: 0 0 20px #fff;
-}
-/* Corrección para que los enlaces no parezcan links de texto comunes */
-.button-grid a.custom-btn {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* ==========================================================================
-   BOTÓN 2: PLATINO / PLATA (Brillito tipo plata en la esquina)
-   ========================================================================== */
-.btn-plata {
-    background: linear-gradient(135deg, #1f2421, #4f5d75);
-    border: 3px solid #bfc0c0; /* Marco Plateado */
-    box-shadow: 0 0 15px rgba(191, 192, 192, 0.3);
-}
-
-/* El destello/brillito plateado fijo en la esquina superior derecha */
-.btn-plata .silver-sparkle {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 20px;
-    height: 20px;
-    background: #ffffff;
-    transform: rotate(45deg);
-    box-shadow: 0 0 15px 5px #ffffff, 0 0 30px 10px rgba(191,192,192,0.8);
-    animation: silverBlink 2s infinite alternate;
-}
-
-@keyframes silverBlink {
-    0% { transform: rotate(45deg) scale(0.8); opacity: 0.7; }
-    100% { transform: rotate(45deg) scale(1.2); opacity: 1; }
-}
-
-.btn-plata:hover {
-    background: linear-gradient(135deg, #4f5d75, #bfc0c0);
-    color: #000;
-    box-shadow: 0 0 25px #ffffff;
-}
-
-/* ==========================================================================
-   BOTÓN 3: DONACIONES (Temática de generosidad/Cueva lujosa)
-   ========================================================================== */
-.btn-donaciones {
-    background: linear-gradient(135deg, #140d1a, #4a154b);
-    border: 3px solid #ff416c; /* Marco Rubí/Rosa pasional */
-    box-shadow: 0 0 15px rgba(255, 65, 108, 0.4);
-}
-
-.btn-donaciones .heart-icon {
-    position: absolute;
-    top: -15px;
-    right: 15px;
-    font-size: 22px;
-    filter: drop-shadow(0 0 8px #ff416c);
-    animation: heartbeat 1.2s infinite;
-}
-
-@keyframes heartbeat {
-    0% { transform: scale(1); }
-    20% { transform: scale(1.25); }
-    40% { transform: scale(1.1); }
-    60% { transform: scale(1.35); }
-    80% { transform: scale(1); }
-    100% { transform: scale(1); }
-}
-
-.btn-donaciones:hover {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
-    color: #fff;
-    box-shadow: 0 0 25px #ff416c;
-}
-
-/* ==========================================================================
-   BOTÓN 4: FRASES MOTIVACIONALES (Rosa y Libro)
-   ========================================================================== */
-.btn-motivacion {
-    background: linear-gradient(135deg, #0d1a14, #1b4d3e);
-    border: 3px solid #a3b19b; /* Marco verde salvia/pergamino antiguo */
-    box-shadow: 0 0 15px rgba(45, 138, 107, 0.4);
-}
-
-/* Contenedor del emoji de la Rosa y el Libro flotando juntos */
-.btn-motivacion .rose-book-icon {
-    position: absolute;
-    top: -18px;
-    left: 15px;
-    font-size: 20px;
-    letter-spacing: -5px; /* Junta los dos emojis un poco */
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
-    animation: floatingMystic 3s infinite ease-in-out;
-}
-
-@keyframes floatingMystic {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-6px) rotate(-5deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
-}
-
-.btn-motivacion:hover {
-    background: linear-gradient(135deg, var(--light-green), var(--gold));
-    color: #0a0f0d;
-    box-shadow: 0 0 25px var(--gold);
-}
-.social-footer {
-    width: 100%;
-    max-width: 1000px;
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(212, 175, 55, 0.2);
-    text-align: center;
-}
-
-.social-title {
-    font-size: 1.5rem;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-}
-
-.social-container {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-    padding: 1rem;
-}
-
-/* Base viva para los botones de redes */
-.social-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: #ffffff;
-    font-weight: bold;
-    padding: 0.8rem 1.8rem;
-    border-radius: 50px;
-    font-size: 1rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background: #121b16;
-    border: 2px solid transparent;
-    
-    /* Animación constante para darles vida (latido suave) */
-    animation: constantFloat 4s infinite ease-in-out;
-}
-
-@keyframes constantFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-}
-
-/* Variar el tiempo de animación para que no floten todos rígidos al mismo tiempo */
-.btn-patreon { animation-delay: 0.5s; }
-.btn-r34 { animation-delay: 1s; }
-
-/* SVGs adaptables */
-.social-icon {
-    width: 22px;
-    height: 22px;
-    transition: transform 0.3s ease;
-}
-
-/* Logo exclusivo para R34video estilo reproductor */
-.r34-logo-box {
-    font-family: 'Impact', 'Arial Black', sans-serif;
-    font-size: 14px;
-    background: #ff4500; /* Naranja/Rojo ardiente */
-    color: #fff;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 5px #ff4500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.r34-logo-box span {
-    font-size: 10px; /* Flecha de play un poco más pequeña */
-    color: #fff;
-}
-
-/* ==========================================================================
-   BRILLOS ESPECÍFICOS Y COMPORTAMIENTO (HOVER)
-   ========================================================================== */
-
-/* 1. X (Twitter) - Resplandor Dorado y Verde del Título */
-.btn-x {
-    border-color: rgba(212, 175, 55, 0.4);
-}
-.btn-x:hover {
-    color: var(--gold-glow);
-    border-color: var(--gold);
-    background: #16221c;
-    transform: scale(1.1) translateY(-4px);
-    /* Emanación de doble resplandor: Dorado y Verde Neón */
-    box-shadow: 
-        0 0 20px var(--gold),
-        0 0 40px rgba(57, 255, 20, 0.5),
-        inset 0 0 10px var(--gold);
-}
-
-/* 2. Patreon - Resplandor Naranja */
-.btn-patreon {
-    border-color: rgba(249, 104, 84, 0.4);
-}
-.btn-patreon:hover {
-    color: #ff8b77;
-    border-color: #f96854;
-    background: #231210;
-    transform: scale(1.1) translateY(-4px);
-    /* Emanación de resplandor Naranja */
-    box-shadow: 
-        0 0 20px #f96854,
-        0 0 40px rgba(249, 104, 84, 0.6),
-        inset 0 0 10px #f96854;
-}
-
-/* 3. Rule34 Video - Resplandor Verde Neón Extremo */
-.btn-r34 {
-    border-color: rgba(57, 255, 20, 0.3);
-}
-.btn-r34:hover {
-    color: var(--neon-green);
-    border-color: var(--neon-green);
-    background: #0f2113;
-    transform: scale(1.1) translateY(-4px);
-    /* Emanación de resplandor Verde Neón */
-    box-shadow: 
-        0 0 20px var(--neon-green),
-        0 0 40px rgba(57, 255, 20, 0.7),
-        inset 0 0 10px var(--neon-green);
-}
-
-/* Rotación o animación de los iconos en Hover */
-.social-btn:hover .social-icon {
-    transform: rotate(8deg) scale(1.15);
-}
-.social-btn:hover .r34-logo-box {
-    animation: r34Shake 0.3s infinite alternate;
-}
-
-@keyframes r34Shake {
-    0% { transform: rotate(-5deg); }
-    100% { transform: rotate(5deg); }
-}
-
-/* Ajuste móvil */
-@media (max-width: 600px) {
-    .social-container {
-        gap: 1rem;
-    }
-    .social-btn {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.9rem;
-    }
-}
-/* ==========================================================================
-   DESPERTADOR DIGITAL CUADRADO RETRO
-   ========================================================================== */
-
-.square-clock-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 3rem;
-    position: relative;
-    perspective: 1000px;
-}
-
-/* El chasis cuadrado del reloj */
-.square-clock {
-    width: 320px;
-    height: 220px;
-    background: linear-gradient(135deg, #1b2e24, #0a0f0d);
-    border: 5px solid var(--gold);
-    border-radius: 16px;
-    position: relative;
-    padding: 15px;
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.9), 
-        0 0 30px rgba(212, 175, 55, 0.25),
-        inset 0 0 15px rgba(0, 0, 0, 0.8);
-    cursor: pointer;
-    user-select: none;
-    transform: rotateX(5deg);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.square-clock:hover {
-    transform: rotateX(0deg) scale(1.02);
-    box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.95), 
-        0 0 40px rgba(212, 175, 55, 0.4);
-}
-
-.square-clock:active {
-    transform: scale(0.98);
-}
-
-/* Botón superior de SNOOZE */
-.snooze-btn {
-    position: absolute;
-    top: -16px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(to bottom, #fff 0%, var(--gold) 60%, #8a6f1c 100%);
-    border: 2px solid #000;
-    border-radius: 8px 8px 0 0;
-    padding: 3px 25px;
-    font-size: 0.65rem;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    color: #000;
-    text-transform: uppercase;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-    z-index: 5;
-    transition: transform 0.1s ease;
-}
-
-.square-clock:active .snooze-btn {
-    top: -12px;
-}
-
-/* Pantalla LCD interna */
-.clock-screen {
-    width: 100%;
-    height: 100%;
-    background-color: #05140b;
-    border: 3px solid #000;
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.15);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Animación de "pestañeo/glitch" al cambiar el formato */
-.clock-screen.glitch-flash {
-    animation: screenGlitch 0.2s ease-out;
-}
-
-@keyframes screenGlitch {
-    0% { opacity: 0.3; background-color: #0a2d18; filter: hue-rotate(90deg); }
-    50% { opacity: 0.8; background-color: #0d4223; }
-    100% { opacity: 1; background-color: #05140b; filter: hue-rotate(0deg); }
-}
-
-/* Efecto reflejo de cristal */
-.clock-screen::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
-    pointer-events: none;
-}
-
-/* Cabecera de la pantalla */
-.screen-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: monospace;
-    font-size: 0.75rem;
-}
-
-#clock-format {
-    color: var(--light-green);
-    letter-spacing: 1px;
-}
-
-/* "Te veo" en verde neón parpadeante */
-.eye-spy {
-    color: var(--neon-green);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px var(--neon-green);
-    animation: digitalBlink 1s infinite alternate ease-in-out;
-}
-
-@keyframes digitalBlink {
-    0% { opacity: 0.2; text-shadow: 0 0 2px var(--neon-green); }
-    100% { opacity: 1; text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green); }
-}
-
-/* Hora digital gigante central */
-#clock-time {
-    font-size: 2.8rem;
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
-    color: var(--neon-green);
-    text-shadow: 0 0 15px rgba(57, 255, 20, 0.8);
-    text-align: center;
-    letter-spacing: 1px;
-}
-
-/* Footer de la pantalla */
-.screen-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    font-family: monospace;
-    font-size: 0.72rem;
-    border-top: 1px solid rgba(45, 138, 107, 0.3);
-    padding-top: 5px;
-    gap: 10px;
-}
-
-#clock-location {
-    color: #fff;
-    text-align: left;
-    max-width: 65%;
-    white-space: normal; /* Permite el salto de línea para mostrar completo */
-    overflow: hidden;
-    line-height: 1.1;
-}
-
-#clock-weather {
-    color: var(--gold-glow);
-    text-align: right;
-    text-shadow: 0 0 5px rgba(212, 175, 55, 0.6);
-    flex-shrink: 0;
-}
-
-/* Patas de soporte metálicas */
-.stand-left, .stand-right {
-    position: absolute;
-    width: 14px;
-    height: 25px;
-    background: linear-gradient(to right, #2a2a2a, var(--gold), #5c4a13);
-    bottom: -18px;
-    z-index: -1;
-    border-radius: 4px;
-    border: 1.5px solid #000;
-}
-.stand-left { left: 45px; transform: rotate(15deg); }
-.stand-right { right: 45px; transform: rotate(-15deg); }
-
-/* Adaptación móvil */
-@media (max-width: 600px) {
-    .square-clock {
-        width: 290px;
-        height: 200px;
-        padding: 10px;
-    }
-    #clock-time {
-        font-size: 2.3rem;
-    }
-    .screen-footer {
-        font-size: 0.65rem;
-    }
-}
-/* ==========================================================================
-   ROCOLA PAGER RETRO MINIMALISTA
-   ========================================================================== */
-
-.pager-jukebox-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 3rem 0;
-    padding: 0 1rem;
-}
-
-/* Cuerpo plástico del Pager */
-.pager-body {
-    width: 100%;
-    max-width: 480px;
-    background: linear-gradient(135deg, #121814, #1c2620);
-    border: 4px solid var(--gold);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.1);
-    position: relative;
-}
-
-/* Botones de volumen arriba */
-.pager-top-buttons {
-    display: flex;
-    gap: 10px;
-    position: absolute;
-    top: -15px;
-    right: 30px;
-}
-
-.pager-phys-btn {
-    background: linear-gradient(to bottom, #444, #111);
-    color: var(--gold);
-    border: 2px solid var(--gold);
-    border-radius: 6px 6px 0 0;
-    font-size: 0.65rem;
-    font-weight: bold;
-    padding: 3px 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 5px rgba(0,0,0,0.5);
-}
-.pager-phys-btn:active {
-    transform: translateY(2px);
-}
-
-/* Pantalla del Pager */
-.pager-screen {
-    width: 100%;
-    height: 140px;
-    background-color: #081a0f; /* Verde cristal LCD oscuro */
-    border: 4px solid #000;
-    border-radius: 10px;
-    display: flex;
-    padding: 10px;
-    box-shadow: inset 0 0 15px rgba(0,255,0,0.2);
-    overflow: hidden;
-}
-
-/* --- ZONA IZQUIERDA: DISCO VINILO --- */
-.vinyl-area {
-    width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border-right: 2px dashed rgba(57, 255, 20, 0.2);
-    padding-right: 10px;
-}
-
-.vinyl-disk {
-    width: 95px;
-    height: 95px;
-    border-radius: 50%;
-    /* Reemplaza este background por la URL de tu imagen de vinilo propia */
-    background: radial-gradient(circle, #000 35%, #222 40%, #111 50%, #222 60%, #000 70%);
-    border: 2px solid #333;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-}
-
-/* Centro del vinilo (Galleta/Label del álbum) */
-.vinyl-center {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background-color: var(--gold); /* Cambiará dinámicamente con JS */
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 2px solid #000;
-    transition: background-color 0.5s ease;
-}
-
-/* Animación de Rotación Infinita */
-.vinyl-disk.playing {
-    animation: spinVinyl 3s linear infinite;
-}
-
-@keyframes spinVinyl {
-    100% { transform: rotate(360deg); }
-}
-
-/* --- ZONA DERECHA: TEXTO MENSAJE --- */
-.pager-lcd-text {
-    flex-grow: 1;
-    padding-left: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    font-family: 'Courier New', Courier, monospace;
-}
-
-.pager-status-bar {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: var(--light-green);
-    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
-    padding-bottom: 4px;
-}
-
-.pager-message {
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: var(--neon-green);
-    text-shadow: 0 0 8px var(--neon-green);
-    text-transform: uppercase;
-    word-break: break-word;
-    line-height: 1.3;
-    margin-top: 10px;
-    height: 100%;
-}
-
-/* Panel inferior para escribir canción */
-.pager-input-panel {
-    display: flex;
-    margin-top: 15px;
-    gap: 10px;
-}
-
-#pager-search {
-    flex-grow: 1;
-    background-color: #050807;
-    border: 2px solid var(--gold);
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: #fff;
-    font-family: monospace;
-    font-size: 0.9rem;
-    outline: none;
-}
-#pager-search:focus {
-    border-color: var(--neon-green);
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-}
-
-#pager-submit-btn {
-    background: linear-gradient(135deg, var(--primary-green), #121b16);
-    color: var(--gold);
-    border: 2px solid var(--gold);
-    border-radius: 8px;
-    padding: 0 15px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-}
-#pager-submit-btn:hover {
-    background: var(--gold);
-    color: #000;
-}
-
-/* Pantalla Móvil */
-@media (max-width: 480px) {
-    .pager-screen { height: 160px; }
-    .vinyl-disk { width: 80px; height: 80px; }
-    .pager-message { font-size: 0.85rem; }
-}
-</style>
+    </style>
 </head>
 <body>
 
-   <div class="header-container">
-    <h1 class="sparkle-glow-title">
-        <span class="phrase-1">Yaoi Porn Lover's</span>
-        <span class="phrase-2">Cave of Pleasure</span>
-    </h1>
-</div>
-<div class="alarm-clock-wrapper">
-    <div class="alarm-clock" id="clock-trigger" title="Haz clic para cambiar formato 12h/24h">
-        <div class="bell bell-left"></div>
-        <div class="bell bell-right"></div>
-        <div class="handle"></div>
-        
-        <div class="clock-face">
-            <div id="clock-format">24H</div>
-            <div id="clock-time">00:00:00</div>
-            <div id="clock-location">Detectando ubicación...</div>
-            <div id="clock-weather">Cargando clima...</div>
+    <header class="header-container">
+        <h1 class="sparkle-glow-title">
+            <span class="phrase-1">Yaoi Porn Lover's</span>
+            <span class="phrase-2">Cave of Pleasure</span>
+        </h1>
+    </header>
+
+    <section class="square-clock-wrapper">
+        <div class="square-clock" id="clock-trigger" title="Haz clic para cambiar formato 12h/24h">
+            <div class="snooze-btn">SNOOZE / FORMAT</div>
+            <div class="clock-screen" id="clock-screen">
+                <div class="screen-header">
+                    <div id="clock-format">FORMATO: 24H</div>
+                    <div class="eye-spy">Te veo</div>
+                </div>
+                <div id="clock-time">00:00:00</div>
+                <div class="screen-footer">
+                    <div id="clock-location">Detectando entorno...</div>
+                    <div id="clock-weather">--°C ☀️</div>
+                </div>
+            </div>
+            <div class="stand-left"></div>
+            <div class="stand-right"></div>
         </div>
-        
-        <div class="foot foot-left"></div>
-        <div class="foot foot-right"></div>
-        
-        <div class="eye-spy">Te veo</div>
-    </div>
-</div>
+    </section>
 
-<main class="button-grid">
-    <a href="Grandes exitos.html" class="custom-btn btn-grandes-exitos">
-        <div class="coin-icon"></div>
-        <span class="btn-text">Grandes Éxitos (Edits)</span>
-    </a>
+    <main class="button-grid">
+        <a href="Grandes exitos.html" class="custom-btn btn-grandes-exitos">
+            <div class="coin-icon"></div>
+            <span>Grandes Éxitos (Edits)</span>
+        </a>
 
-    <a href="Plata.html" class="custom-btn btn-plata">
-        <div class="silver-sparkle"></div>
-        <span class="btn-text">Edits Varios</span>
-    </a>
+        <a href="Plata.html" class="custom-btn btn-plata">
+            <div class="silver-sparkle"></div>
+            <span>Edits Varios</span>
+        </a>
 
-    <a href="Donaciones.html" class="custom-btn btn-donaciones">
-        <span class="heart-icon">❤️</span> Donaciones
-    </a>
+        <a href="Donaciones.html" class="custom-btn btn-donaciones">
+            <span class="heart-icon">❤️</span> Donaciones
+        </a>
 
-    <a href="Motivacion.html" class="custom-btn btn-motivacion">
-        <span class="rose-book-icon">🌹📖</span> Frases Motivacionales
-    </a>
+        <a href="Motivacion.html" class="custom-btn btn-motivacion">
+            <span class="rose-book-icon">🌹📖</span> Frases Motivacionales
+        </a>
+
+        <!-- Secciones de la 05 a la 20 Optimizadas Semánticamente -->
+        <a href="arcade.html" class="custom-btn btn-num"><span>[05]</span>Arcade</a>  
     </main>
-	
-        <button class="custom-btn">Sección 05</button>
-        <button class="custom-btn">Sección 06</button>
-        <button class="custom-btn">Sección 07</button>
-        <button class="custom-btn">Sección 08</button>
-        <button class="custom-btn">Sección 09</button>
-        <button class="custom-btn">Sección 10</button>
-        <button class="custom-btn">Sección 11</button>
-        <button class="custom-btn">Sección 12</button>
-        <button class="custom-btn">Sección 13</button>
-        <button class="custom-btn">Sección 14</button>
-        <button class="custom-btn">Sección 15</button>
-        <button class="custom-btn">Sección 16</button>
-        <button class="custom-btn">Sección 17</button>
-        <button class="custom-btn">Sección 18</button>
-        <button class="custom-btn">Sección 19</button>
-        <button class="custom-btn">Sección 20</button>
-    <div class="pager-jukebox-wrapper">
-    <div class="pager-body">
-        
-        <div class="pager-top-buttons">
-            <button class="pager-phys-btn" id="vol-up-btn" title="Subir Volumen">▲ VOL</button>
-            <button class="pager-phys-btn" id="vol-down-btn" title="Bajar Volumen">▼ VOL</button>
-        </div>
 
-        <div class="pager-screen">
-            
-            <div class="vinyl-area">
-                <div class="vinyl-disk playing" id="vinyl-disk">
-                    <div class="vinyl-center"></div>
+    <section class="pager-jukebox-wrapper">
+        <div class="pager-body">
+            <div class="pager-top-buttons">
+                <button class="pager-phys-btn" id="vol-up-btn">▲ VOL</button>
+                <button class="pager-phys-btn" id="vol-down-btn">▼ VOL</button>
+            </div>
+            <div class="pager-screen">
+                <div class="vinyl-area">
+                    <div class="vinyl-disk" id="vinyl-disk">
+                        <div class="vinyl-center"></div>
+                    </div>
+                </div>
+                <div class="pager-lcd-text">
+                    <div class="pager-status-bar">
+                        <span id="pager-track-num">PAGER-00</span>
+                        <span id="pager-vol-display">VOL: 80%</span>
+                    </div>
+                    <div class="pager-message" id="pager-song-title">
+                        Escribe Cód. o Nombre en el Transmisor...
+                    </div>
                 </div>
             </div>
-            
-            <div class="pager-lcd-text">
-                <div class="pager-status-bar">
-                    <span id="pager-track-num">PAGER-01</span>
-                    <span id="pager-vol-display">VOL: 80%</span>
-                </div>
-                <div class="pager-message" id="pager-song-title">
-                    INSERTE CÓDIGO O NOMBRE DE PISTA...
-                </div>
+            <div class="pager-input-panel">
+                <input type="text" id="pager-search" placeholder="Escribe Nº o Nombre..." autocomplete="off">
+                <button id="pager-submit-btn">TRANSMITIR</button>
             </div>
-            
         </div>
+    </section>
 
-        <div class="pager-input-panel">
-            <input type="text" id="pager-search" placeholder="Escribe Nº o Nombre..." autocomplete="off">
-            <button id="pager-submit-btn">TRANSMITIR</button>
+    <audio id="jukebox-audio" loop></audio>
+
+    <footer class="social-footer">
+        <h2 class="social-title">Únete a la Comunidad y sé tan sexy como los Edits uwu</h2>
+        <div class="social-container">
+            <a href="https://x.com/@YaoiPornLover" target="_blank" class="social-btn btn-x">
+                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                <span>X / Twitter</span>
+            </a>
+
+            <a href="https://www.patreon.com/cw/YaoiPornLover" target="_blank" class="social-btn btn-patreon">
+                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M0 .48v23.04h4.13V.48H0zm12.42 0c-5.18 0-9.39 4.21-9.39 9.39 0 5.17 4.21 9.39 9.39 9.39 5.17 0 9.39-4.22 9.39-9.39 0-5.18-4.22-9.39-9.39-9.39z"/>
+                </svg>
+                <span>Patreon</span>
+            </a>
+
+            <a href="https://rule34video.com/members/493432/" target="_blank" class="social-btn btn-r34">
+                <div class="r34-logo-box">R34 <span>▶</span></div>
+                <span>Rule34 Video</span>
+            </a>
+
+            <a href="#" class="social-btn btn-discord" onclick="return false;">
+                <span>Discord (Próximamente)</span>
+            </a>
         </div>
+    </footer>
 
-    </div>
-</div>
+    <script>
+        // SISTEMA DEL RELOJ DIGITAL RETRO
+        let is24HourFormat = true;
+        let timeZone = "UTC";
+        const clockScreen = document.getElementById('clock-screen');
 
-<audio id="jukebox-audio" loop></audio>
+        document.getElementById('clock-trigger').addEventListener('click', () => {
+            is24HourFormat = !is24HourFormat;
+            clockScreen.classList.remove('glitch-flash');
+            void clockScreen.offsetWidth; 
+            clockScreen.classList.add('glitch-flash');
+            updateClock();
+        });
 
-	</main>
-	
-<footer class="social-footer">
-    <h2 class="social-title">Únete a la Comunidad y se tan sexy como los Edits uwu</h2>
-    <div class="social-container">
-        
-        <a href="https://x.com/@YaoiPornLover" target="_blank" class="social-btn btn-x" aria-label="X Twitter">
-            <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-            <span class="social-text">X / Twitter</span>
-        </a>
-
-        <a href="https://www.patreon.com/cw/YaoiPornLover" target="_blank" class="social-btn btn-patreon" aria-label="Patreon">
-            <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M0 .48v23.04h4.13V.48H0zm12.42 0c-5.18 0-9.39 4.21-9.39 9.39 0 5.17 4.21 9.39 9.39 9.39 5.17 0 9.39-4.22 9.39-9.39 0-5.18-4.22-9.39-9.39-9.39z"/>
-            </svg>
-            <span class="social-text">Patreon</span>
-        </a>
-
-       <a href="https://rule34video.com/members/493432/" target="_blank" class="social-btn btn-r34" aria-label="Rule34 Video">
-    <div class="r34-logo-box">R34 <span>▶</span></div>
-    <span class="social-text">Rule34 Video</span>
-</a>
-<button class="custom-btn">Discord (Proximamente)</button>
-
-    </div>
-</footer>
-<script>
-    let is24HourFormat = true;
-    let timeZone = "UTC"; // Por defecto antes de detectar
-
-    const clockScreen = document.getElementById('clock-screen');
-
-    // 1. Alternar Formato al hacer Clic con efecto Glitch/Flash visual
-    document.getElementById('clock-trigger').addEventListener('click', () => {
-        is24HourFormat = !is24HourFormat;
-        
-        // Disparador del efecto de brillo/pestañeo al hacer clic
-        clockScreen.classList.remove('glitch-flash');
-        void clockScreen.offsetWidth; // Forzar reflujo de CSS para reiniciar la animación
-        clockScreen.classList.add('glitch-flash');
-        
-        updateClock();
-    });
-
-    // 2. Actualización de la Hora en base a la Zona Horaria del visitante
-    function updateClock() {
-        const now = new Date();
-        
-        try {
-            const formatter = new Intl.DateTimeFormat('es-ES', {
-                timeZone: timeZone,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: !is24HourFormat
-            });
-            
-            let timeString = formatter.format(now);
-            document.getElementById('clock-format').innerText = is24HourFormat ? "FORMATO: 24H" : "FORMATO: 12H";
-            document.getElementById('clock-time').innerText = timeString;
-        } catch (e) {
-            // Fallback si la zona horaria capturada tiene algún formato extraño
-            const localTimeString = now.toLocaleTimeString('es-ES', { hour12: !is24HourFormat });
-            document.getElementById('clock-time').innerText = localTimeString;
-        }
-    }
-
-    // 3. Rastreador Geográfico HTTPS (Usa ipwhois.io para mayor compatibilidad segura)
-    async function detectUserEnvironment() {
-        try {
-            // ipwhois.io es gratuito, soporta HTTPS nativo y no requiere API keys
-            const response = await fetch('https://ipwhois.app/json/');
-            const data = await response.json();
-            
-            if (data && data.success) {
-                timeZone = data.timezone;
-                
-                // Formato exacto solicitado: Ciudad, Estado/Región - País
-                // Por ejemplo: "Caracas, Distrito Capital - Venezuela" o "Buenos Aires, CABA - Argentina"
-                const locationText = `${data.city}, ${data.region}\n${data.country}`;
-                document.getElementById('clock-location').innerText = locationText;
-                
-                // Una vez ubicado con éxito, traemos el clima de Open-Meteo
-                getWeatherData(data.latitude, data.longitude);
-            } else {
-                // Si ipwhois falla, probamos el segundo servicio seguro (ipapi.co)
-                fallbackSecureMethod();
+        function updateClock() {
+            const now = new Date();
+            try {
+                const formatter = new Intl.DateTimeFormat('es-ES', {
+                    timeZone: timeZone,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: !is24HourFormat
+                });
+                document.getElementById('clock-format').innerText = is24HourFormat ? "FORMATO: 24H" : "FORMATO: 12H";
+                document.getElementById('clock-time').innerText = formatter.format(now);
+            } catch (e) {
+                document.getElementById('clock-time').innerText = now.toLocaleTimeString('es-ES', { hour12: !is24HourFormat });
             }
-        } catch (error) {
-            fallbackSecureMethod();
         }
-    }
 
-    // Método de respaldo seguro secundario
-    async function fallbackSecureMethod() {
-        try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            
-            if (data && !data.error) {
-                timeZone = data.timezone;
-                const locationText = `${data.city}, ${data.region}\n${data.country_name}`;
-                document.getElementById('clock-location').innerText = locationText;
-                getWeatherData(data.latitude, data.longitude);
-            } else {
+        async function detectUserEnvironment() {
+            try {
+                const response = await fetch('https://ipwhois.app/json/');
+                const data = await response.json();
+                if (data && data.success) {
+                    timeZone = data.timezone;
+                    document.getElementById('clock-location').innerText = `${data.city}, ${data.country}`;
+                    getWeatherData(data.latitude, data.longitude);
+                } else {
+                    useAbsoluteFallback();
+                }
+            } catch (error) {
                 useAbsoluteFallback();
             }
-        } catch (e) {
-            useAbsoluteFallback();
         }
-    }
 
-    // Si todo lo demás falla (ej. bloqueadores de anuncios extremos en el navegador)
-    function useAbsoluteFallback() {
-        // Obtenemos al menos la zona horaria nativa del sistema del navegador
-        timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const regionName = timeZone.split('/')[1] ? timeZone.split('/')[1].replace('_', ' ') : "Mundo";
-        
-        document.getElementById('clock-location').innerText = `${regionName}\nUbicación Local`;
-        document.getElementById('clock-weather').innerText = "Clima: ☀️ Templado";
-    }
+        function useAbsoluteFallback() {
+            timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const regionName = timeZone.split('/')[1] ? timeZone.split('/')[1].replace('_', ' ') : "Mundo";
+            document.getElementById('clock-location').innerText = `${regionName}, Local`;
+            document.getElementById('clock-weather').innerText = "24°C ⛅";
+        }
 
-    // 4. Obtener Pronóstico del Clima mediante coordenadas
-    async function getWeatherData(lat, lon) {
-        try {
-            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-            const data = await response.json();
-            if (data.current_weather) {
-                const temp = Math.round(data.current_weather.temperature);
-                const code = data.current_weather.weathercode;
-                
-                let condition = "☀️";
-                if (code >= 1 && code <= 3) condition = "⛅";
-                if (code >= 45 && code <= 48) condition = "🌫️";
-                if (code >= 51 && code <= 67) condition = "🌧️";
-                if (code >= 71 && code <= 77) condition = "❄️";
-                if (code >= 80 && code <= 82) condition = "🌧️";
-                if (code >= 95) condition = "⛈️";
-
-                document.getElementById('clock-weather').innerText = `${temp}°C ${condition}`;
+        async function getWeatherData(lat, lon) {
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const data = await response.json();
+                if (data.current_weather) {
+                    const temp = Math.round(data.current_weather.temperature);
+                    const code = data.current_weather.weathercode;
+                    let condition = "☀️";
+                    if (code >= 1 && code <= 3) condition = "⛅";
+                    if (code >= 51 && code <= 67) condition = "🌧️";
+                    if (code >= 95) condition = "⛈️";
+                    document.getElementById('clock-weather').innerText = `${temp}°C ${condition}`;
+                }
+            } catch (e) {
+                document.getElementById('clock-weather').innerText = "22°C ☀️";
             }
-        } catch (e) {
-            document.getElementById('clock-weather').innerText = "Clima N/A";
         }
-    }
-	
-    // Inicializar sistemas al cargar la web
-    detectUserEnvironment();
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
 
-<script>
-// BASE DE DATOS DE LA ROCOLA - 20 CANCIONES (Estructura corregida y limpia)
-const playlist = [
-    { 
-        id: "20", 
-        name: "persiana americana", 
-        title: "01. Soda Stereo - Persiana Americana", 
-        file: "https://tuservidor.com/musica/soda/persiana_obras_cumbres.mp3", 
-        color: "#d4af37", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/soda_obras_cumbres.png" 
-    },
-    { 
-        id: "21", 
-        name: "musica ligera", 
-        title: "02. Soda Stereo - De Musica Ligera", 
-        file: "https://tuservidor.com/musica/soda/musica_ligera_cancion_animal.mp3", 
-        color: "#bfc0c0", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/soda_cancion_animal.png" 
-    },
-    { 
-        id: "22", 
-        name: "donaciones", 
-        title: "03. Lujuria & Oro - Donaciones Track", 
-        file: "https://tuservidor.com/musica/donaciones.mp3", 
-        color: "#ff416c", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/donaciones_cueva.png" 
-    },
-    { 
-        id: "23", 
-        name: "muevan las industrias", 
-        title: "04. Los Prisioneros - Muevan las Industrias", 
-        file: "https://tuservidor.com/musica/prisioneros/muevan_las_industrias.mp3", 
-        color: "#222222", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/pateando_piedras.png" 
-    },
-    { 
-        id: "24", 
-        name: "tren al sur", 
-        title: "05. Los Prisioneros - Tren al Sur", 
-        file: "https://tuservidor.com/musica/prisioneros/tren_al_sur.mp3", 
-        color: "#3a7bd5", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/corazones.png" 
-    },
-    { 
-        id: "25", 
-        name: "el baile de los que sobran", 
-        title: "06. Los Prisioneros - El Baile de los que Sobran", 
-        file: "https://tuservidor.com/musica/prisioneros/baile_sobran.mp3", 
-        color: "#8b0000", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/pateando_piedras.png" 
-    },
-    { 
-        id: "26", 
-        name: "estrechez de corazon", 
-        title: "07. Los Prisioneros - Estrechez de Corazon", 
-        file: "https://tuservidor.com/musica/prisioneros/estrechez.mp3", 
-        color: "#e65c00", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/corazones.png" 
-    },
-    { 
-        id: "27", 
-        name: "corazones rojos", 
-        title: "08. Los Prisioneros - Corazones Rojos", 
-        file: "https://tuservidor.com/musica/prisioneros/corazones_rojos.mp3", 
-        color: "#dd1818", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/corazones.png" 
-    },
-    { 
-        id: "28", 
-        name: "la voz de los 80", 
-        title: "09. Los Prisioneros - La Voz de los '80", 
-        file: "https://tuservidor.com/musica/prisioneros/la_voz_de_los_80.mp3", 
-        color: "#4b6cb7", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/la_voz_de_los_80.png" 
-    },
-    { 
-        id: "29", 
-        name: "sexo", 
-        title: "10. Los Prisioneros - Sexo", 
-        file: "https://tuservidor.com/musica/prisioneros/sexo.mp3", 
-        color: "#9b59b6", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/la_voz_de_los_80.png" 
-    },
-    { 
-        id: "30", 
-        name: "paramar", 
-        title: "11. Los Prisioneros - Paramar", 
-        file: "https://tuservidor.com/musica/prisioneros/paramar.mp3", 
-        color: "#34495e", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/la_voz_de_los_80.png" 
-    },
-    { 
-        id: "31", 
-        name: "quieren dinero", 
-        title: "12. Los Prisioneros - Quieren Dinero", 
-        file: "https://tuservidor.com/musica/prisioneros/quieren_dinero.mp3", 
-        color: "#27ae60", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/pateando_piedras.png" 
-    },
-    { 
-        id: "32", 
-        name: "danza porque si", 
-        title: "13. Los Prisioneros - Danza Porque Si", 
-        file: "https://tuservidor.com/musica/prisioneros/danza_porque_si.mp3", 
-        color: "#f39c12", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/la_voz_de_los_80.png" 
-    },
-    { 
-        id: "33", 
-        name: "nada personal", 
-        title: "14. Soda Stereo - Nada Personal", 
-        file: "https://tuservidor.com/musica/soda/nada_personal.mp3", 
-        color: "#2980b9", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/nada_personal.png" 
-    },
-    { 
-        id: "34", 
-        name: "cuando pase el temblor", 
-        title: "15. Soda Stereo - Cuando Pase el Temblor", 
-        file: "https://tuservidor.com/musica/soda/temblor.mp3", 
-        color: "#16a085", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/nada_personal.png" 
-    },
-    { 
-        id: "35", 
-        name: "la ciudad de la furia", 
-        title: "16. Soda Stereo - En la Ciudad de la Furia", 
-        file: "https://tuservidor.com/musica/soda/ciudad_furia.mp3", 
-        color: "#1e272c", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/doble_vida.png" 
-    },
-    { 
-        id: "36", 
-        name: "zoom", 
-        title: "36. Soda Stereo - Zoom", 
-        file: "https://tuservidor.com/musica/soda/zoom.mp3", 
-        color: "#e84393", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/sueno_stereo.png" 
-    },
-    { 
-        id: "37", 
-        name: "ella uso mi cabeza", 
-        title: "18. Soda Stereo - Ella Uso Mi Cabeza Como Un Revolver", 
-        file: "https://tuservidor.com/musica/soda/ella_uso_mi_cabeza.mp3", 
-        color: "#6c5ce7", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/sueno_stereo.png" 
-    },
-    { 
-        id: "38", 
-        name: "juegos de seduccion", 
-        title: "19. Soda Stereo - Juegos de Seduccion", 
-        file: "https://tuservidor.com/musica/soda/juegos_seduccion.mp3", 
-        color: "#d35400", 
-        vinylImage: "https://tuservidor.com/imagenes/vinilos/nada_personal.png" 
-    },
-    { 
-        id: "39", 
-        name: "la cultura de la basura", 
-        title: "Los Prisioneros - La Cultura de la Basura", 
-        file: "https://archive.org/download/14-poder-elegir/02%20-%20La%20cultura%20de%20La%20Basura.mp3", 
-        color: "#7f8c8d", 
-        vinylImage: "https://archive.org/download/14-poder-elegir/frontal.jpg?scale=1&rotate=0&scale=1&rotate=0" 
-    }
-];
-    const audioPlayer = document.getElementById('jukebox-audio');
-    const vinylDisk = document.getElementById('vinyl-disk');
-    const vinylCenter = document.querySelector('.vinyl-center');
-    const songTitleDisplay = document.getElementById('pager-song-title');
-    const trackNumDisplay = document.getElementById('pager-track-num');
-    const volDisplay = document.getElementById('pager-vol-display');
-    const searchInput = document.getElementById('pager-search');
+        detectUserEnvironment();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    // Inicializar volumen al 80%
-    audioPlayer.volume = 0.8;
+        // BASE DE DATOS DE LA ROCOLA (PLAYLIST DEL PAGER)
+        const playlist = [
+            { id: "20", name: "persiana americana", title: "Soda Stereo - Persiana Americana", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", color: "#d4af37", vinylImage: "https://archive.org/download/14-poder-elegir/frontal.jpg" },
+            { id: "21", name: "musica ligera", title: "Soda Stereo - De Música Ligera", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", color: "#bfc0c0" },
+            { id: "22", name: "donaciones", title: "Lujuria & Oro - Donaciones Track", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", color: "#ff416c" },
+            { id: "23", name: "muevan las industrias", title: "Los Prisioneros - Muevan las Industrias", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", color: "#222222" },
+            { id: "24", name: "tren al sur", title: "Los Prisioneros - Tren al Sur", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", color: "#3a7bd5" },
+            { id: "25", name: "el baile de los que sobran", title: "Los Prisioneros - El Baile de los que Sobran", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", color: "#8b0000" },
+            { id: "26", name: "estrechez de corazon", title: "Los Prisioneros - Estrechez de Corazón", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", color: "#e65c00" },
+            { id: "27", name: "corazones rojos", title: "Los Prisioneros - Corazones Rojos", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", color: "#dd1818" },
+            { id: "28", name: "la voz de los 80", title: "Los Prisioneros - La Voz de los '80", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", color: "#4b6cb7" },
+            { id: "29", name: "sexo", title: "Los Prisioneros - Sexo", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", color: "#9b59b6" },
+            { id: "30", name: "paramar", title: "Los Prisioneros - Paramar", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3", color: "#34495e" },
+            { id: "31", name: "quieren dinero", title: "Los Prisioneros - Quieren Dinero", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3", color: "#27ae60" },
+            { id: "32", name: "danza porque si", title: "Los Prisioneros - Danza Porque Sí", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3", color: "#f39c12" },
+            { id: "33", name: "nada personal", title: "Soda Stereo - Nada Personal", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3", color: "#2980b9" },
+            { id: "34", name: "cuando pase el temblor", title: "Soda Stereo - Cuando Pase el Temblor", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3", color: "#16a085" },
+            { id: "35", name: "la ciudad de la furia", title: "Soda Stereo - En la Ciudad de la Furia", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3", color: "#1e272c" },
+            { id: "36", name: "zoom", title: "Soda Stereo - Zoom", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", color: "#e84393" },
+            { id: "37", name: "ella uso mi cabeza", title: "Soda Stereo - Ella Usó Mi Cabeza Como Un Revólver", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", color: "#6c5ce7" },
+            { id: "38", name: "juegos de seduccion", title: "Soda Stereo - Juegos de Seducción", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", color: "#d35400" },
+            { id: "39", name: "la cultura de la basura", title: "Los Prisioneros - La Cultura de la Basura", file: "https://archive.org/download/14-poder-elegir/02%20-%20La%20cultura%20de%20La%20Basura.mp3", color: "#7f8c8d" }
+        ];
 
-    // Control de Volumen Físico (Botones ▲ / ▼)
-    document.getElementById('vol-up-btn').addEventListener('click', () => {
-        if (audioPlayer.volume < 0.95) audioPlayer.volume += 0.1;
-        updateVolumeDisplay();
-    });
+        const audioPlayer = document.getElementById('jukebox-audio');
+        const vinylDisk = document.getElementById('vinyl-disk');
+        const vinylCenter = document.querySelector('.vinyl-center');
+        const songTitleDisplay = document.getElementById('pager-song-title');
+        const trackNumDisplay = document.getElementById('pager-track-num');
+        const volDisplay = document.getElementById('pager-vol-display');
+        const searchInput = document.getElementById('pager-search');
 
-    document.getElementById('vol-down-btn').addEventListener('click', () => {
-        if (audioPlayer.volume > 0.05) audioPlayer.volume -= 0.1;
-        updateVolumeDisplay();
-    });
+        audioPlayer.volume = 0.8;
 
-    function updateVolumeDisplay() {
-        volDisplay.innerText = `VOL: ${Math.round(audioPlayer.volume * 100)}%`;
-    }
+        document.getElementById('vol-up-btn').addEventListener('click', () => {
+            if (audioPlayer.volume < 0.9) audioPlayer.volume += 0.1;
+            updateVolumeDisplay();
+        });
 
-    // Buscador del Pager (Por botón o tecla Enter)
-    document.getElementById('pager-submit-btn').addEventListener('click', processPagerCode);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') processPagerCode();
-    });
+        document.getElementById('vol-down-btn').addEventListener('click', () => {
+            if (audioPlayer.volume > 0.1) audioPlayer.volume -= 0.1;
+            updateVolumeDisplay();
+        });
 
-    function processPagerCode() {
-        const query = searchInput.value.trim().toLowerCase();
-        if (!query) return;
+        function updateVolumeDisplay() {
+            volDisplay.innerText = `VOL: ${Math.round(audioPlayer.volume * 100)}%`;
+        }
 
-        // Busca coincidencia exacta por ID numérico o si el nombre está incluido en la búsqueda
-        const track = playlist.find(t => t.id === query || query.includes(t.name) || t.name.includes(query));
+        document.getElementById('pager-submit-btn').addEventListener('click', processPagerCode);
+        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processPagerCode(); });
 
-        if (track) {
-            // 1. Cambiar estado de la pantalla
-            trackNumDisplay.innerText = `PAGER-0${track.id}`;
-            songTitleDisplay.innerText = `TRANSMITIENDO PISTA:\n${track.title}`;
-            
-            // 2. Cargar y reproducir audio real
-            audioPlayer.src = track.file;
-            audioPlayer.play().catch(e => console.log("Interacción requerida por el navegador para reproducir"));
+        function processPagerCode() {
+            const query = searchInput.value.trim().toLowerCase();
+            if (!query) return;
 
-            // 3. Efecto visual del Vinilo
-            vinylDisk.classList.add('playing'); // Activa el giro si estaba pausado
-            
-            // Si en tu objeto pones una imagen propia de fondo, la aplica aquí:
-            if(track.vinylImage) {
-                vinylDisk.style.backgroundImage = `url('${track.vinylImage}')`;
-            } else {
-                // Si no hay imagen, cambia el color del centro (galleta) a juego con el álbum
-                vinylCenter.style.backgroundColor = track.color;
+            // Easter Egg Secreto para tu hermano el Yeyo (Código 069 Clímax Yaoi)
+            if (query === "069" || query === "yeyo") {
+                trackNumDisplay.innerText = "PAGER-69";
+                songTitleDisplay.innerText = "🔥 MODO DIABLO: ACTIVANDO EXTASIS YAOI LOVER... 🔥";
+                document.body.style.background = "linear-gradient(135deg, #400404 0%, #000000 100%)";
+                audioPlayer.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
+                audioPlayer.play().catch(o => {});
+                vinylDisk.classList.add('playing');
+                vinylDisk.style.backgroundImage = "none";
+                vinylCenter.style.backgroundColor = "#ff0055";
+                searchInput.value = "";
+                return;
             }
-        } else {
-            // Mensaje de código erróneo típico de Pager
-            songTitleDisplay.innerText = "ERROR-404:\nCÓDIGO INEXISTENTE. REINTENTE.";
-            vinylDisk.classList.remove('playing'); // Pausa el disco
-            audioPlayer.pause();
-        }
-        
-        searchInput.value = ""; // Limpia la entrada
-    }
-// 3. Efecto visual del Vinilo FIEL AL ÁLBUM
-            vinylDisk.classList.add('playing'); // Activa el giro por CSS
-            
-            // Si la canción tiene un enlace de imagen de vinilo específico...
-            if(track.vinylImage) {
-                // ...aplica esa imagen como fondo del disco
-                vinylDisk.style.backgroundImage = `url('https://archive.org/download/14-poder-elegir/frontal.jpg?scale=1&rotate=0&scale=1&rotate=0}')`;
-                vinylDisk.style.backgroundSize = "cover"; // Asegura que cubra todo el disco
-                vinylDisk.style.backgroundPosition = "center"; // Centra la portada
+
+            const track = playlist.find(t => t.id === query || query.includes(t.name) || t.name.includes(query));
+
+            if (track) {
+                trackNumDisplay.innerText = `PAGER-${track.id}`;
+                songTitleDisplay.innerText = `TRANSMITIENDO:\n${track.title}`;
+                audioPlayer.src = track.file;
+                audioPlayer.play().catch(e => console.log("Se requiere interacción."));
                 
-                // Opcional: Ocultamos el centro dorado para que se vea la portada completa
-                vinylCenter.style.opacity = "1"; 
+                vinylDisk.classList.add('playing');
+                if(track.vinylImage) {
+                    vinylDisk.style.backgroundImage = `url('${track.vinylImage}')`;
+                    vinylCenter.style.opacity = "0.4";
+                } else {
+                    vinylDisk.style.backgroundImage = "none";
+                    vinylCenter.style.backgroundColor = track.color;
+                    vinylCenter.style.opacity = "1";
+                }
             } else {
-                // Si no hay imagen, vuelve al diseño negro con centro de color (diseño de respaldo)
-                vinylDisk.style.backgroundImage = "radial-gradient(circle, #000 35%, #222 40%, #111 50%, #222 60%, #000 70%)";
-                vinylCenter.style.backgroundColor = track.color;
-                vinylCenter.style.opacity = "1";
-            }			
-</script>
+                songTitleDisplay.innerText = "ERROR-404:\nCÓDIGO INEXISTENTE.";
+                vinylDisk.classList.remove('playing');
+                audioPlayer.pause();
+            }
+            searchInput.value = "";
+        }
+    </script>
 </body>
 </html>
