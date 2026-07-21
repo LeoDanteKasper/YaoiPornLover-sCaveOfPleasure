@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YEYO'S ARCADE - ELF (ROOT EDITION)</title>
+    <!-- Carga de Ruffle CDN WebAssembly -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <style>
+        /* ==========================================================================
+           DESIGN SYSTEM: RETRO CYBER VAPORWAVE (ELF CABINET SPECIFIC)
+           ========================================================================== */
+        :root {
+            --xbox-green: #00ff5f;
+            --vw-pink: #ff007f;
+            --vw-cyan: #00f3ff;
+            --bg-dark: #06060c;
+            --font-arcade: 'Courier New', Courier, monospace;
+            --glass-panel: rgba(12, 12, 24, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: var(--font-arcade);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03), rgba(0, 255, 95, 0.01), rgba(255, 0, 127, 0.03));
+            background-size: 100% 4px, 6px 100%;
+        }
+
+        /* HEADER SUPERIOR */
+        header {
+            width: 100%;
+            background: var(--glass-panel);
+            border-bottom: 2px solid var(--vw-cyan);
+            box-shadow: 0 4px 20px rgba(0, 243, 255, 0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-back-btn {
+            background: transparent;
+            border: 2px solid var(--vw-pink);
+            color: var(--vw-pink);
+            padding: 8px 20px;
+            font-family: var(--font-arcade);
+            font-weight: bold;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+        }
+
+        .nav-back-btn:hover {
+            background: var(--vw-pink);
+            color: #fff;
+            box-shadow: 0 0 15px var(--vw-pink);
+        }
+
+        .cabinet-title {
+            font-size: 1.4rem;
+            color: #fff;
+            text-shadow: -2px -2px 0 var(--vw-cyan), 2px 2px 0 var(--vw-pink);
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            color: var(--xbox-green);
+            border: 1px solid var(--xbox-green);
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: rgba(0, 255, 95, 0.1);
+        }
+
+        /* GABINETE DE EMULACIÓN Flash */
+        .emulator-container {
+            width: 90vw;
+            max-width: 1200px;
+            height: 75vh;
+            margin: 20px auto;
+            background: #000000;
+            border: 3px solid var(--vw-cyan);
+            border-radius: 12px;
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ruffle-player-target {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        ruffle-embed, ruffle-player, object, embed {
+            width: 100% !important;
+            height: 100% !important;
+            border: none;
+        }
+
+        /* CONTROLES INFERIORES */
+        .controls-bar {
+            width: 100%;
+            background: var(--glass-panel);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid var(--vw-cyan);
+            color: var(--vw-cyan);
+            padding: 10px 24px;
+            font-family: var(--font-arcade);
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--vw-cyan);
+            color: #000000;
+            box-shadow: 0 0 15px var(--vw-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
+    <header>
+        <a href="index.html" class="nav-back-btn">← VOLVER AL HUB</a>
+        <div class="cabinet-title">GABINETE: JUEGUILLOS/ELF.SWF</div>
+        <div class="status-badge" id="engineStatus">READY</div>
+    </header>
+
+    <!-- ÁREA DE EJECUCIÓN SWF -->
+    <main class="emulator-container">
+        <div id="ruffle-player-target">
+            <!-- Fallback directo apuntando a Jueguillos/Elf.swf -->
+            <object type="application/x-shockwave-flash" data="Jueguillos/Elf.swf" id="swf-object">
+                <param name="movie" value="Jueguillos/Elf.swf" />
+                <param name="quality" value="high" />
+                <param name="bgcolor" value="#000000" />
+                <param name="play" value="true" />
+                <param name="loop" value="true" />
+                <param name="wmode" value="opaque" />
+                <param name="scale" value="showall" />
+                <embed src="Jueguillos/Elf.swf" quality="high" type="application/x-shockwave-flash" width="100%" height="100%"></embed>
+            </object>
+        </div>
+    </main>
+
+    <!-- BARRAS DE HERRAMIENTAS -->
+    <footer class="controls-bar">
+        <button class="action-btn" onclick="toggleFullscreen()">PANTALLA COMPLETA (F)</button>
+        <button class="action-btn" onclick="reloadPlayer()">REINICIAR JUEGO (R)</button>
+    </footer>
+
+    <script>
+        window.RufflePlayer = window.RufflePlayer || {};
+        window.RufflePlayer.config = {
+            "letterbox": "on",
+            "autofit": true,
+            "warnOnUnsupportedContent": false,
+            "unmuteOverlay": "hidden",
+            "backgroundColor": "#000000",
+            "wmode": "opaque",
+            "quality": "high"
+        };
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const ruffle = window.RufflePlayer.newest();
+            if (ruffle) {
+                const player = ruffle.createPlayer();
+                const container = document.getElementById("ruffle-player-target");
+                container.innerHTML = "";
+                container.appendChild(player);
+                
+                // Carga directa del ejecutable Elf.swf desde la carpeta Jueguillos
+                const swfPath = "Jueguillos/Elf.swf";
+                
+                player.load(swfPath).then(() => {
+                    console.log("Elf.swf cargado exitosamente desde:", swfPath);
+                }).catch((e) => {
+                    console.error("Error al cargar Elf.swf:", e);
+                    document.getElementById("engineStatus").textContent = "SWF PATH ERROR";
+                    document.getElementById("engineStatus").style.color = "#ff0000";
+                });
+            }
+        });
+
+        // Controles vía Teclado
+        window.addEventListener("keydown", (e) => {
+            if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 'r') {
+                reloadPlayer();
+            }
+        });
+
+        function toggleFullscreen() {
+            const elem = document.querySelector(".emulator-container");
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function reloadPlayer() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
