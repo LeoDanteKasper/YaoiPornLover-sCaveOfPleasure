@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YaoiKoob - Ultimate P2P Chat 2006</title>
+  
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Press+Start+2P&family=VT323&family=Comic+Neue:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- PeerJS para P2P Real -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+  <style>
+    /* ==========================================
+       VARIABLES Y ESTILOS GLOBALES VAPORWAVE / 2006
+       ========================================== */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0b001a 0%, #1d0036 50%, #00122e 100%);
+      --accent-pink: #ff007f;
+      --accent-cyan: #00f3ff;
+      --accent-purple: #9d00ff;
+      --accent-green: #00ff66;
+      --glass-bg: rgba(18, 5, 38, 0.75);
+      --glass-border: rgba(255, 0, 127, 0.3);
+      --glass-blur: blur(16px);
+      --text-main: #e0f7fc;
+      --text-muted: #a38ebc;
+      --retro-gold: #ffb700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Canvas de Partículas para Pokes */
+    #fx-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Fondo de Rejilla Vaporwave Animada */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        linear-gradient(rgba(255, 0, 127, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.08) 1px, transparent 1px);
+      background-size: 30px 30px;
+      z-index: 0;
+      pointer-events: none;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 30px 60px; }
+    }
+
+    /* ==========================================
+       CONTENEDOR PRINCIPAL DEL CHAT
+       ========================================== */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      width: 98vw;
+      max-width: 1550px;
+      height: 94vh;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.2), 0 0 50px rgba(255, 0, 127, 0.15);
+      display: grid;
+      grid-template-columns: 310px 1fr 320px;
+      grid-template-rows: 60px 1fr 75px;
+      grid-template-areas:
+        "header header header"
+        "sidebar main profile"
+        "player main profile";
+      overflow: hidden;
+    }
+
+    /* ==========================================
+       BARRA SUPERIOR (HEADER ESTILO YAOIKOOB)
+       ========================================== */
+    .header {
+      grid-area: header;
+      background: rgba(10, 2, 26, 0.85);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'VT323', monospace;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    .brand i {
+      color: var(--accent-pink);
+      filter: drop-shadow(0 0 5px var(--accent-pink));
+    }
+
+    .flipped-text {
+      display: inline-block;
+      transform: scaleX(-1);
+      color: var(--accent-pink);
+      text-shadow: 0 0 8px var(--accent-pink);
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      background: rgba(0,0,0,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .p2p-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-green);
+      font-weight: 600;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .p2p-badge::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    /* ==========================================
+       BARRA LATERAL IZQUIERDA (P2P Y AMIGOS)
+       ========================================== */
+    .sidebar {
+      grid-area: sidebar;
+      background: rgba(5, 1, 15, 0.5);
+      border-right: 1px solid var(--glass-border);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .p2p-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px dashed var(--accent-cyan);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .p2p-box input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      color: #fff;
+      font-size: 0.8rem;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+    }
+
+    .btn-p2p {
+      background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 6px;
+      padding: 8px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-p2p:hover {
+      box-shadow: 0 0 12px rgba(255, 0, 127, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .friend-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .friend-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .friend-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-cyan);
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    .friend-actions {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+
+    .sexy-action-btn {
+      background: rgba(255, 0, 127, 0.2);
+      border: 1px solid var(--accent-pink);
+      color: #fff;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'VT323', monospace;
+      letter-spacing: 1px;
+    }
+
+    .sexy-action-btn:hover {
+      background: var(--accent-pink);
+      box-shadow: 0 0 10px var(--accent-pink);
+      transform: scale(1.05);
+    }
+
+    /* ==========================================
+       REPRODUCTOR DE MÚSICA MYSPACE
+       ========================================== */
+    .music-player {
+      grid-area: player;
+      background: rgba(10, 2, 26, 0.9);
+      border-right: 1px solid var(--glass-border);
+      border-top: 1px solid var(--glass-border);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .track-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .track-name {
+      color: var(--accent-cyan);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .player-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      color: #fff;
+    }
+
+    .player-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .player-btn:hover {
+      color: var(--accent-pink);
+      transform: scale(1.1);
+    }
+
+    /* ==========================================
+       ÁREA PRINCIPAL DE CHAT
+       ========================================== */
+    .main-chat {
+      grid-area: main;
+      display: flex;
+      flex-direction: column;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-pink);
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    .message-content {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0 12px 12px 12px;
+      padding: 10px 14px;
+      position: relative;
+    }
+
+    .message.own {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.own .message-content {
+      background: rgba(255, 0, 127, 0.15);
+      border-color: rgba(255, 0, 127, 0.3);
+      border-radius: 12px 0 12px 12px;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .message-author {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+    }
+
+    .message-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* BADGES DE ROLES */
+    .badge-owner {
+      background: var(--retro-gold);
+      color: #000;
+      box-shadow: 0 0 6px var(--retro-gold);
+    }
+
+    .badge-programador {
+      background: var(--accent-pink);
+      color: #fff;
+      box-shadow: 0 0 6px var(--accent-pink);
+    }
+
+    .badge-patron {
+      background: var(--accent-purple);
+      color: #fff;
+      border: 1px solid var(--accent-pink);
+    }
+
+    .badge-guest {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .message-time {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .ascii-art-box {
+      font-family: 'Fira Code', monospace;
+      white-space: pre;
+      background: #000;
+      color: var(--accent-green);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--accent-green);
+      font-size: 0.7rem;
+      line-height: 1.1;
+      overflow-x: auto;
+      margin-top: 6px;
+    }
+
+    .shake-effect {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    /* BARRA DE HERRAMIENTAS */
+    .chat-input-area {
+      padding: 12px 20px;
+      background: rgba(10, 2, 26, 0.7);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tool-btn:hover {
+      color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .style-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      background: rgba(0,0,0,0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .style-picker input[type="color"] {
+      border: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .style-picker select {
+      background: #000;
+      color: #fff;
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-size: 0.75rem;
+      outline: none;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    }
+
+    .send-btn {
+      background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple));
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+    }
+
+    /* ==========================================
+       PANEL DERECHO: PERFIL & CANJE DE ROLES
+       ========================================== */
+    .profile-panel {
+      grid-area: profile;
+      background: rgba(5, 1, 15, 0.7);
+      border-left: 1px solid var(--glass-border);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+    }
+
+    .profile-card {
+      text-align: center;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .profile-banner {
+      height: 75px;
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .profile-cover {
+      width: 70px;
+      height: 70px;
+      margin: -35px auto 8px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .profile-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .profile-status-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin: 4px 10px 10px;
+    }
+
+    .profile-edit-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .profile-edit-box input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      color: #fff;
+      font-size: 0.75rem;
+      outline: none;
+    }
+
+    /* BOX DE ROLES VISIBLE EN PANTALLA */
+    .role-redeem-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--accent-pink);
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .top8-container {
+      margin-top: 5px;
+    }
+
+    .top8-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .top8-item {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background-size: cover;
+      background-position: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .top8-item:hover {
+      transform: scale(1.1);
+      border-color: var(--accent-pink);
+    }
+
+    /* MODAL ASCII CONVERTER */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-box {
+      background: rgba(18, 5, 38, 0.95);
+      border: 1px solid var(--accent-pink);
+      box-shadow: 0 0 20px var(--accent-pink);
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--accent-cyan);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      color: #fff;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS FX PARA PARTÍCULAS DE POKES -->
+  <canvas id="fx-canvas"></canvas>
+
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <i class="fa-solid fa-compact-disc"></i>
+        <span>Yaoi<span class="flipped-text">booK</span></span>
+      </div>
+      <div class="status-bar">
+        <div class="p2p-badge" id="p2p-status">P2P: Listo</div>
+        <span style="color: var(--text-muted);">|</span>
+        <button class="btn-p2p" style="padding: 2px 8px; font-size: 0.7rem;" onclick="clearHistory()"><i class="fa-solid fa-trash"></i> Limpiar Historial</button>
+      </div>
+    </header>
+
+    <!-- SIDEBAR DE CANALES Y AMIGOS -->
+    <aside class="sidebar">
+      <div class="section-title">Conexión Privada Directa</div>
+      <div class="p2p-box">
+        <span style="font-size: 0.7rem; color: var(--text-muted);">Tu ID de Nodo:</span>
+        <input type="text" id="my-p2p-id" readonly value="Generando..." onclick="this.select()">
+        <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Conectarse a un Amigo:</span>
+        <input type="text" id="peer-id-input" placeholder="Pegar ID de amigo...">
+        <button class="btn-p2p" onclick="connectToPeer()"><i class="fa-solid fa-plug"></i> Conectar P2P</button>
+      </div>
+
+      <!-- SISTEMA DE AMIGOS SEXYS -->
+      <div class="section-title" style="margin-top: 10px;">Amigos Sexys & Conexiones</div>
+      <button class="btn-p2p" style="width: 100%; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="sendSexyFriendshipLink()">
+        <i class="fa-solid fa-heart-pulse"></i> Enviar tu amistad sexy
+      </button>
+
+      <ul class="friend-list" id="friend-list">
+        <!-- Lista dinámica de amigos conectados -->
+      </ul>
+    </aside>
+
+    <!-- REPRODUCTOR DE MÚSICA MYSPACE -->
+    <div class="music-player">
+      <div class="track-info">
+        <span class="track-name" id="track-name"><i class="fa-solid fa-music"></i> Resonance - Home.mp3</span>
+        <span style="color: var(--accent-pink);">02:41</span>
+      </div>
+      <div class="player-controls">
+        <button class="player-btn"><i class="fa-solid fa-backward-step"></i></button>
+        <button class="player-btn" style="font-size: 1.2rem; color: #fff;" onclick="togglePlay()"><i class="fa-solid fa-play" id="play-icon"></i></button>
+        <button class="player-btn"><i class="fa-solid fa-forward-step"></i></button>
+      </div>
+    </div>
+
+    <!-- ÁREA DE CHAT -->
+    <main class="main-chat">
+      <div class="chat-messages" id="chat-messages">
+        <!-- Mensajes persistentes -->
+      </div>
+
+      <div class="chat-input-area">
+        <div class="toolbar">
+          <button class="tool-btn" title="Enviar Zumbido (MSN)" onclick="sendBuzz()"><i class="fa-solid fa-bolt-lightning" style="color: var(--accent-pink);"></i> Zumbido</button>
+          <button class="tool-btn" title="Convertir Foto a ASCII" onclick="openAsciiModal()"><i class="fa-solid fa-font"></i> Foto a ASCII</button>
+          
+          <div class="style-picker">
+            <i class="fa-solid fa-palette" style="color: var(--accent-cyan);"></i>
+            <input type="color" id="msg-color" value="#00f3ff">
+            <select id="msg-font">
+              <option value="'Segoe UI', sans-serif">Default</option>
+              <option value="'VT323', monospace">Retro VT323</option>
+              <option value="'Fira Code', monospace">Fira Code</option>
+              <option value="'Press Start 2P', cursive">8-Bit Arcade</option>
+              <option value="'Comic Neue', cursive">Comic 2006</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-wrapper">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Escribe tu mensaje para YaoiKoob..." onkeypress="handleKeyPress(event)">
+          <button class="send-btn" onclick="sendMessage()">Enviar</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL DE PERFIL -->
+    <aside class="profile-panel">
+      <div class="profile-card">
+        <div class="profile-banner" id="profile-banner" style="background-image: url('https://picsum.photos/300/100?random=1')"></div>
+        <div class="profile-cover" id="profile-avatar" style="background-image: url('https://i.pravatar.cc/100?img=68')"></div>
+        <div class="profile-name" id="profile-name-display">Anon_Guest</div>
+        <div class="profile-status-text" id="profile-status-display">"Escuchando: Linkin Park - Numb"</div>
+      </div>
+
+      <!-- CANJE DE ROLES CON CÓDIGOS (EN PANTALLA) -->
+      <div class="section-title">Canjear Código de Rol</div>
+      <div class="role-redeem-box">
+        <span style="font-size: 0.7rem; color: var(--text-muted);">Ingresá tu clave secreta:</span>
+        <input type="password" id="role-code-input" placeholder="Clave de rol...">
+        <button class="btn-p2p" onclick="redeemRoleCode()"><i class="fa-solid fa-key"></i> Activar Rol</button>
+      </div>
+
+      <div class="section-title">Personalizar Mi Perfil</div>
+      <div class="profile-edit-box">
+        <input type="text" id="edit-username" placeholder="Nombre de usuario..." onchange="updateProfile()">
+        <input type="text" id="edit-avatar-url" placeholder="URL Foto de Perfil..." onchange="updateProfile()">
+        <input type="text" id="edit-banner-url" placeholder="URL Foto de Portada..." onchange="updateProfile()">
+        <input type="text" id="edit-status" placeholder="Estado (Frase)..." onchange="updateProfile()">
+      </div>
+
+      <div class="top8-container">
+        <div class="section-title">Mi Top 8 de Amigos</div>
+        <div class="top8-grid">
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=1')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=2')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=3')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=4')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=5')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=6')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=7')"></div>
+          <div class="top8-item" style="background-image: url('https://i.pravatar.cc/100?img=8')"></div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- MODAL DE GENERADOR ASCII -->
+  <div class="modal-overlay" id="ascii-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span><i class="fa-solid fa-terminal"></i> Generador de Imagen ASCII</span>
+        <span class="modal-close" onclick="closeAsciiModal()">&times;</span>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Sube una foto y convertila en arte ASCII con tu palabra personalizada:</p>
+      
+      <input type="file" id="ascii-file-input" accept="image/*" style="color: #fff; font-size: 0.8rem;">
+      <input type="text" id="ascii-word-input" class="chat-input" placeholder="Palabra o letras para el mapa..." value="AMONGUS">
+      
+      <button class="btn-p2p" style="padding: 10px;" onclick="processAsciiImage()">Generar y Mandar al Chat</button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN Y PERSISTENCIA DE DATOS
+    // ==========================================
+    const STORAGE_KEY = 'yaoikoob_chat_history';
+    const PROFILE_KEY = 'yaoikoob_profile_data';
+
+    // DICCIONARIO DE CÓDIGOS DE ROL
+    const ROLE_CODES = {
+      // Owner
+      "OWNER_SECRET_KEY": { role: "Owner", badgeClass: "badge-owner" },
+      
+      // Programador (Tu código principal + alternativos)
+      "150690": { role: "Programador", badgeClass: "badge-programador" },
+      "PROG_DEV_2006": { role: "Programador", badgeClass: "badge-programador" },
+
+      // Patron User Lover of X Keys
+      "PATRON_YI": { role: "Patron User Lover of Yi", badgeClass: "badge-patron" },
+      "PATRON_WALUIGI": { role: "Patron User Lover of Waluigi", badgeClass: "badge-patron" },
+      "PATRON_RUMBLE": { role: "Patron User Lover of Rumble", badgeClass: "badge-patron" },
+      "PATRON_DOOMENTIO": { role: "Patron User Lover of Doomentio", badgeClass: "badge-patron" },
+      "PATRON_SENPAI": { role: "Patron User Lover of Senpai", badgeClass: "badge-patron" },
+      "PATRON_TERRY": { role: "Patron User Lover of Terry", badgeClass: "badge-patron" }
+    };
+
+    let userProfile = {
+      name: 'Anon_Guest',
+      avatar: 'https://i.pravatar.cc/100?img=68',
+      banner: 'https://picsum.photos/300/100?random=1',
+      status: '"Escuchando: Linkin Park - Numb"',
+      role: 'Guest',
+      badgeClass: 'badge-guest'
+    };
+
+    let p2pPeer = null;
+    let p2pConn = null;
+
+    window.onload = function() {
+      loadProfile();
+      loadChatHistory();
+      initP2P();
+      initCanvasFX();
+      
+      // Auto-detección de invitación sexy
+      const urlParams = new URLSearchParams(window.location.search);
+      const inviteId = urlParams.get('sexy_invite');
+      if (inviteId) {
+        document.getElementById('peer-id-input').value = inviteId;
+        setTimeout(() => connectToPeer(), 1500);
+      }
+
+      // Render inicial de un amigo de prueba
+      renderFriendItem('peer-123', 'Yeyo_Master', 'https://i.pravatar.cc/100?img=33');
+    };
+
+    function saveChatHistory(msgData) {
+      let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      history.push(msgData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    function loadChatHistory() {
+      const chatContainer = document.getElementById('chat-messages');
+      chatContainer.innerHTML = '';
+      let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      
+      if (history.length === 0) {
+        appendMessageToUI({
+          author: 'YaoiKoob Bot',
+          avatar: 'https://i.pravatar.cc/100?img=33',
+          role: 'System',
+          badgeClass: 'badge-owner',
+          text: '¡Bienvenido a YaoiKoob! Chat P2P modular. Canjeá tus códigos de rol en el panel lateral.',
+          color: '#00f3ff',
+          font: "'Fira Code', monospace",
+          time: '12:00',
+          own: false
+        });
+      } else {
+        history.forEach(msg => appendMessageToUI(msg));
+      }
+    }
+
+    function clearHistory() {
+      if (confirm('¿Estás seguro de borrar el historial guardado?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadChatHistory();
+      }
+    }
+
+    // ==========================================
+    // SISTEMA DE CANJE DE ROLES Y PERFIL
+    // ==========================================
+    function redeemRoleCode() {
+      const input = document.getElementById('role-code-input');
+      const code = input.value.trim();
+
+      if (ROLE_CODES[code]) {
+        const match = ROLE_CODES[code];
+        userProfile.role = match.role;
+        userProfile.badgeClass = match.badgeClass;
+
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+        loadProfile();
+
+        alert(`¡RANGO ACTIVADO! Ahora sos: ${match.role}`);
+        input.value = '';
+      } else {
+        alert('Código inválido o expirado. Verificá tus claves.');
+      }
+    }
+
+    function loadProfile() {
+      const saved = localStorage.getItem(PROFILE_KEY);
+      if (saved) {
+        userProfile = JSON.parse(saved);
+      }
+      document.getElementById('profile-name-display').innerText = userProfile.name;
+      document.getElementById('profile-status-display').innerText = userProfile.status;
+      document.getElementById('profile-avatar').style.backgroundImage = `url('${userProfile.avatar}')`;
+      document.getElementById('profile-banner').style.backgroundImage = `url('${userProfile.banner}')`;
+
+      document.getElementById('edit-username').value = userProfile.name;
+      document.getElementById('edit-avatar-url').value = userProfile.avatar;
+      document.getElementById('edit-banner-url').value = userProfile.banner;
+      document.getElementById('edit-status').value = userProfile.status;
+    }
+
+    function updateProfile() {
+      const name = document.getElementById('edit-username').value.trim();
+      const avatar = document.getElementById('edit-avatar-url').value.trim();
+      const banner = document.getElementById('edit-banner-url').value.trim();
+      const status = document.getElementById('edit-status').value.trim();
+
+      if (name) userProfile.name = name;
+      if (avatar) userProfile.avatar = avatar;
+      if (banner) userProfile.banner = banner;
+      if (status) userProfile.status = status;
+
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+      loadProfile();
+    }
+
+    // ==========================================
+    // SISTEMA DE AMIGOS SEXYS & INTERACCIONES
+    // ==========================================
+    function sendSexyFriendshipLink() {
+      const myId = document.getElementById('my-p2p-id').value;
+      if (!myId || myId === 'Generando...') {
+        alert('Esperá a que se genere tu ID P2P...');
+        return;
+      }
+
+      const inviteUrl = `${window.location.origin}${window.location.pathname}?sexy_invite=${myId}`;
+      navigator.clipboard.writeText(inviteUrl).then(() => {
+        alert('🔥 ¡Enlace de "Amistad Sexy" copiado al portapapeles! Pasáselo a tu amigo para conectar directo.');
+      });
+    }
+
+    function renderFriendItem(peerId, friendName, avatarUrl) {
+      const friendList = document.getElementById('friend-list');
+      const isOwner = userProfile.role === 'Owner' || userProfile.role === 'Programador';
+      
+      const actionLabel = isOwner ? '💋 Mamada' : '🍑 Nalgada';
+      const actionType = isOwner ? 'mamada' : 'nalgada';
+
+      const li = document.createElement('li');
+      li.className = 'friend-item';
+      li.innerHTML = `
+        <div class="friend-avatar" style="background-image: url('${avatarUrl}')"></div>
+        <span style="font-size: 0.8rem; font-weight: 600;">${escapeHtml(friendName)}</span>
+        <div class="friend-actions">
+          <button class="sexy-action-btn" onclick="sendSexyPoke('${peerId}', '${actionType}')">
+            ${actionLabel}
+          </button>
+        </div>
+      `;
+
+      friendList.appendChild(li);
+    }
+
+    function sendSexyPoke(peerId, type) {
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      let actionMessage = type === 'mamada' 
+        ? '💋✨ ¡Le Has Dado Al Dueño supremo una mamada legendaria! ✨💋'
+        : '🍑💥 ¡Te han mandado una nalgada bien sabrosa! 💥🍑';
+
+      const msgData = {
+        author: userProfile.name,
+        avatar: userProfile.avatar,
+        role: userProfile.role,
+        badgeClass: userProfile.badgeClass,
+        text: actionMessage,
+        color: '#ff007f',
+        font: "'VT323', monospace",
+        time: timeStr,
+        own: true
+      };
+
+      triggerBuzzEffect();
+      spawnParticles(type);
+      appendMessageToUI(msgData);
+      saveChatHistory(msgData);
+
+      if (p2pConn && p2pConn.open) {
+        p2pConn.send({ ...msgData, own: false, type: 'poke', pokeType: type });
+      }
+    }
+
+    // ==========================================
+    // ENVÍO DE MENSAJES Y PEERJS P2P
+    // ==========================================
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const color = document.getElementById('msg-color').value;
+      const font = document.getElementById('msg-font').value;
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+      const msgData = {
+        author: userProfile.name,
+        avatar: userProfile.avatar,
+        role: userProfile.role,
+        badgeClass: userProfile.badgeClass,
+        text: text,
+        color: color,
+        font: font,
+        time: timeStr,
+        own: true
+      };
+
+      appendMessageToUI(msgData);
+      saveChatHistory(msgData);
+
+      if (p2pConn && p2pConn.open) {
+        p2pConn.send({ ...msgData, own: false });
+      }
+
+      input.value = '';
+    }
+
+    function appendMessageToUI(msg) {
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${msg.own ? 'own' : ''}`;
+
+      let contentHTML = msg.isAscii 
+        ? `<div class="ascii-art-box">${escapeHtml(msg.text)}</div>`
+        : `<div class="message-text" style="color: ${msg.color}; font-family: ${msg.font};">${escapeHtml(msg.text)}</div>`;
+
+      msgDiv.innerHTML = `
+        <div class="message-avatar" style="background-image: url('${msg.avatar}')"></div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-author">${escapeHtml(msg.author)}</span>
+            <span class="message-badge ${msg.badgeClass || 'badge-guest'}">${escapeHtml(msg.role || 'Guest')}</span>
+            <span class="message-time">${msg.time}</span>
+          </div>
+          ${contentHTML}
+        </div>
+      `;
+
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    function initP2P() {
+      p2pPeer = new Peer();
+
+      p2pPeer.on('open', (id) => {
+        document.getElementById('my-p2p-id').value = id;
+        document.getElementById('p2p-status').innerText = 'P2P: Listo';
+      });
+
+      p2pPeer.on('connection', (conn) => {
+        p2pConn = conn;
+        setupP2PListeners();
+        document.getElementById('p2p-status').innerText = 'P2P: ¡Conectado!';
+      });
+    }
+
+    function connectToPeer() {
+      const peerId = document.getElementById('peer-id-input').value.trim();
+      if (!peerId) return;
+
+      p2pConn = p2pPeer.connect(peerId);
+      setupP2PListeners();
+    }
+
+    function setupP2PListeners() {
+      p2pConn.on('open', () => {
+        document.getElementById('p2p-status').innerText = 'P2P: ¡Conectado!';
+      });
+
+      p2pConn.on('data', (data) => {
+        if (data.type === 'buzz') {
+          triggerBuzzEffect();
+        } else if (data.type === 'poke') {
+          triggerBuzzEffect();
+          spawnParticles(data.pokeType);
+          appendMessageToUI(data);
+          saveChatHistory(data);
+        } else {
+          appendMessageToUI(data);
+          saveChatHistory(data);
+        }
+      });
+    }
+
+    function sendBuzz() {
+      triggerBuzzEffect();
+      if (p2pConn && p2pConn.open) {
+        p2pConn.send({ type: 'buzz' });
+      }
+    }
+
+    function triggerBuzzEffect() {
+      const app = document.querySelector('.app-container');
+      app.classList.add('shake-effect');
+      setTimeout(() => app.classList.remove('shake-effect'), 500);
+    }
+
+    // ==========================================
+    // GENERADOR FOTO A ASCII
+    // ==========================================
+    function openAsciiModal() {
+      document.getElementById('ascii-modal').style.display = 'flex';
+    }
+
+    function closeAsciiModal() {
+      document.getElementById('ascii-modal').style.display = 'none';
+    }
+
+    function processAsciiImage() {
+      const fileInput = document.getElementById('ascii-file-input');
+      const wordInput = document.getElementById('ascii-word-input').value.trim() || 'AMONGUS';
+
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert('Seleccioná una imagen.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const asciiArt = convertImageToAscii(img, wordInput);
+          const now = new Date();
+          const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+          const msgData = {
+            author: userProfile.name,
+            avatar: userProfile.avatar,
+            role: userProfile.role,
+            badgeClass: userProfile.badgeClass,
+            text: asciiArt,
+            isAscii: true,
+            time: timeStr,
+            own: true
+          };
+
+          appendMessageToUI(msgData);
+          saveChatHistory(msgData);
+
+          if (p2pConn && p2pConn.open) {
+            p2pConn.send({ ...msgData, own: false });
+          }
+
+          closeAsciiModal();
+        };
+        img.src = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function convertImageToAscii(img, pattern) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const width = 50;
+      const scale = width / img.width;
+      const height = Math.floor(img.height * scale * 0.5);
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+      const imgData = ctx.getImageData(0, 0, width, height).data;
+
+      let asciiResult = '';
+      let charIdx = 0;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const offset = (y * width + x) * 4;
+          const brightness = (imgData[offset] + imgData[offset + 1] + imgData[offset + 2]) / 3;
+
+          if (brightness > 100) {
+            asciiResult += pattern[charIdx % pattern.length];
+            charIdx++;
+          } else {
+            asciiResult += ' ';
+          }
+        }
+        asciiResult += '\n';
+      }
+
+      return asciiResult;
+    }
+
+    // ==========================================
+    // MOTOR DE PARTÍCULAS CANVAS FX
+    // ==========================================
+    let canvas, ctx, particles = [];
+
+    function initCanvasFX() {
+      canvas = document.getElementById('fx-canvas');
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      requestAnimationFrame(updateParticles);
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function spawnParticles(type) {
+      const emoji = type === 'mamada' ? '💋' : '🍑';
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15,
+          size: Math.random() * 20 + 20,
+          emoji: emoji,
+          alpha: 1
+        });
+      }
+    }
+
+    function updateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.font = `${p.size}px serif`;
+        ctx.fillText(p.emoji, p.x, p.y);
+
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+      requestAnimationFrame(updateParticles);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>

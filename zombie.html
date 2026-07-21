@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JUEGUILLOS ARCADE - NES 8-BIT EDITION</title>
+
+    <!-- Google Fonts importados correctamente via <link> para evitar fallos de parser CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Pro / Solid Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ========================================================
+           RESET & ESTILOS BASE (MODO OSCURO SOFISTICADO)
+           ======================================================== */
+           
+        :root {
+            --bg-base: #0a0b0d;
+            --bg-card: rgba(20, 22, 28, 0.85);
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff007f;
+            --neon-green: #00ff66;
+            --nes-grey: #6c6e70;
+            --nes-dark: #38393b;
+            --nes-red: #e60012;
+            --nes-gold: #ffd700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 70%),
+                radial-gradient(circle at 50% 100%, rgba(255, 0, 127, 0.1) 0%, transparent 70%);
+            color: #ffffff;
+            font-family: 'VT323', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 15px;
+            overflow-x: hidden;
+            transition: background-color 1s ease, box-shadow 1s ease;
+        }
+
+        /* Scanline Overlay (Efecto Monitor CRT) */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* EFECTO DORADO GLOBAL EN LA PÁGINA */
+        body.all-gold-mode {
+            background-color: #120e00 !important;
+            box-shadow: inset 0 0 100px rgba(255, 215, 0, 0.3);
+        }
+
+        /* ========================================================
+           HEADER ARCADE
+           ======================================================== */
+        .arcade-header {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-card);
+            border: 2px solid var(--neon-blue);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .arcade-subtitle {
+            font-size: 1.2rem;
+            color: #a0a5b5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* ========================================================
+           ESTILOS TÍTULO 3D TIPO METAL SLUG INTERACTIVO
+           ======================================================== */
+        .title-container {
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .metal-slug-title {
+            font-family: 'Black Ops One', cursive, sans-serif;
+            font-size: clamp(1.8rem, 4.5vw, 3.8rem);
+            text-transform: uppercase;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2px;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .metal-slug-title .space {
+            width: 20px;
+        }
+
+        .metal-slug-title .letter {
+            position: relative; /* CRÍTICO: Permite contener los brillos pseudo-elementos */
+            display: inline-block;
+            overflow: hidden; /* Evita que el destello se desborde romper el layout */
+            transition: transform 0.2s ease;
+        }
+
+        .metal-slug-title .letter:hover {
+            transform: translateY(-5px) scale(1.08);
+        }
+
+        /* Animación de Giro 3D Completo al hacer Click */
+        .metal-slug-title .letter.spinning {
+            animation: flip3D 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes flip3D {
+            0% { transform: rotateY(0deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.2); }
+            100% { transform: rotateY(360deg) scale(1); }
+        }
+
+        /* ESTADO DORADO + EFECTO DE BRILLO CARTOON */
+        .metal-slug-title .letter.gold {
+    /* 1. Definimos el degradado de fondo */
+    background: linear-gradient(180deg, #fff2a3 0%, #ffd700 45%, #cca100 50%, #8a6d00 100%);
+    
+    /* 2. Recortamos el fondo con el texto (Versión estándar + Prefijo Webkit para compatibilidad) */
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    /* 3. Volvemos transparente el color del texto para que se vea el degradado de abajo */
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    /* 4. IMPORTANTE: Para que el navegador dibuje el recorte correctamente en cada letra */
+    display: inline-block;
+
+    /* Sombras 3D extrudidas */
+    filter: drop-shadow(0px 1px 0px #d4a017)
+            drop-shadow(0px 2px 0px #aa7c11)
+            drop-shadow(0px 3px 0px #7a5807)
+            drop-shadow(0px 4px 0px #4a3400)
+            drop-shadow(0px 0px 15px rgba(255, 215, 0, 0.8));
+}
+
+        /* Barra de Luz Diagonal de Brillo Cartoon */
+        .metal-slug-title .letter.gold::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 60%;
+            height: 300%;
+            background: linear-gradient(
+                120deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.9) 50%,
+                transparent 70%
+            );
+            transform: rotate(25deg);
+            pointer-events: none;
+            animation: cartoonShineLine 2.5s infinite ease-in-out;
+        }
+
+        /* Destello / Sparkle Radiante */
+        .metal-slug-title .letter.gold::after {
+            content: '✦';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            font-size: 12px;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ffea00, 0 0 20px #ffffff;
+            -webkit-text-fill-color: #ffffff;
+            opacity: 0;
+            transform: scale(0.2) rotate(0deg);
+            pointer-events: none;
+            animation: sparkleFlash 2.5s infinite ease-in-out;
+        }
+
+        @keyframes cartoonShineLine {
+            0% { left: -120%; top: -100%; }
+            35%, 100% { left: 160%; top: 120%; }
+        }
+
+        @keyframes sparkleFlash {
+            0%, 28% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+            32% { opacity: 1; transform: scale(1.5) rotate(90deg); }
+            38% { opacity: 0; transform: scale(0.2) rotate(180deg); }
+            100% { opacity: 0; }
+        }
+
+        /* ========================================================
+           TICKER / CINTA DE NOTICIAS
+           ======================================================== */
+        .ticker-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            background: rgba(12, 10, 24, 0.92);
+            border: 2px solid rgba(0, 243, 255, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px rgba(0, 243, 255, 0.25),
+                inset 0 0 15px rgba(255, 0, 127, 0.15);
+            position: relative;
+            backdrop-filter: blur(10px);
+            font-family: 'VT323', monospace;
+        }
+
+        .ticker-badge {
+            background: linear-gradient(135deg, #ff007f, #a100ff);
+            color: #ffffff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+            white-space: nowrap;
+            box-shadow: 4px 0 15px rgba(255, 0, 127, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .ticker-badge .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ffea00;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ffea00;
+            animation: blinkDot 0.8s infinite alternate;
+        }
+
+        @keyframes blinkDot {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        .ticker-track {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            position: relative;
+            height: 40px;
+        }
+
+        .ticker-content {
+            display: flex;
+            white-space: nowrap;
+            will-change: transform;
+            animation: tickerMove 32s linear infinite;
+        }
+
+        .ticker-content:hover {
+            animation-play-state: paused;
+        }
+
+        .ticker-item {
+            font-size: 1.2rem;
+            color: #e2e8ff;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-right: 30px;
+        }
+
+        .ticker-item .highlight {
+            color: #00f3ff;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+            font-weight: bold;
+        }
+
+        .ticker-item .special-msg {
+            color: #ffea00;
+            text-shadow: 0 0 10px rgba(255, 234, 0, 0.8);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.65rem;
+            background: rgba(255, 0, 127, 0.15);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 0, 127, 0.4);
+        }
+
+        .ticker-item .separator {
+            color: #ff007f;
+            font-size: 0.8rem;
+            text-shadow: 0 0 8px #ff007f;
+        }
+
+        @keyframes tickerMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ========================================================
+           GRID DE CARTUCHOS NINTENDO NES (2 COLUMNAS)
+           ======================================================== */
+        .game-grid {
+            width: 100%;
+            max-width: 600px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding-bottom: 20px;
+        }
+
+        .nes-cartridge {
+            position: relative;
+            background: linear-gradient(145deg, #787a7d 0%, #4a4c4e 100%);
+            border: 2px solid #2b2c2e;
+            border-radius: 6px 6px 3px 3px;
+            box-shadow: 
+                0 6px 0 #1b1c1d,
+                0 8px 15px rgba(0, 0, 0, 0.6),
+                inset 0 2px 2px rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 8px 4px 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            overflow: hidden;
+        }
+
+        .nes-cartridge:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 10px 0 #1b1c1d,
+                0 12px 20px rgba(0, 243, 255, 0.35),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        }
+
+        .nes-cartridge:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #1b1c1d;
+        }
+
+        .nes-top-notch {
+            width: 55%;
+            height: 5px;
+            background: #2a2b2c;
+            border-radius: 0 0 4px 4px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #5a5c5e;
+        }
+
+        .nes-label-area {
+            width: 100%;
+            background: #111215;
+            border: 2px solid #000;
+            border-radius: 3px;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+            border-left: 5px solid var(--cart-accent, #ff007f);
+        }
+
+        .nes-brand-banner {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.42rem;
+            color: var(--nes-red);
+            background: #ffffff;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .nes-cart-icon {
+            font-size: 1.4rem;
+            color: var(--cart-accent, #00f3ff);
+            margin: 4px 0;
+            filter: drop-shadow(0 0 6px var(--cart-accent));
+        }
+
+        .nes-cart-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 1px 1px 0 #000;
+            line-height: 1.3;
+            min-height: 22px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nes-seal-of-quality {
+            font-size: 0.5rem;
+            color: var(--nes-gold);
+            font-family: 'VT323', monospace;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .nes-grip-lines {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .nes-grip-lines span {
+            width: 22%;
+            height: 10px;
+            background: #38393b;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 2px #1a1b1c;
+        }
+
+        .nes-pin-connector {
+            width: 88%;
+            height: 5px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ffd700,
+                #ffd700 4px,
+                #1b1c1d 4px,
+                #1b1c1d 7px
+            );
+            margin-top: 6px;
+            border-top: 1px solid #000;
+        }
+
+        /* ========================================================
+           POPUP LOGRO NEWGROUNDS Y LLUVIA MONEDAS
+           ======================================================== */
+        .ng-achievement {
+            position: fixed;
+            bottom: -120px;
+            right: 20px;
+            width: 320px;
+            background: #111115;
+            border: 3px solid #ffaa00;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            gap: 12px;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.6), inset 0 0 10px rgba(255, 170, 0, 0.2);
+            z-index: 9999;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'VT323', monospace;
+        }
+
+        .ng-achievement.show {
+            transform: translateY(-140px);
+        }
+
+        .ng-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ffea00, #ff8800);
+            border: 2px solid #ffffff;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #111;
+            box-shadow: 0 0 10px #ffea00;
+        }
+
+        .ng-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ng-header {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem;
+            color: #ffaa00;
+            letter-spacing: 1px;
+        }
+
+        .ng-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            color: #ffffff;
+            margin: 4px 0 2px 0;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .ng-desc {
+            font-size: 0.95rem;
+            color: #b0b0b0;
+            margin: 0;
+        }
+
+        .coin-rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            overflow: hidden;
+        }
+
+        .pixel-coin {
+            position: absolute;
+            top: -40px;
+            width: 20px;
+            height: 20px;
+            background: #ffea00;
+            border: 2px solid #b8860b;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ffea00;
+            animation: fallCoin linear forwards;
+        }
+
+        @keyframes fallCoin {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+        }
+
+        /* Responsive movil pequeño */
+        @media (max-width: 480px) {
+            .game-grid { grid-template-columns: 1fr; }
+            .ng-achievement { right: 10px; width: calc(100% - 20px); }
+        }
+
+        /* ========================================================
+   ESTILOS: TERMINAL MS-DOS INTERACTIVA
+   ======================================================== */
+.msdos-container {
+    width: 100%;
+    max-width: 850px;
+    background: #000000;
+    border: 3px solid #555555;
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+    margin: 20px auto 35px auto;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.msdos-header {
+    background: #0000aa;
+    color: #ffffff;
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.msdos-controls .win-btn {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: #c0c0c0;
+    color: #000000;
+    text-align: center;
+    line-height: 14px;
+    margin-left: 4px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.msdos-body {
+    padding: 15px;
+    color: #00ff41; /* Verde DOS clásico */
+    min-height: 160px;
+    max-height: 250px;
+    overflow-y: auto;
+    font-size: 1.05rem;
+}
+
+.dos-highlight { 
+    color: #ffffff; 
+    font-weight: bold; 
+}
+
+.dos-input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.dos-prompt { 
+    color: #00ff41; 
+    margin-right: 8px; 
+}
+
+.dos-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #00ff41;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.05rem;
+    flex-grow: 1;
+}
+
+/* ========================================================
+   ESTILOS: CARTUCHOS GAME BOY ADVANCE (GBA)
+   ======================================================== */
+.gba-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.gba-cartridge {
+    background: linear-gradient(145deg, #2d2e32, #18191c);
+    border: 2px solid #444444;
+    border-radius: 8px 8px 4px 4px;
+    padding: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 15px var(--aura-color, rgba(0, 243, 255, 0.2));
+}
+
+.gba-cartridge:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 0 25px var(--aura-color, #00f3ff);
+}
+
+.gba-top-grip {
+    height: 8px;
+    background: #111111;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.gba-label-area {
+    background: #0d0e10;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+}
+
+.gba-cover-img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    background: #1a1c23;
+}
+
+.gba-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55rem;
+    color: var(--title-color, #ffffff);
+    text-shadow: 0 0 5px var(--title-color, #ffffff);
+}
+
+/* ========================================================
+   ESTILOS: DISQUETES FLOPPY DISK 3.5" (PC MS-DOS)
+   ======================================================== */
+.floppy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.floppy-disk {
+    background: var(--floppy-bg, #1a1a24);
+    border: 2px solid #333333;
+    border-radius: 6px;
+    padding: 10px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 15px var(--aura-color, rgba(0, 255, 102, 0.2));
+}
+
+.floppy-disk:hover {
+    transform: translateY(-6px) rotate(1deg);
+    box-shadow: 0 0 25px var(--aura-color, #00ff66);
+}
+
+/* Placa metálica deslizable superior */
+.floppy-shutter {
+    width: 60%;
+    height: 28px;
+    background: linear-gradient(180deg, #d0d0d0, #888888);
+    border-radius: 2px;
+    margin: 0 auto;
+    border: 1px solid #222222;
+    position: relative;
+}
+
+.floppy-shutter::after {
+    content: '';
+    position: absolute;
+    left: 8px; 
+    top: 6px; 
+    width: 10px; 
+    height: 16px;
+    background: #111111;
+}
+
+/* Etiqueta de papel adhesiva */
+.floppy-sticker {
+    background: #ffffff;
+    color: #000000;
+    border-radius: 3px;
+    padding: 6px;
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.floppy-cover-img {
+    width: 100%;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 2px;
+    background: #cccccc;
+}
+
+.floppy-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: var(--title-color, #000000);
+    text-align: center;
+}
+
+/* ========================================================
+   ESTILOS: SISTEMA DE ESTRELLAS FNAF / FNAC 3
+   ======================================================== */
+.fnaf-stars-container {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10000; /* Siempre visible por encima de todo */
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.fnaf-star {
+    font-size: 1.4rem;
+    color: #222222; /* Color cuando está bloqueada */
+    text-shadow: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    position: relative;
+}
+
+.fnaf-star.locked {
+    opacity: 0.3;
+    filter: grayscale(100%);
+}
+
+.fnaf-star.unlocked {
+    opacity: 1;
+    filter: grayscale(0%);
+    animation: starUnlockPop 0.6s ease-out forwards;
+}
+
+/* --- COLORES Y AURAS INDIVIDUALES (ESTRELLAS 1 A 6) --- */
+.fnaf-star.star-1.unlocked { color: #00f3ff; filter: drop-shadow(0 0 8px #00f3ff) drop-shadow(0 0 15px #00f3ff); }
+.fnaf-star.star-2.unlocked { color: #ff007f; filter: drop-shadow(0 0 8px #ff007f) drop-shadow(0 0 15px #ff007f); }
+.fnaf-star.star-3.unlocked { color: #00ff66; filter: drop-shadow(0 0 8px #00ff66) drop-shadow(0 0 15px #00ff66); }
+.fnaf-star.star-4.unlocked { color: #9d00ff; filter: drop-shadow(0 0 8px #9d00ff) drop-shadow(0 0 15px #9d00ff); }
+.fnaf-star.star-5.unlocked { color: #00e5ff; filter: drop-shadow(0 0 8px #00e5ff) drop-shadow(0 0 15px #00e5ff); }
+.fnaf-star.star-6.unlocked { color: #ff6600; filter: drop-shadow(0 0 8px #ff6600) drop-shadow(0 0 15px #ff6600); }
+
+/* --- ESTRELLA 7 ESPECIAL: MENTA, ROJO, BLANCO + AURA DORADA (FNAC 3) --- */
+.fnaf-star.star-7.fnac3-special.unlocked {
+    /* Degradado Tricolor: Menta, Blanco y Rojo */
+    background: linear-gradient(135deg, #3eb489 0%, #3eb489 35%, #ffffff 50%, #ff2244 65%, #ff2244 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+
+    /* Aura Dorada Intensa Resplandeciente */
+    filter: drop-shadow(0 0 6px #ffd700) 
+            drop-shadow(0 0 14px #ffa500) 
+            drop-shadow(0 0 22px rgba(255, 215, 0, 0.9));
+    
+    animation: fnac3Pulse 2s infinite alternate ease-in-out;
+}
+
+/* Animación de desbloqueo tipo Pop */
+@keyframes starUnlockPop {
+    0% { transform: scale(0.3) rotate(-30deg); }
+    70% { transform: scale(1.4) rotate(15deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Pulso Místico para la Estrella 7 */
+@keyframes fnac3Pulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 6px #ffd700) drop-shadow(0 0 12px #ffa500); }
+    100% { transform: scale(1.15); filter: drop-shadow(0 0 10px #ffd700) drop-shadow(0 0 22px #ff8c00) drop-shadow(0 0 30px #ffffff); }
+}
+
+/* ========================================================
+   ESTILOS: CABEZA VAPORWAVE & CASETE
+   ======================================================== */
+.vapor-oracle-section {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.vapor-oracle-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 550px;
+    width: 100%;
+}
+
+/* Aura Estilo Vaporwave Púrpura / PlayStation 1 */
+.vapor-aura {
+    position: absolute;
+    top: 20px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(157, 0, 255, 0.8) 0%, rgba(0, 243, 255, 0.4) 50%, rgba(0,0,0,0) 70%);
+    filter: blur(30px);
+    z-index: 1;
+    animation: psAuraPulse 4s infinite alternate ease-in-out;
+}
+
+.vapor-head-wrapper {
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    animation: vaporFloat 3.5s infinite ease-in-out;
+}
+
+.vapor-head-img {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px #9d00ff) drop-shadow(0 0 30px #00f3ff);
+    transition: all 0.5s ease;
+}
+
+/* Casete Retro */
+.vapor-cassette {
+    position: relative;
+    z-index: 2;
+    width: 180px;
+    height: 105px;
+    background: #111118;
+    border: 3px solid #3d2b56;
+    border-radius: 8px;
+    margin-top: -20px;
+    padding: 8px;
+    box-shadow: 0 0 15px rgba(157, 0, 255, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cassette-tape-wheels {
+    display: flex;
+    justify-content: space-between;
+    width: 70%;
+    margin-top: 10px;
+}
+
+.cassette-tape-wheels .wheel {
+    width: 28px;
+    height: 28px;
+    border: 3px dashed #9d00ff;
+    border-radius: 50%;
+    animation: spinTape 4s linear infinite;
+}
+
+.cassette-label {
+    background: #ffffff;
+    color: #000;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+/* Consola de Diálogo */
+.vapor-dialog-box {
+    position: relative;
+    z-index: 2;
+    margin-top: 20px;
+    background: rgba(15, 10, 25, 0.9);
+    border: 2px solid #9d00ff;
+    box-shadow: 0 0 20px rgba(157, 0, 255, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    color: #e0d0ff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+    text-align: center;
+    width: 100%;
+    min-height: 90px;
+}
+
+/* --- MODO DORADO ULTRA RARO (1/100) --- */
+.vapor-oracle-container.gold-mode .vapor-aura {
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.9) 0%, rgba(255, 140, 0, 0.5) 50%, rgba(0,0,0,0) 70%);
+}
+
+.vapor-oracle-container.gold-mode .vapor-head-img {
+    filter: drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 40px #ff8c00) sepia(100%) hue-rotate(5deg) saturate(300%);
+}
+
+.vapor-oracle-container.gold-mode .vapor-dialog-box {
+    border-color: #ffd700;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    color: #fff8d0;
+}
+
+.gold-code-input-group {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.gold-code-input-group input {
+    flex: 1;
+    background: #000;
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    padding: 6px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    outline: none;
+}
+
+.gold-code-input-group button {
+    background: #ffd700;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Animaciones */
+@keyframes vaporFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(1.5deg); }
+}
+
+@keyframes psAuraPulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    100% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes spinTape {
+    100% { transform: rotate(360deg); }
+}
+
+    </style>
+</head>
+<body>
+<!-- ========================================================
+   MÓDULO: CABEZA VAPORWAVE & CASETE DE FILOSOFÍA NOCTURNA
+   ======================================================== -->
+<section class="vapor-oracle-section">
+    <div class="vapor-oracle-container" id="vaporContainer">
+        <!-- Aura Flotante Vaporwave / PlayStation -->
+        <div class="vapor-aura"></div>
+        
+        <!-- Cabeza Flotante (Reemplazá la URL del src si tenés una imagen propia) -->
+        <div class="vapor-head-wrapper">
+            <img src="https://via.placeholder.com/300x300/180e29/9d00ff?text=VAPORWAVE+HEAD" 
+                 alt="Cabeza Vaporwave" 
+                 class="vapor-head-img" 
+                 id="vaporHead">
+        </div>
+
+        <!-- Casete Retro Inferior -->
+        <div class="vapor-cassette" id="vaporCassette">
+            <div class="cassette-tape-wheels">
+                <span class="wheel left"></span>
+                <span class="wheel right"></span>
+            </div>
+            <div class="cassette-label">TAPE_01 // PROFUNDIDADES</div>
+        </div>
+
+        <!-- Consola de Diálogo / Citas Profundas & Códigos -->
+        <div class="vapor-dialog-box" id="vaporDialogBox">
+            <p id="vaporText">Haz clic en la cabeza o el casete para escuchar la voz del abismo...</p>
+            
+            <!-- Formulario Secreto que se activa en Modo Dorado -->
+            <div class="gold-code-input-group" id="goldCodeGroup" style="display: none;">
+                <input type="text" id="goldCodeInput" placeholder="Escribe tu respuesta aquí..." autocomplete="off">
+                <button id="goldCodeBtn">VERIFICAR</button>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ========================================================
+   MÓDULO: SISTEMA DE 7 ESTRELLAS DE LOGRO (ESTILO FNAF / FNAC)
+   ======================================================== -->
+<div class="fnaf-stars-container" id="fnafStarsContainer">
+    <!-- Estrella 1: Neón Azul -->
+    <div class="fnaf-star star-1 locked" data-star="1" title="Estrella 1: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 2: Neón Rosa -->
+    <div class="fnaf-star star-2 locked" data-star="2" title="Estrella 2: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 3: Neón Verde -->
+    <div class="fnaf-star star-3 locked" data-star="3" title="Estrella 3: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 4: Neón Violeta -->
+    <div class="fnaf-star star-4 locked" data-star="4" title="Estrella 4: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 5: Neón Cian -->
+    <div class="fnaf-star star-5 locked" data-star="5" title="Estrella 5: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 6: Neón Naranja -->
+    <div class="fnaf-star star-6 locked" data-star="6" title="Estrella 6: Incompleto">
+        <i class="fa-solid fa-star"></i>
+    </div>
+    <!-- Estrella 7: Menta, Rojo y Blanco (Estilo FNaC 3) + Aura Dorada Ultra Especial -->
+    <div class="fnaf-star star-7 fnac3-special locked" data-star="7" title="Estrella 7: Desafío Supremo FNAC 3">
+        <i class="fa-solid fa-star"></i>
+    </div>
+</div>
+
+    <!-- TÍTULO 3D METAL SLUG CON DETECTOR ALL GOLD -->
+    <div class="title-container">
+        <h1 class="metal-slug-title" id="interactiveTitle">
+            <span class="letter">Y</span>
+            <span class="letter">a</span>
+            <span class="letter">o</span>
+            <span class="letter">i</span>
+            <span class="letter">L</span>
+            <span class="letter">o</span>
+            <span class="letter">v</span>
+            <span class="letter">e</span>
+            <span class="letter">r</span>
+            <span class="letter">'</span>
+            <span class="letter">s</span>
+            <span class="space"></span>
+            <span class="letter">P</span>
+            <span class="letter">l</span>
+            <span class="letter">e</span>
+            <span class="letter">a</span>
+            <span class="letter">s</span>
+            <span class="letter">u</span>
+            <span class="letter">r</span>
+            <span class="letter">e</span>
+            <span class="space"></span>
+            <span class="letter">S</span>
+            <span class="letter">t</span>
+            <span class="letter">a</span>
+            <span class="letter">t</span>
+            <span class="letter">i</span>
+            <span class="letter">o</span>
+            <span class="letter">n</span>
+        </h1>
+    </div>
+
+    <!-- CINTA DE NOTICIAS / TICKER UBICADO JUSTO DEBAJO DEL TÍTULO -->
+    <div class="ticker-container">
+        <div class="ticker-badge">
+            <span class="live-dot"></span>
+            SYSTEM NEWS
+        </div>
+
+        <div class="ticker-track">
+            <div class="ticker-content" id="tickerContent">
+                <div class="ticker-item">
+                    <span class="separator">★</span>
+                    <span>BIENVENIDO AL <span class="highlight">YaoiLover's Pleasure Station!</span></span>
+                    
+                    <span class="separator">◆</span>
+                    <span>ESTADO DEL SISTEMA: <span class="highlight" style="color: #ffea00;">100% ONLINE</span></span>
+                    
+                    <span class="separator">◆</span>
+                    <span>MEMORY CARD: <span class="highlight">BLOQUE 01 CARGADO</span></span>
+                    
+                    <span class="separator">★</span>
+                    <span class="special-msg">
+                        ⭐ ¡Hola Yeyo! espero te guste la pagina la hice con amor y cariño para vos &lt;3 espero la disfrutes ATT: Leo Kasper Con amor Para YaoiPornLover ⭐
+                    </span>
+                    
+                    <span class="separator">◆</span>
+                    <span>SINTETIZADOR BGM: <span class="highlight">8-BIT / SYNTHWAVE READY</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER / SUBTÍTULO -->
+    <header class="arcade-header">
+        <div class="arcade-subtitle">
+            <i class="fa-solid fa-gamepad"></i> SELECTOR DE CARTUCHOS NES
+        </div>
+    </header>
+
+    <!-- Grilla de Juegos (Cartuchos NES) -->
+    <main class="game-grid" id="gameGrid"></main>
+<!-- ========================================================
+   MÓDULO: CONTENEDOR DE CARTUCHOS GAME BOY ADVANCE
+   ======================================================== -->
+<section class="catalog-section">
+    <h2 class="section-title gba-theme">
+        <i class="fa-solid fa-microchip"></i> COLECCIÓN GAME BOY ADVANCE (16-BIT)
+    </h2>
+    <div class="game-grid gba-grid" id="gbaGrid">
+        <!-- Los 10 cartuchos GBA con aura neón se generan aquí con JS -->
+    </div>
+</section>
+<!-- ========================================================
+   MÓDULO: CONTENEDOR DE DISQUETES FLOPPY DISK 3.5"
+   ======================================================== -->
+<section class="catalog-section">
+    <h2 class="section-title floppy-theme">
+        <i class="fa-solid fa-floppy-disk"></i> DISQUETES FLOPPY DISK 3.5" (PC MS-DOS)
+    </h2>
+    <div class="game-grid floppy-grid" id="floppyGrid">
+        <!-- Los 10 disquetes con placa metálica y etiqueta se generan aquí con JS -->
+    </div>
+</section>
+
+    <!-- MEDALLA Y POPUP DE LOGRO ESTILO NEWGROUNDS -->
+    <div class="ng-achievement" id="achievementPopup">
+        <div class="ng-icon">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+        <div class="ng-content">
+            <span class="ng-header">MEDAL UNLOCKED!</span>
+            <h4 class="ng-title">The Midas Touch</h4>
+            <p class="ng-desc">+50 pts - Transformed the station into solid gold!</p>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE LA LLUVIA DE MONEDAS ARCADE -->
+    <div class="coin-rain-container" id="coinRain"></div>
+<!-- ========================================================
+   MÓDULO: TERMINAL MS-DOS INTERACTIVA
+   ======================================================== -->
+<section class="msdos-container">
+    <div class="msdos-header">
+        <div class="msdos-title">
+            <i class="fa-solid fa-terminal"></i> MS-DOS Executive v6.22 - [SYSTEM TERMINAL]
+        </div>
+        <div class="msdos-controls">
+            <span class="win-btn minimize">_</span>
+            <span class="win-btn maximize">□</span>
+            <span class="win-btn close">×</span>
+        </div>
+    </div>
+    <div class="msdos-body" id="dosBody">
+        <p>MICROSOFT(R) MS-DOS(R) VERSION 6.22</p>
+        <p>(C)Copyright Microsoft Corp 1981-1993.</p>
+        <br>
+        <p>Escribe <span class="dos-highlight">HELP</span> para listar comandos disponibles del sistema.</p>
+        <br>
+        <div class="dos-output" id="dosOutput"></div>
+        <div class="dos-input-line">
+            <span class="dos-prompt">C:\SYSTEM\GAMES&gt;</span>
+            <input type="text" id="dosInput" class="dos-input" autofocus autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+</section>
+
+    <script>
+        /* ========================================================
+           SISTEMA DE AUDIO VIRTUAL (SIN ARCHIVOS EXTERNOS)
+           ======================================================== */
+        class RetroAudio {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playInsertSFX() {
+                this.init();
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.12);
+
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            }
+        }
+
+        const audio = new RetroAudio();
+
+        /* ========================================================
+           BASE DE DATOS DE CARTUCHOS NES Y REDIRECCIÓN .HTML
+           ======================================================== */
+        const GAMES_DATABASE = [
+            { id: 'snake', title: 'SNAKE CLASSIC', icon: 'fa-staff-snake', color: '#00ff66' },
+            { id: 'pong', title: 'PONG RETRO', icon: 'fa-table-tennis-paddle-ball', color: '#00f3ff' },
+            { id: 'tetris', title: 'TETRIS 8-BIT', icon: 'fa-cubes', color: '#ff007f' },
+            { id: 'space-invaders', title: 'SPACE INVADERS', icon: 'fa-robot', color: '#ffd700' },
+            { id: 'flappy-bird', title: 'FLAPPY BIRD', icon: 'fa-crow', color: '#ff6600' },
+            { id: 'breakout', title: 'BREAKOUT', icon: 'fa-ghost', color: '#b000ff' }
+        ];
+
+        /* ========================================================
+           GENERACIÓN DINÁMICA DE CARTUCHOS NES EN EL DOM
+           ======================================================== */
+        const gameGrid = document.getElementById('gameGrid');
+
+        GAMES_DATABASE.forEach(game => {
+            const card = document.createElement('a');
+            card.href = `${game.id}.html`;
+            card.className = 'nes-cartridge';
+            card.title = `Insertar cartucho: ${game.title}`;
+
+            card.innerHTML = `
+                <div class="nes-top-notch"></div>
+                <div class="nes-label-area" style="--cart-accent: ${game.color};">
+                    <div class="nes-brand-banner">NIENTIENDO NAS</div>
+                    <i class="fa-solid ${game.icon} nes-cart-icon"></i>
+                    <div class="nes-cart-title">${game.title}</div>
+                    <div class="nes-seal-of-quality">★ OFFICIAL NAS ★</div>
+                </div>
+                <div class="nes-grip-lines">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="nes-pin-connector"></div>
+            `;
+
+            card.addEventListener('click', () => {
+                audio.playInsertSFX();
+            });
+
+            gameGrid.appendChild(card);
+        });
+
+        /* ========================================================
+           INTERACTIVIDAD SLUG TITLE + MODO ALL GOLD + TICKER LOOP
+           ======================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Loop Infinito para Ticker
+            const tickerContent = document.getElementById('tickerContent');
+            if (tickerContent) {
+                const originalHTML = tickerContent.innerHTML;
+                tickerContent.innerHTML = originalHTML + originalHTML;
+            }
+
+            // Lógica Metal Slug Title & Achievement
+            const letters = document.querySelectorAll('.metal-slug-title .letter');
+            const achievementPopup = document.getElementById('achievementPopup');
+            const coinRainContainer = document.getElementById('coinRain');
+            let achievementUnlocked = false;
+
+            letters.forEach(letter => {
+                letter.addEventListener('click', () => {
+                    letter.classList.add('spinning');
+                    letter.classList.toggle('gold');
+
+                    setTimeout(() => {
+                        letter.classList.remove('spinning');
+                    }, 800);
+
+                    checkAllGold();
+                });
+            });
+
+            function checkAllGold() {
+                const totalLetters = letters.length;
+                const goldLetters = document.querySelectorAll('.metal-slug-title .letter.gold').length;
+
+                if (goldLetters === totalLetters && !achievementUnlocked) {
+                    achievementUnlocked = true;
+                    triggerAllGoldMode();
+                }
+            }
+
+            function triggerAllGoldMode() {
+                document.body.classList.add('all-gold-mode');
+                achievementPopup.classList.add('show');
+                spawnCoinRain();
+
+                setTimeout(() => {
+                    achievementPopup.classList.remove('show');
+                }, 5000);
+            }
+
+            function spawnCoinRain() {
+                const coinCount = 60;
+                for (let i = 0; i < coinCount; i++) {
+                    setTimeout(() => {
+                        const coin = document.createElement('div');
+                        coin.classList.add('pixel-coin');
+                        coin.style.left = Math.random() * 100 + 'vw';
+                        coin.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                        
+                        coinRainContainer.appendChild(coin);
+
+                        setTimeout(() => {
+                            coin.remove();
+                        }, 3500);
+                    }, i * 80);
+                }
+            }
+        });
+    </script>
+
+    <script>
+        /* ========================================================
+   MÓDULO JS: GENERADOR DE CARTUCHOS GAME BOY ADVANCE
+   ======================================================== */
+
+// Paletas de colores neón para las Auras y Títulos
+const GBA_PALETTES = [
+    { aura: 'rgba(255, 0, 127, 0.6)', title: '#ff007f' },
+    { aura: 'rgba(0, 243, 255, 0.6)', title: '#00f3ff' },
+    { aura: 'rgba(0, 255, 102, 0.6)', title: '#00ff66' },
+    { aura: 'rgba(157, 0, 255, 0.6)', title: '#9d00ff' },
+    { aura: 'rgba(255, 215, 0, 0.6)', title: '#ffd700' },
+    { aura: 'rgba(255, 102, 0, 0.6)', title: '#ff6600' }
+];
+
+// Array con los 10 Placeholders de GBA
+const GBA_GAMES = Array.from({ length: 10 }, (_, i) => {
+    const palette = GBA_PALETTES[i % GBA_PALETTES.length];
+    return {
+        id: i + 1,
+        title: `VACÍO GBA #${i + 1}`,
+        imgUrl: '', // <-- Agregá la URL de la carátula aquí
+        auraColor: palette.aura,
+        titleColor: palette.title,
+        link: '#'   // <-- Agregá la URL del juego o HTML aquí
+    };
+});
+
+function renderGBA() {
+    const container = document.getElementById('gbaGrid');
+    if (!container) return;
+
+    container.innerHTML = ''; // Limpiamos contenedor por seguridad
+
+    GBA_GAMES.forEach(game => {
+        const el = document.createElement('a');
+        el.href = game.link;
+        el.className = 'gba-cartridge';
+        el.style.setProperty('--aura-color', game.auraColor);
+        el.style.setProperty('--title-color', game.titleColor);
+        el.style.textDecoration = 'none';
+
+        // Imagen placeholder por defecto si imgUrl está vacío
+        const imgSrc = game.imgUrl || 'https://via.placeholder.com/200x80/1a1c23/00f3ff?text=GBA+COVER';
+
+        el.innerHTML = `
+            <div class="gba-top-grip"></div>
+            <div class="gba-label-area">
+                <img src="${imgSrc}" class="gba-cover-img" alt="${game.title}">
+                <div class="gba-title">${game.title}</div>
+            </div>
+        `;
+        container.appendChild(el);
+    });
+}
+
+// Inicializar el renderizado al cargar el DOM
+document.addEventListener('DOMContentLoaded', renderGBA);
+</script>
+
+<script>
+/* ========================================================
+   MÓDULO JS: GENERADOR DE DISQUETES FLOPPY DISK 3.5"
+   ======================================================== */
+
+// Colores oscuros de carcasa de plástico para los disquetes
+const FLOPPY_BG_COLORS = ['#1e1f29', '#14281d', '#2b1b17', '#281428', '#14252b'];
+
+// Paletas neón para auras y títulos en la etiqueta de papel
+const FLOPPY_PALETTES = [
+    { aura: 'rgba(0, 255, 102, 0.6)', title: '#00bb44' },
+    { aura: 'rgba(0, 243, 255, 0.6)', title: '#00a8b3' },
+    { aura: 'rgba(255, 0, 127, 0.6)', title: '#cc0066' },
+    { aura: 'rgba(157, 0, 255, 0.6)', title: '#7a00cc' },
+    { aura: 'rgba(255, 215, 0, 0.6)', title: '#cca100' }
+];
+
+// Array con los 10 Placeholders de Disquetes
+const FLOPPY_GAMES = Array.from({ length: 10 }, (_, i) => {
+    const palette = FLOPPY_PALETTES[i % FLOPPY_PALETTES.length];
+    return {
+        id: i + 1,
+        title: `DISK_VACIO_${i + 1}.EXE`,
+        imgUrl: '', // <-- Agregá la URL de la imagen del juego aquí
+        auraColor: palette.aura,
+        titleColor: palette.title,
+        floppyBg: FLOPPY_BG_COLORS[i % FLOPPY_BG_COLORS.length],
+        link: '#'   // <-- Agregá la URL del juego o HTML aquí
+    };
+});
+
+function renderFloppy() {
+    const container = document.getElementById('floppyGrid');
+    if (!container) return;
+
+    container.innerHTML = ''; // Limpiamos contenedor por seguridad
+
+    FLOPPY_GAMES.forEach(game => {
+        const el = document.createElement('a');
+        el.href = game.link;
+        el.className = 'floppy-disk';
+        el.style.setProperty('--aura-color', game.auraColor);
+        el.style.setProperty('--title-color', game.titleColor);
+        el.style.setProperty('--floppy-bg', game.floppyBg);
+        el.style.textDecoration = 'none';
+
+        // Imagen placeholder por defecto si imgUrl está vacío
+        const imgSrc = game.imgUrl || 'https://via.placeholder.com/150x45/cccccc/000000?text=FLOPPY+IMG';
+
+        el.innerHTML = `
+            <div class="floppy-shutter"></div>
+            <div class="floppy-sticker">
+                <img src="${imgSrc}" class="floppy-cover-img" alt="${game.title}">
+                <div class="floppy-title">${game.title}</div>
+            </div>
+        `;
+        container.appendChild(el);
+    });
+}
+
+// Inicializar el renderizado al cargar el DOM
+document.addEventListener('DOMContentLoaded', renderFloppy);
+</script>
+
+<script>
+/* ========================================================
+   SISTEMA INTEGRADO ELITE: TERMINAL + ESTRELLAS + EFECTOS
+   ======================================================== */
+
+// --- 1. PERSISTENCIA Y MANEJO DE ESTRELLAS ---
+function initFnafStars() {
+    const unlockedStars = JSON.parse(localStorage.getItem('fnaf_unlocked_stars')) || [];
+    unlockedStars.forEach(starNumber => unlockStarUI(starNumber));
+}
+
+function unlockStar(starNumber) {
+    if (starNumber < 1 || starNumber > 7) return false;
+
+    let unlockedStars = JSON.parse(localStorage.getItem('fnaf_unlocked_stars')) || [];
+
+    if (!unlockedStars.includes(starNumber)) {
+        unlockedStars.push(starNumber);
+        localStorage.setItem('fnaf_unlocked_stars', JSON.stringify(unlockedStars));
+        unlockStarUI(starNumber);
+        
+        // Disparar Notificación Flotante
+        const title = starNumber === 7 ? '¡DESAFÍO SUPREMO FNAC 3!' : `ESTRELLA #${starNumber}`;
+        showAchievementToast(title, starNumber === 7);
+
+        return true; 
+    }
+    return false;
+}
+
+function unlockStarUI(starNumber) {
+    const starElement = document.querySelector(`.fnaf-star[data-star="${starNumber}"]`);
+    if (starElement) {
+        starElement.classList.remove('locked');
+        starElement.classList.add('unlocked');
+        starElement.title = starNumber === 7 
+            ? 'Estrella 7: ¡LOGRO SUPREMO FNAC 3 DESBLOQUEADO!' 
+            : `Estrella ${starNumber}: ¡Desbloqueada!`;
+    }
+}
+
+/* ========================================================
+   REPARADO: NOTIFICACIÓN FLOTANTE CON TEMPLATE LITERALS
+   ======================================================== */
+function showAchievementToast(starTitle, isSpecial = false) {
+    let toast = document.getElementById('achievementToast');
+    
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'achievementToast';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 15, 0.95);
+            border: 2px solid ${isSpecial ? '#ffd700' : '#00f3ff'};
+            box-shadow: 0 0 20px ${isSpecial ? '#ffd700' : '#00f3ff'};
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        `;
+        document.body.appendChild(toast);
+    }
+
+    toast.style.borderColor = isSpecial ? '#ffd700' : '#00f3ff';
+    toast.style.boxShadow = `0 0 20px ${isSpecial ? '#ffd700' : '#00f3ff'}`;
+    
+    // AQUÍ ESTÁ EL CAMBIO FIXEADO (Comillas invertidas completas):
+    toast.innerHTML = `
+        <div>
+            <div style="font-size: 0.75rem; color: #888; text-transform: uppercase;">¡Logro Desbloqueado!</div>
+            <div style="font-weight: bold; font-size: 1rem; color: #fff;">${starTitle}</div>
+        </div>
+    `;
+
+    // Animación de entrada
+    setTimeout(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+    }, 50);
+
+    // Animación de salida a los 3.5 segundos
+    setTimeout(() => {
+        toast.style.transform = 'translateY(100px)';
+        toast.style.opacity = '0';
+    }, 3500);
+}
+// --- 3. PARTICULAS DORADAS PARA LA ESTRELLA 7 (HOVER EFFECT) ---
+function initStar7Particles() {
+    const star7 = document.querySelector('.fnaf-star.star-7');
+    if (!star7) return;
+
+    star7.addEventListener('mousemove', (e) => {
+        if (!star7.classList.contains('unlocked')) return;
+
+        const particle = document.createElement('span');
+        particle.style.cssText = `
+            position: fixed;
+            left: ${e.clientX + (Math.random() * 20 - 10)}px;
+            top: ${e.clientY + (Math.random() * 20 - 10)}px;
+            width: ${Math.random() * 6 + 2}px;
+            height: ${Math.random() * 6 + 2}px;
+            background: ${Math.random() > 0.5 ? '#ffd700' : '#ffffff'};
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 8px #ffd700;
+            z-index: 10001;
+            transition: all 0.8s ease-out;
+            opacity: 1;
+        `;
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+            particle.style.transform = `translateY(${Math.random() * 30 + 20}px) scale(0)`;
+            particle.style.opacity = '0';
+        }, 50);
+
+        setTimeout(() => particle.remove(), 850);
+    });
+}
+
+// --- 4. TERMINAL MS-DOS INTERACTIVA ---
+function initMSDOS() {
+    const input = document.getElementById('dosInput');
+    const output = document.getElementById('dosOutput');
+    const body = document.getElementById('dosBody');
+
+    if (!input || !output) return;
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const rawCmd = input.value.trim();
+            const cmd = rawCmd.toUpperCase();
+            
+            const line = document.createElement('p');
+            line.textContent = `C:\\SYSTEM\\GAMES> ${rawCmd}`;
+            output.appendChild(line);
+
+            let response = '';
+
+            switch (cmd) {
+                case 'HELP':
+                    response = 'COMANDOS: DIR, CLS, STATUS, YEYO, UNLOCK [1-7], CHEAT_FNAC3';
+                    break;
+
+                case 'DIR':
+                    response = 'DIRECTORIO DE C:\\SYSTEM\\GAMES:\n- GBA_COLLECTION [10 ITEMS]\n- FLOPPY_DISKS [10 ITEMS]\n- STARS_ACHIEVEMENTS.SYS';
+                    break;
+
+                case 'CLS':
+                case 'CLEAR':
+                    output.innerHTML = '';
+                    input.value = '';
+                    return;
+
+                case 'YEYO':
+                    const isNewYeyo = unlockStar(1);
+                    response = isNewYeyo 
+                        ? '⭐ ¡ACCESO DE YEYO CONCEDIDO! Estrella 1 desatada.' 
+                        : '⭐ MODO YEYO ACTIVO: Hermano, ya tenías la Estrella 1.';
+                    break;
+
+                case 'CHEAT_FNAC3':
+                    const isNewFnac = unlockStar(7);
+                    response = isNewFnac
+                        ? '🔥 ¡CÓDIGO SECRETO! Estrella 7 FNaC 3 (Menta/Blanco/Rojo + Aura Dorada) ACTIVADA.'
+                        : '🔥 La Estrella 7 ya resplandece en tu corona.';
+                    break;
+
+                default:
+                    if (cmd.startsWith('UNLOCK ')) {
+                        const targetStar = parseInt(cmd.split(' ')[1]);
+                        if (targetStar >= 1 && targetStar <= 7) {
+                            const isNew = unlockStar(targetStar);
+                            response = isNew 
+                                ? `⭐ ¡ÉXITO! Estrella ${targetStar} desbloqueada dinámicamente.` 
+                                : `⚠️ La Estrella ${targetStar} ya estaba activa.`;
+                        } else {
+                            response = 'ERROR: Rango de estrellas válido entre 1 y 7.';
+                        }
+                    } else if (cmd !== '') {
+                        response = `'${cmd}' no se reconoce como un comando válido. Usa HELP.`;
+                    }
+            }
+
+            if (response) {
+                const resLine = document.createElement('p');
+                resLine.style.color = '#ffffff';
+                resLine.style.whiteSpace = 'pre-line';
+                resLine.textContent = response;
+                output.appendChild(resLine);
+            }
+
+            input.value = '';
+            if (body) body.scrollTop = body.scrollHeight;
+        }
+    });
+}
+
+// --- 5. INICIALIZADOR GENERAL DEL SISTEMA ---
+document.addEventListener('DOMContentLoaded', () => {
+    initFnafStars();
+    initMSDOS();
+    initStar7Particles();
+
+    // Evento manual por clic en las estrellas
+    const stars = document.querySelectorAll('.fnaf-star');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const starNum = parseInt(star.getAttribute('data-star'));
+            unlockStar(starNum);
+        });
+    });
+});
+</script>
+<script>
+    /* ========================================================
+   MÓDULO UNIFICADO: VAPOR ORACLE + LOGROS TRÁGICOS + TRIVIAS
+   ======================================================== */
+
+// --- 1. BASE DE DATOS DE FRASES (HUMOR, ACCIÓN, FILOSOFÍA Y DESTRUCCIÓN) ---
+const VAPOR_PHILOSOPHY = [
+    // --- ROBIN WILLIAMS ---
+    "«La comedia es solo una forma divertida de ser serio.» — Robin Williams",
+    "«Solo se te da una pequeña chispa de locura. No debes perderla.» — Robin Williams",
+    "«Pensaba que la idea de la vida era simplemente encajar. Pero luego me di cuenta de que no viniste a este mundo a encajar, viniste a florecer.» — Robin Williams",
+    "«Tendrás momentos malos, pero ellos siempre te despertarán para ver las cosas buenas a las que no prestabas atención.» — Robin Williams (Good Will Hunting)",
+    
+    // --- FRASES DEVASTADORAS / DESTRUCTORES DE CORAZONES ---
+    "«Solía pensar que lo peor de la vida era terminar solo. No lo es. Lo peor de la vida es terminar con personas que te hacen sentir solo.» — Robin Williams (World's Greatest Dad)",
+    "«Ahí fuera hay personas a las que amas y que te aman. Y a veces, nos olvidamos de decírselo. Nos olvidamos de abrazarlos, de mirarlos a los ojos y darles las gracias por estar. No esperes a que sea tarde, porque el tiempo no perdona a nadie.» — Robin Williams",
+    "«Tuve miedo, John... Yo solo quería salvarte, quería salvarlos a todos. Al final, lo intenté. Sí que lo intenté...» — Arthur Morgan (RDR2)",
+    "«Por favor, no me pongas en la oscuridad. Le tengo miedo a la oscuridad...» — John Coffey (La Milla Verde)",
+    "«He visto cosas que ustedes no creerían... Todos esos momentos se perderán en el tiempo, como lágrimas en la lluvia. Es hora de morir.» — Roy Batty (Blade Runner)",
+
+    // --- ACCIÓN, CULTURA RETRO Y LEYENDAS ---
+    "«No importa si eres alto, bajo, feo, guapo, negro o blanco. Lo que importa es el tamaño de tu corazón y el respeto que tienes por los demás.» — Herman Munster",
+    "«Mientras estás ahí afuera divirtiéndote, alguien al mismo tiempo está trabajando duro. Alguien se está volviendo más listo y alguien está ganando.» — Arnold Schwarzenegger",
+    "«Vacía tu mente, sé amorfo, moldeable, como el agua. Si pones agua en una taza, se convierte en la taza. Si la pones en una botella, se convierte en la botella. Sé agua, amigo mío.» — Bruce Lee",
+    "«Encontrá lo que amás y dejá que te mate.» — Charles Bukowski",
+    "«El hombre se complace en contar sus pesares, pero no calcula sus felicidades.» — Fiódor Dostoyevski",
+    "«Hay un punto a partir del cual ya no hay retorno. Ese es el punto que hay que alcanzar.» — Franz Kafka",
+    "«Quien sabe de dolor, todo lo sabe.» — Dante Alighieri",
+    "«No seré una estrella de rock, seré una leyenda.» — Freddie Mercury",
+    "«Únanse al baile de los que sobran, nadie nos va a echar de más.» — Jorge González",
+    "«No vine a guiar corderos, vine a despertar leones.» — Javier Milei",
+    "«¿Quién decide qué es la locura? La sociedad, un puñado de sombras. Tú y yo sabemos la verdad.» — Leo Kasper",
+    "«No busco peleas, pero si alguien intenta lastimar a un amigo, no me voy a quedar de brazos cruzados.» — Capitán América",
+    "«Hay que luchar para alcanzar tus sueños. Tienes que sacrificarte y trabajar duro para ello.» — Lionel Messi",
+    "«Nadie te golpeará tan fuerte como lo hace la vida. Pero no importa lo fuerte que golpeas, sino lo fuerte que puedes ser golpeado y seguir avanzando.» — Sylvester Stallone",
+    "«Sabemos lo que hay que hacer. Tenemos los medios. Todo lo que necesitamos es la voluntad.» — George H. W. Bush",
+    "«Cualquiera puede lograr la victoria, pero solo los fuertes son capaces de mantenerse en ella.» — Adolf Hitler"
+];
+
+// Arreglo específico para detectar frases tristes y activar el logro
+const TRAGIC_PHILOSOPHY = [
+    "«Solía pensar que lo peor de la vida era terminar solo. No lo es. Lo peor de la vida es terminar con personas que te hacen sentir solo.» — Robin Williams (World's Greatest Dad)",
+    "«Ahí fuera hay personas a las que amas y que te aman. Y a veces, nos olvidamos de decírselo. Nos olvidamos de abrazarlos, de mirarlos a los ojos y darles las gracias por estar. No esperes a que sea tarde, porque el tiempo no perdona a nadie.» — Robin Williams",
+    "«Tuve miedo, John... Yo solo quería salvarte, quería salvarlos a todos. Al final, lo intenté. Sí que lo intenté...» — Arthur Morgan (RDR2)",
+    "«Por favor, no me pongas en la oscuridad. Le tengo miedo a la oscuridad...» — John Coffey (La Milla Verde)",
+    "«He visto cosas que ustedes no creerían... Todos esos momentos se perderán en el tiempo, como lágrimas en la lluvia. Es hora de morir.» — Roy Batty (Blade Runner)"
+];
+
+// Frase específica que activa el botón de WhatsApp
+const FAMILY_QUOTE = "«Ahí fuera hay personas a las que amas y que te aman. Y a veces, nos olvidamos de decírselo. Nos olvidamos de abrazarlos, de mirarlos a los ojos y darles las gracias por estar. No esperes a que sea tarde, porque el tiempo no perdona a nadie.» — Robin Williams";
+
+// --- 2. TRIVIAS DEL MODO DORADO (1/100) ---
+const GOLD_TRIVIAS = [
+    {
+        id: 'q1',
+        question: '👑 MODO DORADO ACTIVADO 👑\nPregunta: ¿De dónde viene Leo Kasper?',
+        answers: ['tumbaleja', 'tumbalalmeja'],
+        targetStar: 4,
+        successMsg: '¡Correcto! La verdad sobre Leo Kasper ha desatado la ESTRELLA 4.'
+    },
+    {
+        id: 'q2',
+        question: '👑 MODO DORADO ACTIVADO 👑\nPregunta: ¿Cuándo llegó YL a AN1? (Formatos: DD/MM/AAAA o MM/DD/AAAA)',
+        answers: ['25/04/2020', '04/25/2020'],
+        targetStar: 2,
+        successMsg: '¡Exacto! La fecha histórica se ha confirmado. ESTRELLA 2 DESBLOQUEADA.'
+    },
+    {
+        id: 'q3',
+        question: '👑 MODO DORADO ACTIVADO 👑\nIngresa el código cronológico secreto de acceso:',
+        answers: ['30/01/33', '30/01/1933'],
+        targetStar: 1,
+        successMsg: '¡Código de acceso aceptado! La ESTRELLA 1 brilla en tu poder.'
+    }
+];
+
+let currentActiveTrivia = null;
+let sadTimer = null;
+
+// --- 3. LÓGICA PRINCIPAL DEL ORÁCULO VAPORWAVE ---
+function initVaporOracle() {
+    const head = document.getElementById('vaporHead');
+    const cassette = document.getElementById('vaporCassette');
+    const container = document.getElementById('vaporContainer');
+    const dialogText = document.getElementById('vaporText');
+    const goldGroup = document.getElementById('goldCodeGroup');
+    const goldInput = document.getElementById('goldCodeInput');
+    const goldBtn = document.getElementById('goldCodeBtn');
+
+    if (!head || !container) return;
+
+    function triggerOracle() {
+        // Resetear temporizadores y efectos al hacer un nuevo clic
+        if (sadTimer) clearTimeout(sadTimer);
+        document.body.style.filter = 'none';
+
+        // Remover botón previo de WhatsApp si existía
+        const oldFamilyBtn = document.getElementById('familyWspBtn');
+        if (oldFamilyBtn) oldFamilyBtn.remove();
+
+        // Probabilidad de 1 en 100 (1%) de MODO DORADO
+        const isGold = Math.floor(Math.random() * 100) === 0;
+
+        if (isGold) {
+            container.classList.add('gold-mode');
+            currentActiveTrivia = GOLD_TRIVIAS[Math.floor(Math.random() * GOLD_TRIVIAS.length)];
+            
+            dialogText.innerText = currentActiveTrivia.question;
+            goldGroup.style.display = 'flex';
+            goldInput.value = '';
+            goldInput.focus();
+        } else {
+            // MODO NORMAL: Filosofía
+            container.classList.remove('gold-mode');
+            goldGroup.style.display = 'none';
+            currentActiveTrivia = null;
+
+            const randomQuote = VAPOR_PHILOSOPHY[Math.floor(Math.random() * VAPOR_PHILOSOPHY.length)];
+            dialogText.innerText = randomQuote;
+
+            // EVALUAR SI ES UNA FRASE TRÁGICA / LOGRO / FAMILIA
+            handleQuoteEffects(randomQuote);
+        }
+    }
+
+    head.addEventListener('click', triggerOracle);
+    cassette.addEventListener('click', triggerOracle);
+
+    // Validación de Códigos Dorados
+    if (goldBtn && goldInput) {
+        function validateCode() {
+            if (!currentActiveTrivia) return;
+
+            const userAns = goldInput.value.trim().toLowerCase();
+
+            if (currentActiveTrivia.answers.includes(userAns)) {
+                dialogText.innerText = currentActiveTrivia.successMsg;
+                goldGroup.style.display = 'none';
+
+                if (typeof unlockStar === 'function') {
+                    unlockStar(currentActiveTrivia.targetStar);
+                }
+            } else {
+                dialogText.innerText = '❌ CÓDIGO INCORRECTO. La cabeza vuelve al abismo...';
+                goldGroup.style.display = 'none';
+                setTimeout(() => container.classList.remove('gold-mode'), 2000);
+            }
+        }
+
+        goldBtn.addEventListener('click', validateCode);
+        goldInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') validateCode();
+        });
+    }
+}
+
+// --- 4. EFECTOS ATMOSFÉRICOS Y LOGRO OCULTO ---
+function handleQuoteEffects(quote) {
+    const aura = document.querySelector('.vapor-aura');
+    const dialogBox = document.getElementById('vaporDialogBox');
+
+    // SI ES UNA FRASE TRÁGICA:
+    if (TRAGIC_PHILOSOPHY.includes(quote)) {
+        
+        // Aura Azul Melancólico Profundo
+        if (aura) aura.style.background = 'radial-gradient(circle, rgba(10, 30, 80, 0.9) 0%, rgba(0, 100, 200, 0.3) 50%, rgba(0,0,0,0) 70%)';
+
+        // Si se queda 10 segundos congelado leyendo:
+        sadTimer = setTimeout(() => {
+            document.body.style.transition = 'filter 2s ease';
+            document.body.style.filter = 'grayscale(70%)'; // Desaturación progresiva
+
+            if (typeof showAchievementToast === 'function') {
+                showAchievementToast("🌧️ Lágrimas en la Lluvia", true);
+            }
+        }, 10000);
+    } else {
+        // Restaurar Aura Púrpura/Vaporwave Estándar
+        if (aura) aura.style.background = 'radial-gradient(circle, rgba(157, 0, 255, 0.8) 0%, rgba(0, 243, 255, 0.4) 50%, rgba(0,0,0,0) 70%)';
+    }
+
+    // SI ES LA FRASE DE LA FAMILIA: Agregar Botón de WhatsApp
+    if (quote === FAMILY_QUOTE) {
+        if (aura) aura.style.background = 'radial-gradient(circle, rgba(255, 140, 0, 0.9) 0%, rgba(255, 215, 0, 0.4) 50%, rgba(0,0,0,0) 70%)';
+
+        const familyBtn = document.createElement('a');
+        familyBtn.id = 'familyWspBtn';
+        familyBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent('Hola, solo quería decirte que te quiero mucho y agradecerte por estar siempre.')}`;
+        familyBtn.target = '_blank';
+        familyBtn.style.cssText = `
+            display: inline-block;
+            margin-top: 12px;
+            background: #25D366;
+            color: #000;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            box-shadow: 0 0 10px #25D366;
+            animation: pulseBtn 1.5s infinite alternate;
+        `;
+        familyBtn.innerText = '📞 ENVIAR UN MENSAJE A ALGUIEN IMPORTANTE';
+        
+        if (dialogBox) dialogBox.appendChild(familyBtn);
+    }
+}
+
+// Inicializar el oráculo al cargar el DOM
+document.addEventListener('DOMContentLoaded', initVaporOracle);
+</script>
+
+</body>
+</html>
