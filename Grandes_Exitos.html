@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grandes Éxitos - Mugen Edits | Ultimate Showcase</title>
+    <style>
+        /* ==========================================================================
+           1. VARIABLES, PALETA DE COLORES Y RESET (MODO OSCURO SOFISTICADO)
+           ========================================================================== */
+        :root {
+            --bg-dark: #050403;
+            --bg-card: rgba(18, 14, 8, 0.85);
+            --gold-primary: #ffd700;
+            --gold-secondary: #d4af37;
+            --gold-dark: #6e5200;
+            --gold-glow: rgba(255, 215, 0, 0.35);
+            --gold-border: rgba(212, 175, 55, 0.4);
+            --text-main: #fcf6e8;
+            --text-muted: #a89873;
+            --accent-red: #ff3344;
+            --status-wip: #ff3344;
+            --status-alpha: #ff9900;
+            --status-playable: #00ff88;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 70%),
+                radial-gradient(circle at 80% 80%, rgba(110, 82, 0, 0.08) 0%, transparent 60%),
+                linear-gradient(to bottom, rgba(5,4,3,0.9), rgba(5,4,3,0.98));
+            color: var(--text-main);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding: 2rem 1rem 6rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Scanlines */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 12, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* ==========================================================================
+           2. JUKEBOX BGM & HEADER
+           ========================================================================== */
+        .jukebox-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 48px;
+            background: rgba(10, 8, 4, 0.92);
+            border-bottom: 1px solid var(--gold-border);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        .jukebox-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .jukebox-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .visualizer-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 18px;
+        }
+
+        .v-bar {
+            width: 3px;
+            background: var(--gold-primary);
+            height: 3px;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .v-bar.active {
+            animation: bounce 0.6s infinite alternate ease-in-out;
+        }
+
+        @keyframes bounce {
+            0% { height: 3px; }
+            100% { height: 18px; }
+        }
+
+        .jukebox-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .jukebox-btn {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .jukebox-btn:hover {
+            background: var(--gold-primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        /* HEADER */
+        .header-title {
+            text-align: center;
+            margin-top: 3.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px var(--gold-glow);
+            margin-bottom: 0.2rem;
+        }
+
+        .header-title .subtitle {
+            color: var(--gold-secondary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-title .authors-badge {
+            margin-top: 8px;
+            display: inline-block;
+            background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, rgba(212,175,55,0.25) 50%, rgba(255,215,0,0.1) 100%);
+            border: 1px solid var(--gold-border);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* ==========================================================================
+           3. CONTROLES DE BÚSQUEDA Y FILTRADO
+           ========================================================================== */
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-box {
+            width: 100%;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(18, 14, 8, 0.9);
+            border: 1px solid var(--gold-border);
+            border-radius: 30px;
+            padding: 0.8rem 1.5rem 0.8rem 3rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .search-input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-glow), inset 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-secondary);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(22, 18, 10, 0.8);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-secondary);
+            padding: 0.6rem 1.4rem;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+            color: var(--bg-dark);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-glow);
+            transform: scale(1.05);
+        }
+
+        /* ==========================================================================
+           4. GRID SYSTEM & CARDS (GLASSMORPHISM)
+           ========================================================================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 340px));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1350px;
+            justify-content: center;
+        }
+
+        .edit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gold-border);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 1px rgba(255, 215, 0, 0.2);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                        border-color 0.4s ease, 
+                        box-shadow 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .edit-card.hidden {
+            display: none !important;
+        }
+
+        .edit-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--gold-primary);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 25px var(--gold-glow);
+        }
+
+        /* INSIGNIA DE ESTADO CON ANIMACIÓN NEÓN (IDEA 3) */
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            border: 1px solid transparent;
+            animation: statusPulse 2s infinite alternate;
+        }
+
+        .status-badge.wip {
+            background: rgba(255, 51, 68, 0.2);
+            border-color: var(--status-wip);
+            color: var(--status-wip);
+            box-shadow: 0 0 12px rgba(255, 51, 68, 0.4);
+        }
+
+        .status-badge.alpha {
+            background: rgba(255, 153, 0, 0.2);
+            border-color: var(--status-alpha);
+            color: var(--status-alpha);
+            box-shadow: 0 0 12px rgba(255, 153, 0, 0.4);
+        }
+
+        .status-badge.playable {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--status-playable);
+            color: var(--status-playable);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+        }
+
+        @keyframes statusPulse {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* VISUAL DISPLAY CONTAINER */
+        .visual-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: radial-gradient(circle, #1f1a0e 0%, #0a0804 100%);
+            border-bottom: 1px solid var(--gold-border);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .visual-container .filter-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            transition: background 0.3s ease;
+        }
+
+        .stand-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: flex-end;
+            padding-bottom: 12px;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .stand-layer img {
+            max-height: 85%;
+            max-width: 45%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(0,0,0,0.9));
+            image-rendering: pixelated;
+        }
+
+        .pose-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .pose-layer img {
+            max-height: 90%;
+            max-width: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px var(--gold-glow));
+            image-rendering: pixelated;
+        }
+
+        .visual-container:hover .stand-layer { opacity: 0; }
+        .visual-container:hover .pose-layer { opacity: 1; }
+
+        .sequence-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(5,4,3,0.85);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-primary);
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            z-index: 4;
+            letter-spacing: 0.5px;
+        }
+
+        /* PALETTE CONTROLLER */
+        .card-palette-bar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 4;
+            display: flex;
+            gap: 6px;
+            background: rgba(5,4,3,0.7);
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--gold-border);
+        }
+
+        .palette-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid #fff;
+            transition: transform 0.2s ease;
+        }
+
+        .palette-dot:hover {
+            transform: scale(1.3);
+        }
+
+        /* CARD BODY */
+        .card-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-author {
+            color: var(--gold-primary);
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 0.6rem;
+            line-height: 1.2;
+        }
+
+        .card-lore {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+            white-space: pre-line;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+            padding-top: 0.6rem;
+        }
+
+        /* BARRA DE PROGRESO DE DESARROLLO */
+        .progress-box {
+            background: rgba(10, 8, 4, 0.9);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--gold-secondary);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .edit-prog-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: transparent;
+            border: none;
+            color: var(--gold-primary);
+            font-size: 0.65rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .edit-prog-btn:hover {
+            opacity: 1;
+        }
+
+        /* CARD ACTIONS */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 0.8rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-secondary);
+            padding: 6px 0;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--gold-primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag-pill {
+            background: rgba(110, 82, 0, 0.25);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-secondary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        /* ==========================================================================
+           5. MODALES Y FORMULARIOS DE EDICIÓN
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 2px solid var(--gold-primary);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px var(--gold-glow);
+            padding: 2rem;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 51, 68, 0.2);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .vs-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .vs-header h2 {
+            font-size: 2rem;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .vs-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: radial-gradient(circle, #2a2212 0%, #080603 100%);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vs-fighter {
+            text-align: center;
+            width: 45%;
+        }
+
+        .vs-fighter img {
+            max-height: 180px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 10px var(--gold-glow));
+        }
+
+        .vs-badge {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-red);
+            font-style: italic;
+            text-shadow: 0 0 10px rgba(255,51,68,0.8);
+        }
+
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-name {
+            width: 120px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gold-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-bar-bg {
+            flex-grow: 1;
+            height: 12px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold-border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+            width: 0%;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .command-list {
+            background: rgba(10, 8, 4, 0.8);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .command-title {
+            font-size: 0.9rem;
+            color: var(--gold-primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+            border-bottom: 1px solid var(--gold-border);
+            padding-bottom: 0.3rem;
+        }
+
+        .command-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.3rem 0;
+            color: var(--text-main);
+        }
+
+        .command-keys {
+            color: var(--gold-primary);
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        /* ESTILOS PARA FORMULARIO DE EDICIÓN ADMIN (IDEA 1) */
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            background: rgba(10, 8, 4, 0.9);
+            border: 1px solid var(--gold-border);
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .combo-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        /* ==========================================================================
+           6. ACHIEVEMENTS SYSTEM & FLOATING NOTIFICATION
+           ========================================================================== */
+        .achievement-toast {
+            position: fixed;
+            bottom: 20px;
+            right: -350px;
+            background: rgba(18, 14, 8, 0.95);
+            border: 2px solid var(--gold-primary);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 0 25px var(--gold-glow);
+            z-index: 3000;
+            transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .achievement-toast.active {
+            right: 20px;
+        }
+
+        .achievement-icon {
+            font-size: 1.8rem;
+        }
+
+        .achievement-text h4 {
+            font-size: 0.85rem;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+        }
+
+        .achievement-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- JUKEBOX AUDIO BAR -->
+    <div class="jukebox-bar">
+        <div class="jukebox-info">
+            <span class="jukebox-title" id="bgmTitle">🎵 BGM: MUGEN Select Theme</span>
+            <div class="visualizer-container" id="visualizer">
+                <div class="v-bar"></div>
+                <div class="v-bar"></div>
+                <div class="v-bar"></div>
+                <div class="v-bar"></div>
+                <div class="v-bar"></div>
+            </div>
+        </div>
+        <div class="jukebox-controls">
+            <button class="jukebox-btn" onclick="toggleBGM()" id="bgmBtn">PLAY BGM</button>
+            <button class="jukebox-btn" onclick="nextBGM()">NEXT ⏭</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header-title">
+        <h1>Grandes Éxitos</h1>
+        <div class="subtitle">Mugen Yaoi & Bara Sprite Edits</div>
+        <div class="authors-badge">🔥 Creados por YaoiPornLover & DOUZOZ 🔥</div>
+    </header>
+
+    <!-- SEARCH & CONTROLS -->
+    <div class="controls-wrapper">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar por título, lore o hashtag..." oninput="handleSearch()">
+        </div>
+
+        <div class="filter-container" id="filterContainer">
+            <button class="filter-btn active" onclick="filterCategory('all', event)">Todos</button>
+            <button class="filter-btn" onclick="filterCategory('fnf', event)">FNF</button>
+            <button class="filter-btn" onclick="filterCategory('lolcow', event)">Lolcow</button>
+            <button class="filter-btn" onclick="filterCategory('bara', event)">Bara Custom</button>
+            <button class="filter-btn" onclick="filterCategory('wip', event)">En Desarrollo</button>
+        </div>
+    </div>
+
+    <!-- MAIN CARDS GRID -->
+    <main class="cards-grid" id="cardsGrid"></main>
+
+    <!-- MODAL POPUP -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card" id="modalCard">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- ACHIEVEMENT TOAST -->
+    <div class="achievement-toast" id="achievementToast">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-text">
+            <h4 id="achTitle">¡Logro Desbloqueado!</h4>
+            <p id="achDesc">Has explorado todos los personajes.</p>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. BASE DE DATOS Y CONFIGURACIÓN
+           ========================================================================== */
+        const globalAuthors = "YaoiPornLover & DOUZOZ";
+        const ADMIN_PIN = "250420";
+
+        const defaultEditsData = [
+            {
+                id: "senpai-fnf",
+                category: "fnf",
+                author: globalAuthors,
+                title: "Senpai (FNF) - Bara Edition",
+                standGifs: [
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=Senpai+Stand+1",
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=Senpai+Stand+2"
+                ],
+                poseGifs: [
+                    "https://archive.org/download/e_20260721/ea%20%281%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%284%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%282%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%283%29.gif"
+                ],
+                lore: "Reconstrucción completa de las proporciones de Senpai para el motor MUGEN. Pasó de su estilo vectorial escolar a una contextura muscular pesada, conservando sus expresiones de conquista.",
+                hashtags: ["#FNF", "#Senpai", "#BaraMugen", "#SpriteEdit"],
+                stats: { fuerza: 88, velocidad: 92, resistencia: 85, aura: 95 },
+                combos: [
+                    { name: "Heartbreak Overdrive", keys: "↓ ↘ → + A" },
+                    { name: "Bara Slam", keys: "→ ↘ ↓ ↙ ← + B" },
+                    { name: "Schoolyard Climax", keys: "↓ ↓ ↓ + C" }
+                ],
+                defaultProgress: 100
+            },
+            {
+                id: "doomentio-lolcow",
+                category: "lolcow",
+                author: globalAuthors,
+                title: "Doomentio - Overlord Custom",
+                standGifs: [
+                    "https://ia800104.us.archive.org/29/items/el-diente/EA%20%282%29.webp",
+                    "https://ia800104.us.archive.org/29/items/el-diente/EA%20%282%29.webp"
+                ],
+                poseGifs: [
+                    "https://archive.org/download/e_20260721/ea%20%283%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%282%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%281%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%284%29.gif"
+                ],
+                lore: "Edit de MUGEN basado en la estética del Perezoso Doom. Rediseño de hitboxes, animaciones de ataque con auras doradas y sprites ajustados a estilo Bara.",
+                hashtags: ["#Lolcow", "#Doomentio", "#MugenCustom", "#YaoiBara"],
+                stats: { fuerza: 95, velocidad: 70, resistencia: 90, aura: 100 },
+                combos: [
+                    { name: "Aura Aria Palm", keys: "↓ ↙ ← + X" },
+                    { name: "Palmira Charge", keys: "→ → + Y" },
+                    { name: "Supremacy Blast", keys: "← ↙ ↓ ↘ → + Z" }
+                ],
+                defaultProgress: 85
+            },
+            {
+                id: "boyfriend-bara",
+                category: "bara",
+                author: globalAuthors,
+                title: "BF - Heavyweight Champion",
+                standGifs: [
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=BF+Stand+1",
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=BF+Stand+2"
+                ],
+                poseGifs: [
+                    "https://archive.org/download/e_20260721/ea%20%281%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%283%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%284%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%282%29.gif"
+                ],
+                lore: "Interpretación hiper-musculada de Boyfriend. Se reemplazaron sus micrófonos por puños envueltos en energía sonora y movimientos de suplex pesado.",
+                hashtags: ["#FNF", "#Boyfriend", "#Heavyweight", "#MugenEdits"],
+                stats: { fuerza: 98, velocidad: 80, resistencia: 94, aura: 88 },
+                combos: [
+                    { name: "Beep Boop Upper", keys: "→ ↓ ↘ + A" },
+                    { name: "Mic Toss Suplex", keys: "↓ ↙ ← + B" }
+                ],
+                defaultProgress: 60
+            },
+            {
+                id: "metal-slug-tarma-wip",
+                category: "wip",
+                author: globalAuthors,
+                title: "Tarma Roving - Heavy Muscle",
+                standGifs: [
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=Tarma+Stand+1",
+                    "https://placehold.co/120x200/121008/FFD700.gif?text=Tarma+Stand+2"
+                ],
+                poseGifs: [
+                    "https://archive.org/download/e_20260721/ea%20%284%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%282%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%283%29.gif",
+                    "https://archive.org/download/e_20260721/ea%20%281%29.gif"
+                ],
+                lore: "Proyecto activo. Adaptación del veterano de Metal Slug a una contextura masiva tipo Bara MUGEN, con animaciones de vulcan cannon personalizadas.",
+                hashtags: ["#MetalSlug", "#Tarma", "#WIP", "#SpriteEdit"],
+                stats: { fuerza: 90, velocidad: 75, resistencia: 88, aura: 82 },
+                combos: [
+                    { name: "Heavy Machine Punch", keys: "↓ ↘ → + X" }
+                ],
+                defaultProgress: 35
+            }
+        ];
+
+        // Cargar datos personalizados de localStorage o usar defaults
+        let editsData = JSON.parse(localStorage.getItem('mugen_edits_custom_data')) || defaultEditsData;
+
+        function saveEditsData() {
+            localStorage.setItem('mugen_edits_custom_data', JSON.stringify(editsData));
+        }
+
+        const sequenceStates = {};
+
+        /* HELPER: CALCULAR BADGE DE ESTADO SEGÚN EL PORCENTAJE (IDEA 3) */
+        function getStatusBadgeConfig(prog) {
+            if (prog < 50) {
+                return { text: `WIP [${prog}%]`, class: 'wip' };
+            } else if (prog < 90) {
+                return { text: `ALPHA [${prog}%]`, class: 'alpha' };
+            } else {
+                return { text: `PLAYABLE [${prog}%]`, class: 'playable' };
+            }
+        }
+
+        /* ==========================================================================
+           2. SINTETIZADOR DE AUDIO FX & JUKEBOX
+           ========================================================================== */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSynthesizedSFX(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'hover') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } else if (type === 'vs') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            }
+        }
+
+        let bgmPlaying = false;
+        const bgmTracks = ["MUGEN Select Theme", "FNF Street Beats", "Bara Arena Climax"];
+        let currentTrackIdx = 0;
+
+        function toggleBGM() {
+            playSynthesizedSFX('click');
+            bgmPlaying = !bgmPlaying;
+            const btn = document.getElementById('bgmBtn');
+            const bars = document.querySelectorAll('.v-bar');
+            
+            if (bgmPlaying) {
+                btn.innerText = "PAUSE BGM";
+                bars.forEach(b => b.classList.add('active'));
+            } else {
+                btn.innerText = "PLAY BGM";
+                bars.forEach(b => b.classList.remove('active'));
+            }
+        }
+
+        function nextBGM() {
+            playSynthesizedSFX('click');
+            currentTrackIdx = (currentTrackIdx + 1) % bgmTracks.length;
+            document.getElementById('bgmTitle').innerText = `🎵 BGM: ${bgmTracks[currentTrackIdx]}`;
+        }
+
+        /* ==========================================================================
+           3. RENDERIZADO DE TARJETAS
+           ========================================================================== */
+        let activeCategory = 'all';
+        let searchQuery = '';
+        const viewedCards = new Set();
+
+        function getSavedProgress(id, defaultVal) {
+            const saved = localStorage.getItem(`mugen_prog_${id}`);
+            return saved !== null ? parseInt(saved, 10) : defaultVal;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cardsGrid');
+            container.innerHTML = '';
+
+            editsData.forEach((data) => {
+                sequenceStates[data.id] = { currentIndex: 1, hasUnlockedFirst: false };
+
+                const currentProgress = getSavedProgress(data.id, data.defaultProgress);
+                const badgeConfig = getStatusBadgeConfig(currentProgress);
+
+                const card = document.createElement('article');
+                card.className = `edit-card`;
+                card.id = `card-${data.id}`;
+
+                const tagsHTML = data.hashtags.map(tag => `<span class="tag-pill">${tag}</span>`).join('');
+
+                card.innerHTML = `
+                    <!-- INSIGNIA DE ESTADO DE DESARROLLO (IDEA 3) -->
+                    <div class="status-badge ${badgeConfig.class}" id="status-badge-${data.id}">
+                        ${badgeConfig.text}
+                    </div>
+
+                    <div class="card-palette-bar">
+                        <div class="palette-dot" style="background:#ffd700;" onclick="applyPalette('${data.id}', 'none', event)" title="Default Gold"></div>
+                        <div class="palette-dot" style="background:#ff3344;" onclick="applyPalette('${data.id}', 'hue-rotate(90deg)', event)" title="Crimson Red"></div>
+                        <div class="palette-dot" style="background:#00ffff;" onclick="applyPalette('${data.id}', 'hue-rotate(180deg)', event)" title="Cyan Shadow"></div>
+                    </div>
+                    <div class="visual-container" id="visual-${data.id}" onclick="openVSModal('${data.id}')">
+                        <div class="filter-overlay" id="overlay-${data.id}"></div>
+                        <div class="stand-layer">
+                            <img src="${data.standGifs[0]}" alt="Stand Left">
+                            <img src="${data.standGifs[1]}" alt="Stand Right">
+                        </div>
+                        <div class="pose-layer">
+                            <img id="pose-img-${data.id}" src="${data.poseGifs[1]}" alt="Pose GIF">
+                        </div>
+                        <span class="sequence-badge" id="badge-${data.id}">GIF: 2 / ${data.poseGifs.length}</span>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-author">${data.author}</span>
+                        <h2 class="card-title" id="card-title-${data.id}">${data.title}</h2>
+
+                        <!-- BARRA DE PROGRESO CON MODIFICACIÓN AMBAS IDEAS -->
+                        <div class="progress-box">
+                            <button class="edit-prog-btn" onclick="openAdminModal('${data.id}', event)" title="Panel Admin Completo (Requiere PIN)">⚙️ Edit Admin</button>
+                            <div class="progress-info">
+                                <span>Progreso de Edit</span>
+                                <span id="prog-text-${data.id}">${currentProgress}%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="prog-bar-${data.id}" style="width: ${currentProgress}%;"></div>
+                            </div>
+                        </div>
+
+                        <p class="card-lore" id="card-lore-${data.id}">${data.lore}</p>
+                        
+                        <div class="card-actions">
+                            <button class="action-btn" onclick="openVSModal('${data.id}')">⚔️ VS Screen</button>
+                            <button class="action-btn" onclick="openStatsModal('${data.id}')">📊 Stats & Combos</button>
+                        </div>
+
+                        <div class="tags-container" id="card-tags-${data.id}">
+                            ${tagsHTML}
+                        </div>
+                    </div>
+                `;
+
+                // Secuencia de GIF al pasar el mouse
+                const visualBox = card.querySelector(`#visual-${data.id}`);
+                const poseImg = card.querySelector(`#pose-img-${data.id}`);
+                const badge = card.querySelector(`#badge-${data.id}`);
+
+                visualBox.addEventListener('mouseenter', () => {
+                    playSynthesizedSFX('hover');
+                    const state = sequenceStates[data.id];
+
+                    poseImg.src = data.poseGifs[state.currentIndex];
+                    badge.innerText = `GIF: ${state.currentIndex + 1} / ${data.poseGifs.length}${state.currentIndex === 0 ? ' (UNLOCK!)' : ''}`;
+
+                    let nextIdx = state.currentIndex + 1;
+
+                    if (nextIdx >= data.poseGifs.length) {
+                        state.hasUnlockedFirst = true;
+                        nextIdx = 0;
+                    } else if (nextIdx === 0 && !state.hasUnlockedFirst) {
+                        nextIdx = 1;
+                    }
+
+                    state.currentIndex = nextIdx;
+
+                    viewedCards.add(data.id);
+                    if (viewedCards.size === editsData.length) {
+                        unlockAchievement("MUGEN Master Explorer", "Has examinado todos los edits de la galería.");
+                    }
+                });
+
+                container.appendChild(card);
+            });
+
+            applyFilters();
+        }
+
+        /* ==========================================================================
+           4. PANEL DE ADMINISTRACIÓN DINÁMICA DE LORE, PROGRESO Y COMBOS (IDEA 1)
+           ========================================================================== */
+        function openAdminModal(id, event) {
+            if (event) event.stopPropagation();
+            playSynthesizedSFX('click');
+
+            const pass = prompt("🔑 Ingrese la clave de administrador para acceder al panel de modificación:");
+            if (pass === null) return;
+
+            if (pass !== ADMIN_PIN) {
+                alert("❌ Clave incorrecta. Acceso denegado.");
+                return;
+            }
+
+            const data = editsData.find(item => item.id === id);
+            const currentProg = getSavedProgress(data.id, data.defaultProgress);
+            const modalContent = document.getElementById('modalContent');
+
+            const combosInputs = (data.combos || []).map((c, idx) => `
+                <div class="combo-input-row">
+                    <input type="text" class="form-control combo-name" value="${c.name}" placeholder="Nombre del Ataque">
+                    <input type="text" class="form-control combo-keys" value="${c.keys}" placeholder="Comandos (ej. ↓ ↘ → + A)">
+                </div>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <div class="vs-header">
+                    <h2>⚙️ PANEL ADMIN - EDITAR PERSONAJE</h2>
+                    <p style="color: var(--gold-secondary); font-size: 0.85rem;">MODIFICANDO: ${data.title}</p>
+                </div>
+
+                <form class="admin-form" onsubmit="saveAdminChanges('${data.id}', event)">
+                    <div class="form-group">
+                        <label>Título del Personaje:</label>
+                        <input type="text" id="admin-title" class="form-control" value="${data.title}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Porcentaje de Progreso (%):</label>
+                        <input type="number" id="admin-prog" class="form-control" min="0" max="100" value="${currentProg}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Historia / Lore del Edit:</label>
+                        <textarea id="admin-lore" class="form-control" required>${data.lore}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Comandos / Lista de Combos:</label>
+                        <div id="combos-container">
+                            ${combosInputs}
+                        </div>
+                        <button type="button" class="action-btn" style="margin-top:6px;" onclick="addComboRow()">+ Agregar Combo</button>
+                    </div>
+
+                    <div style="display:flex; gap:10px; margin-top:1rem;">
+                        <button type="submit" class="action-btn" style="background:var(--gold-primary); color:var(--bg-dark); font-weight:900; padding:10px 0;">💾 GUARDAR CAMBIOS</button>
+                        <button type="button" class="action-btn" onclick="closeModal()">CANCELAR</button>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function addComboRow() {
+            playSynthesizedSFX('click');
+            const container = document.getElementById('combos-container');
+            const div = document.createElement('div');
+            div.className = 'combo-input-row';
+            div.innerHTML = `
+                <input type="text" class="form-control combo-name" placeholder="Nombre del Ataque">
+                <input type="text" class="form-control combo-keys" placeholder="Comandos (ej. ↓ ↘ → + A)">
+            `;
+            container.appendChild(div);
+        }
+
+        function saveAdminChanges(id, event) {
+            event.preventDefault();
+            playSynthesizedSFX('vs');
+
+            const data = editsData.find(item => item.id === id);
+            const newTitle = document.getElementById('admin-title').value;
+            const newProg = parseInt(document.getElementById('admin-prog').value, 10);
+            const newLore = document.getElementById('admin-lore').value;
+
+            // Recopilar combos
+            const comboRows = document.querySelectorAll('.combo-input-row');
+            const newCombos = [];
+            comboRows.forEach(row => {
+                const name = row.querySelector('.combo-name').value.trim();
+                const keys = row.querySelector('.combo-keys').value.trim();
+                if (name && keys) {
+                    newCombos.push({ name, keys });
+                }
+            });
+
+            // Actualizar objeto
+            data.title = newTitle;
+            data.lore = newLore;
+            data.combos = newCombos;
+
+            // Guardar progreso individual y base de datos completa
+            localStorage.setItem(`mugen_prog_${id}`, newProg);
+            saveEditsData();
+
+            // Actualizar UI sin recargar
+            document.getElementById(`card-title-${id}`).innerText = newTitle;
+            document.getElementById(`card-lore-${id}`).innerText = newLore;
+            document.getElementById(`prog-text-${id}`).innerText = `${newProg}%`;
+            document.getElementById(`prog-bar-${id}`).style.width = `${newProg}%`;
+
+            // Actualizar Badge neón (Idea 3)
+            const badgeEl = document.getElementById(`status-badge-${id}`);
+            const badgeConfig = getStatusBadgeConfig(newProg);
+            badgeEl.className = `status-badge ${badgeConfig.class}`;
+            badgeEl.innerText = badgeConfig.text;
+
+            closeModal();
+            unlockAchievement("Admin Supreme", "Lore y habilidades actualizados con éxito.");
+        }
+
+        /* PALETTE FILTER */
+        function applyPalette(id, filterValue, event) {
+            event.stopPropagation();
+            playSynthesizedSFX('click');
+            const overlay = document.getElementById(`overlay-${id}`);
+            overlay.style.backdropFilter = filterValue !== 'none' ? filterValue : 'none';
+        }
+
+        /* FILTRADO Y BÚSQUEDA REGEX */
+        function filterCategory(cat, event) {
+            playSynthesizedSFX('click');
+            activeCategory = cat;
+            
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if(event) event.target.classList.add('active');
+
+            applyFilters();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            applyFilters();
+        }
+
+        function applyFilters() {
+            editsData.forEach(data => {
+                const card = document.getElementById(`card-${data.id}`);
+                const matchesCategory = (activeCategory === 'all' || data.category === activeCategory);
+                const searchText = `${data.title} ${data.lore} ${data.hashtags.join(' ')}`.toLowerCase();
+                const matchesSearch = searchText.includes(searchQuery);
+
+                if (matchesCategory && matchesSearch) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        /* ==========================================================================
+           5. MODALES VS Y STATS
+           ========================================================================== */
+        function openVSModal(id) {
+            playSynthesizedSFX('vs');
+            const data = editsData.find(item => item.id === id);
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+                <div class="vs-header">
+                    <h2>VS SCREEN - SELECTOR</h2>
+                    <p style="color: var(--gold-secondary); font-size: 0.85rem;">EDIT CREADO POR ${data.author}</p>
+                </div>
+
+                <div class="vs-display">
+                    <div class="vs-fighter">
+                        <img src="${data.poseGifs[0]}" alt="${data.title}">
+                        <h3 style="color:#fff; font-size: 0.95rem; margin-top:8px;">P1: ${data.title}</h3>
+                    </div>
+                    <div class="vs-badge">VS</div>
+                    <div class="vs-fighter">
+                        <img src="${data.poseGifs[1] || data.poseGifs[0]}" alt="Opponent" style="transform: scaleX(-1);">
+                        <h3 style="color: var(--gold-primary); font-size: 0.95rem; margin-top:8px;">P2: SHADOW VARIANT</h3>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="action-btn" style="padding: 10px 24px; font-size: 0.9rem;" onclick="closeModal()">¡ENTRAR EN COMBATE!</button>
+                </div>
+            `;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openStatsModal(id) {
+            playSynthesizedSFX('click');
+            const data = editsData.find(item => item.id === id);
+            const modalContent = document.getElementById('modalContent');
+
+            const combosHTML = data.combos && data.combos.length > 0 ? data.combos.map(c => `
+                <div class="command-item">
+                    <span>${c.name}</span>
+                    <span class="command-keys">${c.keys}</span>
+                </div>
+            `).join('') : '<p style="font-size:0.8rem; color:var(--text-muted);">No hay combos registrados.</p>';
+
+            modalContent.innerHTML = `
+                <div class="vs-header">
+                    <h2>${data.title}</h2>
+                    <p style="color: var(--gold-primary); font-size: 0.85rem;">AUTORES: ${data.author}</p>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-row">
+                        <span class="stat-name">Fuerza</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${data.stats.fuerza}%;"></div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Velocidad</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${data.stats.velocidad}%;"></div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Resistencia</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${data.stats.resistencia}%;"></div></div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Aura Bara</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${data.stats.aura}%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="command-list">
+                    <div class="command-title">Lista de Comandos / Special Moves</div>
+                    ${combosHTML}
+                </div>
+            `;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            playSynthesizedSFX('click');
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        /* ==========================================================================
+           6. SISTEMA DE LOGROS (ACHIEVEMENTS)
+           ========================================================================== */
+        function unlockAchievement(title, desc) {
+            playSynthesizedSFX('vs');
+            document.getElementById('achTitle').innerText = title;
+            document.getElementById('achDesc').innerText = desc;
+
+            const toast = document.getElementById('achievementToast');
+            toast.classList.add('active');
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 5000);
+        }
+
+        /* INICIALIZACIÓN */
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+        });
+    </script>
+</body>
+</html>
