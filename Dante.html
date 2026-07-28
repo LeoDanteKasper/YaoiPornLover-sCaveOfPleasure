@@ -3,255 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCADE NEXUS - DEVIL MAY CRY: DANTE ZONE</title>
+    <title>El Diente - SWF WASM Arcade Player</title>
+    <!-- Motor Ruffle en WebAssembly desde CDN CDNJS/Unpkg -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
-        /* ==========================================================================
-           CORE DESIGN SYSTEM (DEVIL MAY CRY - NEOGOTHIC INDUSTRIAL)
-           ========================================================================== */
         :root {
-            --dmc-red: #bb0a1e;
-            --dmc-crimson: #ff002b;
-            --dmc-glow: rgba(255, 0, 43, 0.4);
-            --bg-gothic: #030305;
-            --panel-ebony: rgba(10, 10, 14, 0.9);
-            --font-gothic: 'Cinzel', 'Georgia', serif;
-            --font-hud: 'Courier New', Courier, monospace;
+            --bg-base: #06080e;
+            --bg-card: rgba(15, 20, 32, 0.8);
+            --border-glow: rgba(99, 102, 241, 0.3);
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --status-active: #10b981;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background-color: var(--bg-gothic);
-            color: #ffffff;
-            font-family: var(--font-gothic);
-            overflow-x: hidden;
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.18) 0px, transparent 40%),
+                radial-gradient(at 90% 90%, rgba(139, 92, 246, 0.18) 0px, transparent 40%);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            /* Textura de fondo gótica con degradado de azufre profundo */
-            background-image: 
-                linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
-                radial-gradient(circle at 50% 30%, rgba(187, 10, 30, 0.15) 0%, transparent 70%);
-            background-attachment: fixed;
+            justify-content: center;
+            padding: 1.5rem;
         }
 
-        /* ==========================================================================
-           STYLISH HUD HEADER
-           ========================================================================== */
-        .dmc-header {
-            text-align: center;
-            margin: 30px 0;
+        .arcade-card {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .arcade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .game-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .game-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--status-active);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--status-active);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--status-active);
+        }
+
+        .stage-wrapper {
             position: relative;
-            z-index: 10;
-        }
-
-        .dmc-header h1 {
-            font-size: 3rem;
-            text-transform: uppercase;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 6px;
-            text-shadow: 0 0 15px var(--dmc-crimson), 2px 2px 0 #000;
-        }
-
-        .dmc-sub {
-            font-family: var(--font-hud);
-            font-size: 0.8rem;
-            color: #8a8a95;
-            letter-spacing: 3px;
-            margin-top: 8px;
-            text-transform: uppercase;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
         }
 
-        .dmc-sub span {
-            color: var(--dmc-crimson);
-            font-weight: bold;
-        }
-
-        /* ==========================================================================
-           THE DEMONIC CABINET (CONTENEDOR DEL JUEGO)
-           ========================================================================== */
-        .gothic-cabinet {
-            background: #000000;
-            width: 100%;
-            max-width: 850px;
-            height: 620px;
-            border: 2px solid #1a1a24;
-            position: relative;
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
-            margin-bottom: 25px;
-            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        /* Efecto de marco iluminado con el poder de Rebellion */
-        .gothic-cabinet::before {
-            content: '';
-            position: absolute;
-            top: -3px; left: -3px; right: -3px; bottom: -3px;
-            background: linear-gradient(45deg, var(--dmc-red), #300005, var(--dmc-crimson), #000);
-            z-index: -1;
-            border-radius: 6px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .gothic-cabinet:hover::before {
-            opacity: 1;
-            filter: drop-shadow(0 0 15px var(--dmc-crimson));
-        }
-
-        #dante-emulator-container {
+        #ruffle-stage {
             width: 100%;
             height: 100%;
-            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Overlay estilizado de carga gótica */
-        #loading-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #050508;
+        #ruffle-stage ruffle-player {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .loading-spinner {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 5;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-
-        .rank-s {
-            font-size: 5rem;
-            font-weight: 900;
-            color: var(--dmc-crimson);
-            text-shadow: 0 0 30px var(--dmc-crimson);
-            font-style: italic;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.08); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
-        /* ==========================================================================
-           CONTROLES HUD / INTERFAZ DE SALIDA
-           ========================================================================== */
-        .dmc-actions {
-            display: flex;
-            gap: 20px;
-            margin-top: 10px;
-        }
-
-        .dmc-btn {
-            background: var(--panel-ebony);
-            border: 1px solid var(--dmc-red);
-            color: #d1d1d6;
-            padding: 12px 30px;
-            font-family: var(--font-gothic);
+            gap: 1rem;
+            color: var(--text-muted);
             font-size: 0.9rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
 
-        .dmc-btn:hover {
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .controls-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             color: #ffffff;
-            background: var(--dmc-red);
-            border-color: var(--dmc-crimson);
-            box-shadow: 0 0 20px var(--dmc-glow);
-            transform: scale(1.05);
+            border: none;
+            padding: 0.75rem 1.4rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
         }
 
-        .dmc-btn-secondary {
-            border-color: #3a3a4a;
-            color: #7a7a85;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
         }
 
-        .dmc-btn-secondary:hover {
-            background: #1c1c24;
-            color: #fff;
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: none;
         }
-    </style>
 
-    <!-- CDN DE CONFIANZA DE RUFFLE -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ruffle/0.1.0.1065/ruffle.js"></script>
-</head>
-<body>
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
 
-    <header class="dmc-header">
-        <h1>Let's Rock!</h1>
-        <div class="dmc-sub">
-            MISSION: <span>El_Diente.swf</span> // STYLE RANK: <span style="text-shadow: 0 0 5px var(--dmc-crimson);">SSSR</span>
-        </div>
-    </header>
+        .file-upload-btn {
+            position: relative;
+            overflow: hidden;
+        }
 
-    <div class="gothic-cabinet">
-        <div id="loading-overlay">
-            <div class="rank-s">S</div>
-            <p style="font-family: var(--font-hud); font-size: 0.75rem; color: #5a5a65; letter-spacing: 4px; margin-top: 15px;">LOADING DEVIL ARMS...</p>
-        </div>
+        .file-upload-btn input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
 
-        <div id="dante-emulator-container"></div>
-    </div>
-
-    <div class="dmc-actions">
-        <button class="dmc-btn" onclick="toggleFullscreen()">Fullscreen</button>
-        <button class="dmc-btn dmc-btn-secondary" onclick="window.history.back()">Leave Mission</button>
-    </div>
-
-    <script>
-        window.addEventListener("DOMContentLoaded", () => {
-            const ruffle = window.RufflePlayer.newest();
-            const player = ruffle.createPlayer();
-            const container = document.getElementById("dante-emulator-container");
-            container.appendChild(player);
-            
-            // Carga optimizada apuntando al archivo exacto indicado por el usuario
-            player.load({
-                url: "jueguillos/El_Diente.swf", 
-                letterbox: "on",
-                backgroundColor: "#000000",
-                autoplay: "on",
-                unmuteOverlay: "hidden"
-            }).then(() => {
-                setTimeout(() => {
-                    const overlay = document.getElementById("loading-overlay");
-                    if (overlay) {
-                        overlay.style.opacity = "0";
-                        setTimeout(() => overlay.remove(), 500);
-                    }
-                }, 600);
-                console.log("Devil May Cry Engine: Ruffle y El_Diente.swf cargados con éxito.");
-            }).catch((err) => {
-                console.error("Fallo crítico al inicializar el SWF:", err);
-            });
-        });
-
-        function toggleFullscreen() {
-            const emu = document.getElementById("dante-emulator-container");
-            if (emu.requestFullscreen) {
-                emu.requestFullscreen();
-            } else if (emu.webkitRequestFullscreen) {
-                emu.webkitRequestFullscreen();
+        @media (max-width: 768px) {
+            .arcade-card {
+                padding: 1.25rem;
+            }
+            .controls-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .actions-group {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
             }
         }
+    </style>
+</head>
+<body>
+    <main class="arcade-card">
+        <header class="arcade-header">
+            <div class="game-title-group">
+                <h1 class="game-title">El Diente</h1>
+            </div>
+            <div class="status-badge" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">Inicializando WASM...</span>
+            </div>
+        </header>
+
+        <section class="stage-wrapper" id="stage-wrapper">
+            <div id="ruffle-stage">
+                <div class="loading-spinner" id="loader">
+                    <div class="spinner"></div>
+                    <span>Cargando binario SWF desde GitHub...</span>
+                </div>
+            </div>
+        </section>
+
+        <footer class="controls-toolbar">
+            <div class="actions-group">
+                <button class="btn btn-secondary" id="btn-reload">Reiniciar SWF</button>
+                <div class="btn btn-secondary file-upload-btn">
+                    <span>Cargar SWF Alternativo</span>
+                    <input type="file" id="file-input" accept=".swf" />
+                </div>
+            </div>
+            <button class="btn" id="btn-fullscreen">Pantalla Completa</button>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const RAW_SWF_URL = 'https://raw.githubusercontent.com/LeoDanteKasper/YaoiPornLover-sCaveOfPleasure/main/El_Diente.swf';
+            
+            const stage = document.getElementById('ruffle-stage');
+            const stageWrapper = document.getElementById('stage-wrapper');
+            const statusText = document.getElementById('status-text');
+            const btnFullscreen = document.getElementById('btn-fullscreen');
+            const btnReload = document.getElementById('btn-reload');
+            const fileInput = document.getElementById('file-input');
+
+            let rufflePlayerInstance = null;
+            let loadedArrayBuffer = null;
+
+            const initRuffleEngine = () => {
+                const ruffle = window.RufflePlayer ? window.RufflePlayer.newest() : null;
+                if (!ruffle) {
+                    statusText.textContent = 'Error: Ruffle no cargó';
+                    return null;
+                }
+                return ruffle.createPlayer();
+            };
+
+            const loadSwfFromUrl = async (url) => {
+                try {
+                    statusText.textContent = 'Descargando SWF...';
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const buffer = await response.arrayBuffer();
+                    loadedArrayBuffer = buffer;
+                    renderSwfBuffer(buffer);
+                } catch (error) {
+                    console.error('Error al cargar SWF remoto:', error);
+                    statusText.textContent = 'Error CORS / Red';
+                    stage.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #ef4444;">
+                            <p style="font-weight: 700; margin-bottom: 0.5rem;">No se pudo descargar el juego directamente.</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Puedes cargar el archivo .swf localmente usando el botón de abajo.</p>
+                        </div>
+                    `;
+                }
+            };
+
+            const renderSwfBuffer = (buffer) => {
+                stage.innerHTML = '';
+                rufflePlayerInstance = initRuffleEngine();
+                
+                if (!rufflePlayerInstance) return;
+
+                stage.appendChild(rufflePlayerInstance);
+                rufflePlayerInstance.load({
+                    data: new Uint8Array(buffer),
+                    allowScriptAccess: true,
+                    backgroundColor: '#000000',
+                    wmode: 'direct'
+                });
+
+                statusText.textContent = 'Juego En Ejecución';
+            };
+
+            // Event Listeners
+            btnReload.addEventListener('click', () => {
+                if (loadedArrayBuffer) {
+                    renderSwfBuffer(loadedArrayBuffer);
+                } else {
+                    loadSwfFromUrl(RAW_SWF_URL);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        loadedArrayBuffer = evt.target.result;
+                        renderSwfBuffer(loadedArrayBuffer);
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            btnFullscreen.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    stageWrapper.requestFullscreen().catch(err => {
+                        console.error(`Error de pantalla completa: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            // Auto-arranque al montar el DOM
+            loadSwfFromUrl(RAW_SWF_URL);
+        });
     </script>
 </body>
 </html>
