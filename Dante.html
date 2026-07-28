@@ -3,119 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Diente - SWF WASM Arcade Player</title>
-    <!-- Motor Ruffle en WebAssembly desde CDN CDNJS/Unpkg -->
+    <title>Arcade Matrix SWF - Player Tri-Engine</title>
+    <!-- Google Fonts & Ruffle Emulator Core -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
         :root {
             --bg-base: #06080e;
-            --bg-card: rgba(15, 20, 32, 0.8);
-            --border-glow: rgba(99, 102, 241, 0.3);
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-cyan: #06b6d4;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --status-active: #10b981;
+            --bg-surface: rgba(15, 20, 32, 0.65);
+            --bg-card: rgba(22, 29, 47, 0.7);
+            --accent-cyan: #00f0ff;
+            --accent-magenta: #ff0055;
+            --accent-purple: #7000ff;
+            --accent-yellow: #ffcc00;
+            --text-main: #f0f4fc;
+            --text-muted: #8e9bb4;
+            --border-glow: rgba(0, 240, 255, 0.25);
+            --glass-blur: blur(16px);
+            --font-title: 'Orbitron', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+            --radius-main: 16px;
+            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
             background-color: var(--bg-base);
             background-image: 
-                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.18) 0px, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(139, 92, 246, 0.18) 0px, transparent 40%);
+                radial-gradient(circle at 15% 15%, rgba(112, 0, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
             color: var(--text-main);
+            font-family: var(--font-body);
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .arcade-card {
-            width: 100%;
-            max-width: 1100px;
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glow);
-            border-radius: 24px;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9);
-            padding: 2rem;
-            display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            overflow-x: hidden;
         }
 
+        /* App Header */
         .arcade-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1.25rem 2rem;
+            background: var(--bg-surface);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 1.2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .game-title-group {
+        .arcade-header__brand {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.75rem;
         }
 
-        .game-title {
-            font-size: 1.75rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff, var(--accent-cyan));
+        .arcade-header__logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            font-family: var(--font-title);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .arcade-header__title {
+            font-family: var(--font-title);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--text-main), var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
+        }
+
+        .arcade-header__status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
         }
 
         .status-badge {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.4rem;
-            font-size: 0.75rem;
-            color: var(--status-active);
-            background: rgba(16, 185, 129, 0.1);
-            padding: 0.35rem 0.8rem;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 20px;
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .status-badge__dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* Layout Main Grid */
+        .arcade-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .arcade-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Selector */
+        .arcade-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .sidebar-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-main);
+            padding: 1.25rem;
+        }
+
+        .sidebar-card__title {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .game-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.25s var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-item:hover {
+            background: rgba(0, 240, 255, 0.06);
+            border-color: rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .game-item--active {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.12), rgba(112, 0, 255, 0.12));
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+
+        .game-item--active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .game-item__info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .game-item__name {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .game-item__meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .game-item__badge {
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
             text-transform: uppercase;
         }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--status-active);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--status-active);
+        .game-item--active .game-item__badge {
+            background: var(--accent-cyan);
+            color: #000;
+            font-weight: 700;
         }
 
-        .stage-wrapper {
+        /* File Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            background: rgba(0, 240, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.25s var(--transition-smooth);
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone--drag {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .upload-zone__input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-zone__text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .upload-zone__highlight {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Screen Cabinet / Emulator Viewport */
+        .arcade-viewport {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-main);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            position: relative;
+        }
+
+        .screen-frame {
             position: relative;
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000000;
-            border-radius: 16px;
+            height: 620px;
+            background: #000;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        #ruffle-stage {
+        .screen-frame::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 10;
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .screen-frame--crt::after {
+            opacity: 1;
+        }
+
+        #ruffle-container {
             width: 100%;
             height: 100%;
             display: flex;
@@ -123,238 +343,535 @@
             justify-content: center;
         }
 
-        #ruffle-stage ruffle-player {
+        #ruffle-container ruffle-embed, 
+        #ruffle-container ruffle-player {
             width: 100% !important;
             height: 100% !important;
+            border: none;
         }
 
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--accent-cyan);
-            border-radius: 50%;
-            animation: spin 1s infinite linear;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .controls-toolbar {
+        /* Viewport Controls Toolbar */
+        .viewport-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .actions-group {
+        .toolbar-group {
             display: flex;
+            align-items: center;
             gap: 0.75rem;
         }
 
-        .btn {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            color: #ffffff;
-            border: none;
-            padding: 0.75rem 1.4rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.875rem;
+        .arcade-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s var(--transition-smooth);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        .arcade-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
+        .arcade-btn--active {
+            background: var(--accent-cyan);
+            color: #000;
+            font-weight: 600;
+            border-color: var(--accent-cyan);
+        }
+
+        .arcade-btn--active:hover {
+            color: #000;
+        }
+
+        /* Dynamic Search Bar Component */
+        .search-cabinet-bar {
+            background: rgba(10, 14, 24, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            flex-wrap: wrap;
+        }
+
+        .sticker-badge {
+            background: linear-gradient(135deg, var(--accent-yellow), #ff9900);
+            color: #000;
+            font-family: var(--font-title);
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 3px 3px 0px #000, 0 0 12px rgba(255, 204, 0, 0.4);
+            transform: rotate(-2deg);
+            white-space: nowrap;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: none;
+            border-radius: 8px;
+            padding: 0.25rem 0.75rem;
+            transition: all 0.25s ease;
+            min-width: 240px;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: none;
+        .search-input-wrapper:focus-within {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
         }
 
-        .file-upload-btn {
-            position: relative;
-            overflow: hidden;
+        .search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            padding: 0.5rem 0;
         }
 
-        .file-upload-btn input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
+        .search-input::placeholder {
+            color: rgba(142, 155, 180, 0.5);
         }
 
-        @media (max-width: 768px) {
-            .arcade-card {
-                padding: 1.25rem;
-            }
-            .controls-toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .actions-group {
-                flex-direction: column;
-            }
-            .btn {
-                justify-content: center;
-            }
+        /* Placeholder Screen when no SWF loaded */
+        .screen-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .screen-placeholder__icon {
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            opacity: 0.6;
+        }
+
+        /* Maximization proposals container */
+        .maximization-section {
+            grid-column: 1 / -1;
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: var(--radius-main);
+            padding: 2rem;
+            margin-top: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .maximization-section__title {
+            font-family: var(--font-title);
+            font-size: 1.3rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .maximization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .max-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: transform 0.25s ease;
+        }
+
+        .max-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(112, 0, 255, 0.4);
+        }
+
+        .max-card__head {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            color: var(--accent-magenta);
+            margin-bottom: 0.5rem;
+        }
+
+        .max-card__body {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
-    <main class="arcade-card">
-        <header class="arcade-header">
-            <div class="game-title-group">
-                <h1 class="game-title">El Diente</h1>
-            </div>
-            <div class="status-badge" id="status-badge">
-                <span class="status-dot"></span>
-                <span id="status-text">Inicializando WASM...</span>
-            </div>
-        </header>
 
-        <section class="stage-wrapper" id="stage-wrapper">
-            <div id="ruffle-stage">
-                <div class="loading-spinner" id="loader">
-                    <div class="spinner"></div>
-                    <span>Cargando binario SWF desde GitHub...</span>
+    <!-- Header Terminal -->
+    <header class="arcade-header">
+        <div class="arcade-header__brand">
+            <div class="arcade-header__logo-icon">M</div>
+            <h1 class="arcade-header__title">SWF MULTI-ENGINE ARCHITECTURE</h1>
+        </div>
+        <div class="arcade-header__status">
+            <div class="status-badge">
+                <span class="status-badge__dot"></span>
+                <span id="engine-status">RUFFLE READY</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Engine Layout -->
+    <main class="arcade-layout">
+        
+        <!-- Sidebar Selection Panel -->
+        <aside class="arcade-sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-card__title">
+                    <span>Biblioteca de Juegos</span>
+                    <span style="color: var(--accent-cyan); font-family: var(--font-mono);">3 SLOTS</span>
+                </div>
+                
+                <div class="game-list">
+                    <!-- Slot 1: Diente -->
+                    <div class="game-item game-item--active" onclick="arcadeApp.loadGameSlot('diente', this)">
+                        <div class="game-item__info">
+                            <span class="game-item__name">1. Diente</span>
+                            <span class="game-item__meta">Archivo: diente.swf</span>
+                        </div>
+                        <span class="game-item__badge">Activo</span>
+                    </div>
+
+                    <!-- Slot 2: Juego SWF 2 -->
+                    <div class="game-item" onclick="arcadeApp.loadGameSlot('game2', this)">
+                        <div class="game-item__info">
+                            <span class="game-item__name">2. SWF Arcade #2</span>
+                            <span class="game-item__meta">Archivo: juego2.swf</span>
+                        </div>
+                        <span class="game-item__badge">Slot 2</span>
+                    </div>
+
+                    <!-- Slot 3: Juego SWF 3 -->
+                    <div class="game-item" onclick="arcadeApp.loadGameSlot('game3', this)">
+                        <div class="game-item__info">
+                            <span class="game-item__name">3. SWF Arcade #3</span>
+                            <span class="game-item__meta">Archivo: juego3.swf</span>
+                        </div>
+                        <span class="game-item__badge">Slot 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom SWF File Loader -->
+            <div class="sidebar-card">
+                <div class="sidebar-card__title">Carga Directa Local</div>
+                <div class="upload-zone" id="drop-zone">
+                    <input type="file" id="swf-input" class="upload-zone__input" accept=".swf" onchange="arcadeApp.handleFileSelect(event)">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
+                    <div class="upload-zone__text">
+                        Arrastrá tu archivo <span class="upload-zone__highlight">.SWF</span> aquí o hacé clic para explorar
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Viewport / Cabinet -->
+        <section class="arcade-viewport">
+            <div class="screen-frame" id="screen-frame">
+                <div id="ruffle-container">
+                    <div class="screen-placeholder">
+                        <div class="screen-placeholder__icon">🎮</div>
+                        <p>Inicializando motor Ruffle Flash Emulator...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Bar Toolbar -->
+            <div class="viewport-toolbar">
+                <div class="toolbar-group">
+                    <button class="arcade-btn" onclick="arcadeApp.reloadCurrentGame()">
+                        <span>🔄</span> Reiniciar
+                    </button>
+                    <button class="arcade-btn" id="crt-toggle" onclick="arcadeApp.toggleCRT()">
+                        <span>📺</span> Filtro CRT
+                    </button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="arcade-btn" onclick="arcadeApp.toggleFullscreen()">
+                        <span>⛶</span> Pantalla Completa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Search Bar with Sticker -->
+            <div class="search-cabinet-bar">
+                <div class="sticker-badge">
+                    <span>🏷️</span> nombre de los juegos para buscar
+                </div>
+                <div class="search-input-wrapper">
+                    <input type="text" id="game-search-input" class="search-input" placeholder="Ej: El_Diente.swf, juego.swf..." onkeydown="if(event.key==='Enter') arcadeApp.searchAndLoadSwf()">
+                </div>
+                <button class="arcade-btn arcade-btn--active" onclick="arcadeApp.searchAndLoadSwf()">
+                    <span>🔍</span> Cargar
+                </button>
+            </div>
+        </section>
+
+        <!-- Propuestas de Maximización de Élite -->
+        <section class="maximization-section">
+            <h2 class="maximization-section__title">
+                <span>🚀</span> Propuestas de Maximización de Élite
+            </h2>
+            <div class="maximization-grid">
+                <div class="max-card">
+                    <div class="max-card__head">1. Auto-Completado & Detección de Index HTML</div>
+                    <div class="max-card__body">
+                        Implementar un parser automático vía `fetch()` a la carpeta local de assets para escanear y autocompletar la barra de búsqueda en tiempo real mediante un datalist interactivo.
+                    </div>
+                </div>
+                <div class="max-card">
+                    <div class="max-card__head">2. Visualizador 3D Three.js Arcade Cabinet</div>
+                    <div class="max-card__body">
+                        Montar el visor Ruffle dentro de una textura dinámica de un gabinete Arcade 3D renderizado en tiempo real con Three.js e iluminación reactiva según los colores del SWF.
+                    </div>
+                </div>
+                <div class="max-card">
+                    <div class="max-card__head">3. Mapeo Módulo Gamepad / Touch Virtual</div>
+                    <div class="max-card__body">
+                        Integración de la API de Gamepad HTML5 para mapear mandos físicos (PS5/Xbox) a las teclas analógicas de Flash, sumado a un D-Pad touch flotante personalizable.
+                    </div>
                 </div>
             </div>
         </section>
 
-        <footer class="controls-toolbar">
-            <div class="actions-group">
-                <button class="btn btn-secondary" id="btn-reload">Reiniciar SWF</button>
-                <div class="btn btn-secondary file-upload-btn">
-                    <span>Cargar SWF Alternativo</span>
-                    <input type="file" id="file-input" accept=".swf" />
-                </div>
-            </div>
-            <button class="btn" id="btn-fullscreen">Pantalla Completa</button>
-        </footer>
     </main>
 
+    <!-- Client-Side Engine Controller Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const RAW_SWF_URL = 'https://raw.githubusercontent.com/LeoDanteKasper/YaoiPornLover-sCaveOfPleasure/main/El_Diente.swf';
-            
-            const stage = document.getElementById('ruffle-stage');
-            const stageWrapper = document.getElementById('stage-wrapper');
-            const statusText = document.getElementById('status-text');
-            const btnFullscreen = document.getElementById('btn-fullscreen');
-            const btnReload = document.getElementById('btn-reload');
-            const fileInput = document.getElementById('file-input');
+        class ArcadeEngine {
+            constructor() {
+                this.container = document.getElementById('ruffle-container');
+                this.screenFrame = document.getElementById('screen-frame');
+                this.statusElement = document.getElementById('engine-status');
+                this.searchInput = document.getElementById('game-search-input');
+                this.rufflePlayer = null;
+                this.currentSource = null;
+                this.crtEnabled = false;
 
-            let rufflePlayerInstance = null;
-            let loadedArrayBuffer = null;
+                // Definición de las rutas predeterminadas de los 3 slots de juegos SWF
+                this.gameSlots = {
+                    'diente': { name: 'Diente', url: 'diente.swf' },
+                    'game2': { name: 'SWF Arcade #2', url: 'juego2.swf' },
+                    'game3': { name: 'SWF Arcade #3', url: 'juego3.swf' }
+                };
 
-            const initRuffleEngine = () => {
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('DOMContentLoaded', () => {
+                    this.loadGameSlot('diente');
+                    this.setupDragAndDrop();
+                });
+            }
+
+            // Instanciador del motor Ruffle
+            createPlayerInstance() {
+                this.container.innerHTML = '';
                 const ruffle = window.RufflePlayer ? window.RufflePlayer.newest() : null;
+                
                 if (!ruffle) {
-                    statusText.textContent = 'Error: Ruffle no cargó';
+                    this.statusElement.textContent = 'ERROR: RUFFLE NO DETECTADO';
+                    this.statusElement.style.color = 'var(--accent-magenta)';
                     return null;
                 }
-                return ruffle.createPlayer();
-            };
 
-            const loadSwfFromUrl = async (url) => {
-                try {
-                    statusText.textContent = 'Descargando SWF...';
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    
-                    const buffer = await response.arrayBuffer();
-                    loadedArrayBuffer = buffer;
-                    renderSwfBuffer(buffer);
-                } catch (error) {
-                    console.error('Error al cargar SWF remoto:', error);
-                    statusText.textContent = 'Error CORS / Red';
-                    stage.innerHTML = `
-                        <div style="text-align: center; padding: 2rem; color: #ef4444;">
-                            <p style="font-weight: 700; margin-bottom: 0.5rem;">No se pudo descargar el juego directamente.</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">Puedes cargar el archivo .swf localmente usando el botón de abajo.</p>
-                        </div>
-                    `;
-                }
-            };
+                this.rufflePlayer = ruffle.createPlayer();
+                this.container.appendChild(this.rufflePlayer);
+                return this.rufflePlayer;
+            }
 
-            const renderSwfBuffer = (buffer) => {
-                stage.innerHTML = '';
-                rufflePlayerInstance = initRuffleEngine();
+            // Cargar archivo SWF desde URL local o slot
+            loadSwfFromUrl(url, gameName) {
+                const player = this.createPlayerInstance();
+                if (!player) return;
+
+                this.currentSource = { type: 'url', value: url, name: gameName };
+                this.statusElement.textContent = `CARGANDO: ${gameName.toUpperCase()}`;
                 
-                if (!rufflePlayerInstance) return;
+                player.load(url).then(() => {
+                    this.statusElement.textContent = `EJECUTANDO: ${gameName.toUpperCase()}`;
+                }).catch((err) => {
+                    console.warn('Ruffle load warning:', err);
+                    this.statusElement.textContent = `ONLINE: ${gameName.toUpperCase()}`;
+                });
+            }
 
-                stage.appendChild(rufflePlayerInstance);
-                rufflePlayerInstance.load({
-                    data: new Uint8Array(buffer),
-                    allowScriptAccess: true,
-                    backgroundColor: '#000000',
-                    wmode: 'direct'
+            // Cargar archivo SWF dinámico cargado por el usuario mediante FileReader
+            loadSwfBuffer(arrayBuffer, fileName) {
+                const player = this.createPlayerInstance();
+                if (!player) return;
+
+                this.currentSource = { type: 'buffer', value: arrayBuffer, name: fileName };
+                this.statusElement.textContent = `EJECUTANDO BINARIO: ${fileName}`;
+
+                player.load({ data: arrayBuffer }).catch(err => {
+                    console.error('Error al parsear el binario SWF:', err);
+                    this.statusElement.textContent = 'ERROR DE PARSEO SWF';
+                });
+            }
+
+            // Búsqueda dinámica desde la barra de texto por nombre de archivo
+            searchAndLoadSwf() {
+                let query = this.searchInput.value.trim();
+                if (!query) return;
+
+                // Formatear automáticamente extensión .swf si se omite
+                if (!query.toLowerCase().endsWith('.swf')) {
+                    query += '.swf';
+                }
+
+                // Normalizar nombre visual
+                const cleanName = query.replace('.swf', '').replace(/_/g, ' ');
+
+                // Desmarcar selección de slots estáticos
+                document.querySelectorAll('.game-item').forEach(item => {
+                    item.classList.remove('game-item--active');
+                    item.querySelector('.game-item__badge').textContent = 'Slot';
                 });
 
-                statusText.textContent = 'Juego En Ejecución';
-            };
+                this.loadSwfFromUrl(query, cleanName);
+            }
 
-            // Event Listeners
-            btnReload.addEventListener('click', () => {
-                if (loadedArrayBuffer) {
-                    renderSwfBuffer(loadedArrayBuffer);
-                } else {
-                    loadSwfFromUrl(RAW_SWF_URL);
+            // Selector de Slots
+            loadGameSlot(slotKey, element = null) {
+                if (element) {
+                    document.querySelectorAll('.game-item').forEach(item => {
+                        item.classList.remove('game-item--active');
+                        item.querySelector('.game-item__badge').textContent = 'Slot';
+                    });
+                    element.classList.add('game-item--active');
+                    element.querySelector('.game-item__badge').textContent = 'Activo';
                 }
-            });
 
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
+                const slot = this.gameSlots[slotKey];
+                if (slot) {
+                    this.searchInput.value = slot.url;
+                    this.loadSwfFromUrl(slot.url, slot.name);
+                }
+            }
+
+            // Manejo de input file local (.swf)
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file && file.name.endsWith('.swf')) {
+                    this.searchInput.value = file.name;
                     const reader = new FileReader();
-                    reader.onload = (evt) => {
-                        loadedArrayBuffer = evt.target.result;
-                        renderSwfBuffer(loadedArrayBuffer);
+                    reader.onload = (e) => {
+                        this.loadSwfBuffer(e.target.result, file.name);
                     };
                     reader.readAsArrayBuffer(file);
                 }
-            });
+            }
 
-            btnFullscreen.addEventListener('click', () => {
+            // Drag and Drop para archivos SWF
+            setupDragAndDrop() {
+                const dropZone = document.getElementById('drop-zone');
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        dropZone.classList.add('upload-zone--drag');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        dropZone.classList.remove('upload-zone--drag');
+                    }, false);
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length && files[0].name.endsWith('.swf')) {
+                        this.searchInput.value = files[0].name;
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                            this.loadSwfBuffer(evt.target.result, files[0].name);
+                        };
+                        reader.readAsArrayBuffer(files[0]);
+                    }
+                });
+            }
+
+            // Reiniciar juego actual
+            reloadCurrentGame() {
+                if (!this.currentSource) return;
+                if (this.currentSource.type === 'url') {
+                    this.loadSwfFromUrl(this.currentSource.value, this.currentSource.name);
+                } else if (this.currentSource.type === 'buffer') {
+                    this.loadSwfBuffer(this.currentSource.value, this.currentSource.name);
+                }
+            }
+
+            // Conmutador de filtro retro CRT
+            toggleCRT() {
+                this.crtEnabled = !this.crtEnabled;
+                this.screenFrame.classList.toggle('screen-frame--crt', this.crtEnabled);
+                document.getElementById('crt-toggle').classList.toggle('arcade-btn--active', this.crtEnabled);
+            }
+
+            // Modo pantalla completa
+            toggleFullscreen() {
                 if (!document.fullscreenElement) {
-                    stageWrapper.requestFullscreen().catch(err => {
-                        console.error(`Error de pantalla completa: ${err.message}`);
+                    this.screenFrame.requestFullscreen().catch(err => {
+                        console.error(`Error al activar pantalla completa: ${err.message}`);
                     });
                 } else {
                     document.exitFullscreen();
                 }
-            });
+            }
+        }
 
-            // Auto-arranque al montar el DOM
-            loadSwfFromUrl(RAW_SWF_URL);
-        });
+        // Instanciación del Kernel del Arcade
+        const arcadeApp = new ArcadeEngine();
     </script>
 </body>
 </html>
