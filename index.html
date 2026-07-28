@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yaoi Porn Lover's Cave of Pleasure</title>
+    <title>Yaoi Porn Lover's Cave of Pleasure - 3D Edition</title>
     <style>
         :root {
-            --bg-color: #050806;
+            --bg-color: #030504;
             --primary-green: #0f3427;
             --light-green: #1d634d;
             --neon-green: #39ff14;
             --gold: #d4af37;
             --gold-glow: #fff1be;
-            --dark-surface: rgba(15, 25, 20, 0.7);
+            --dark-surface: rgba(10, 18, 14, 0.9);
             --glass-border: rgba(214, 175, 55, 0.25);
-            --white-sparkle: rgba(255, 255, 255, 0.95);
+            --alert-red: #ff3366;
+            --bg-dynamic: url('https://archive.org/download/ezgif-377fcbe0f4aa7ab3/ezgif-377fcbe0f4aa7ab3.gif');
         }
 
         * {
@@ -31,133 +32,248 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 3rem 1.5rem;
+            padding: 2rem 1rem;
             overflow-x: hidden;
             position: relative;
+            transition: background 0.5s ease;
+        }
+
+        /* FONDO DINÁMICO SFW / NSFW */
+        body.sfw-mode {
+            background-image: radial-gradient(circle at 50% 30%, #0d231a 0%, #030504 80%);
+            background-attachment: fixed;
+        }
+
+        body.nsfw-mode {
+            background-image: var(--bg-dynamic);
             background-repeat: no-repeat;
             background-position: center top;
             background-attachment: fixed;
             background-size: cover;
-            transition: background 0.5s ease;
         }
 
-        body::before {
+        body.nsfw-mode::before {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(5, 8, 6, 0.85) 0%, rgba(10, 15, 13, 0.95) 100%);
+            background: radial-gradient(circle at 50% 20%, rgba(15, 52, 39, 0.4) 0%, rgba(3, 5, 4, 0.85) 80%);
             z-index: -1;
             pointer-events: none;
         }
 
-        @media (min-width: 769px) {
-            body {
-                background-image: url('https://archive.org/download/ezgif-377fcbe0f4aa7ab3/ezgif-377fcbe0f4aa7ab3.gif');
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                background-image: url('https://archive.org/download/cloud-wallpaper/Cloud%20wallpaper.mp4');
-            }
-        }
-
-        /* HEADER PREMIUM */
-        .header-container {
-            width: 100%;
-            max-width: 1000px;
-            margin-bottom: 4rem;
-            text-align: center;
-            position: relative;
-            padding: 2.5rem;
-            background: radial-gradient(circle, rgba(29, 99, 77, 0.25) 0%, rgba(5, 8, 6, 0) 70%);
-        }
-
-        .sparkle-glow-title {
-            font-size: 3.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--gold);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 0 30px var(--primary-green);
-        }
-
-        .phrase-1, .phrase-2 {
-            position: relative;
-            overflow: hidden;
-            padding: 8px 0;
-            display: inline-block;
-        }
-
-        .phrase-1::after, .phrase-2::after {
-            content: '';
-            position: absolute;
+        /* SCANLINES RETRO VISUAL LAYER */
+        .scanline-overlay {
+            position: fixed;
             top: 0;
-            left: -150%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, var(--white-sparkle), transparent);
-            transform: skewX(-25deg);
-            animation: sparkleSweep 6s infinite ease-in-out;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.4;
         }
 
-        .phrase-2::after { animation-delay: 3s; }
-
-        @keyframes sparkleSweep {
-            0% { left: -150%; }
-            15% { left: 150%; }
-            100% { left: 150%; }
-        }
-
-        /* CUADRO DIGITAL RETRO */
-        .square-clock-wrapper {
+        /* MARQUEE HEADER */
+        .ticker-wrap {
             width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 4rem;
+            max-width: 1100px;
+            background: rgba(5, 12, 8, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            overflow: hidden;
+            white-space: nowrap;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--neon-green);
+        }
+
+        .ticker-item span { color: var(--gold); }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* HEADER & TÍTULO 3D DINÁMICO */
+        .header-container {
+            width: 100%;
+            max-width: 1050px;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            padding: 2.5rem 1.5rem;
             perspective: 1000px;
         }
 
+        .status-badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--gold);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: var(--gold-glow);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .badge:hover { transform: scale(1.05); border-color: var(--neon-green); }
+
+        .btn-nsfw-toggle {
+            background: linear-gradient(135deg, #4a0000, #990000);
+            border-color: #ff3333;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .title-3d-wrapper {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        .title-3d {
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            line-height: 1.1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.9));
+        }
+
+        .title-line {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .char-3d {
+            display: inline-block;
+            transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.2s ease;
+            position: relative;
+            /* EFECTO DE EXTRUSIÓN 3D METÁLICA/DORADA POR DEFECTO */
+            color: var(--gold);
+            text-shadow: 
+                0 1px 0 #997f22,
+                0 2px 0 #88701e,
+                0 3px 0 #77611a,
+                0 4px 0 #665216,
+                0 5px 0 #554312,
+                0 6px 10px rgba(0,0,0,0.8),
+                0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .char-3d:hover {
+            transform: translateZ(30px) scale(1.2) rotate(-5deg);
+            z-index: 10;
+        }
+
+        /* PALETAS DE COLOR / BANDERAS POR LETRA */
+        .palette-gold .char-3d {
+            color: #ffd700;
+            text-shadow: 0 1px 0 #b8860b, 0 2px 0 #996515, 0 3px 0 #7b4a12, 0 4px 0 #5c350e, 0 0 15px #ffd700;
+        }
+
+        .palette-silver .char-3d {
+            color: #e0e0e0;
+            text-shadow: 0 1px 0 #a0a0a0, 0 2px 0 #808080, 0 3px 0 #606060, 0 4px 0 #404040, 0 0 15px #ffffff;
+        }
+
+        .palette-rainbow .char-3d { animation: rainbowFlow 3s infinite linear alternate; }
+        @keyframes rainbowFlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* INDICADOR DE PALETA ACTIVA */
+        .palette-name-tag {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            margin-top: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* SISTEMA DE LOGROS (NOTIFICACIÓN POPUP) */
+        .achievement-toast {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            background: rgba(10, 20, 15, 0.95);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(212, 175, 55, 0.4);
+            z-index: 10000;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: monospace;
+        }
+
+        .achievement-toast.show { bottom: 20px; }
+        .toast-icon { font-size: 2rem; }
+        .toast-title { color: var(--gold); font-weight: bold; font-size: 0.85rem; }
+        .toast-desc { color: #fff; font-size: 0.75rem; }
+
+        /* WIDGETS Y GRID LAYOUT */
+        .top-widgets-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 2.5rem;
+        }
+
         .square-clock {
-            width: 350px;
-            height: 230px;
+            width: 100%;
+            height: 220px;
             background: linear-gradient(135deg, #0e1a14, #050806);
             border: 4px solid var(--gold);
             border-radius: 12px;
             position: relative;
             padding: 16px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
             cursor: pointer;
-            user-select: none;
-            transform: rotateX(6deg);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-        }
-
-        .square-clock:hover {
-            transform: rotateX(0deg) scale(1.03);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.98), 0 0 45px rgba(212, 175, 55, 0.4);
-        }
-
-        .snooze-btn {
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to bottom, #ffffff, var(--gold) 60%, #7c6314);
-            border: 2px solid #000;
-            border-radius: 6px 6px 0 0;
-            padding: 2px 28px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: #000;
-            text-transform: uppercase;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
         }
 
         .clock-screen {
@@ -166,741 +282,4279 @@
             background-color: #030f08;
             border: 3px solid #000;
             border-radius: 6px;
-            padding: 14px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: inset 0 0 25px rgba(57, 255, 20, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .clock-screen.glitch-flash { animation: screenGlitch 0.25s ease-out; }
-
-        @keyframes screenGlitch {
-            0% { opacity: 0.4; background-color: #0c3a1e; }
-            50% { opacity: 0.9; background-color: #175a32; }
-            100% { opacity: 1; background-color: #030f08; }
-        }
-
-        .screen-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-        #clock-format { color: var(--light-green); font-weight: bold; }
-
-        .eye-spy {
-            color: var(--neon-green);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            text-shadow: 0 0 8px var(--neon-green);
-            animation: digitalBlink 1.2s infinite alternate ease-in-out;
-        }
-
-        @keyframes digitalBlink {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; text-shadow: 0 0 12px var(--neon-green), 0 0 20px var(--neon-green); }
         }
 
         #clock-time {
-            font-size: 3.1rem;
+            font-size: 2.8rem;
             font-weight: 900;
             font-family: 'Courier New', Courier, monospace;
             color: var(--neon-green);
-            text-shadow: 0 0 20px rgba(57, 255, 20, 0.85);
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.85);
             text-align: center;
         }
 
-        .screen-footer {
+        .system-hud-card {
+            background: rgba(10, 20, 15, 0.85);
+            border: 2px solid rgba(57, 255, 20, 0.3);
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: flex-end;
             font-family: monospace;
-            font-size: 0.75rem;
-            border-top: 1px solid rgba(45, 138, 107, 0.3);
-            padding-top: 6px;
         }
 
-        #clock-location { color: #ffffff; max-width: 65%; line-height: 1.2; }
-        #clock-weather { color: var(--gold-glow); text-shadow: 0 0 6px rgba(212, 175, 55, 0.5); }
-
-        .stand-left, .stand-right {
-            position: absolute;
-            width: 14px;
-            height: 22px;
-            background: linear-gradient(to right, #111, var(--gold), #534310);
-            bottom: -16px;
-            z-index: -1;
-            border-radius: 3px;
-            border: 1.5px solid #000;
+        .hud-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
         }
-        .stand-left { left: 50px; transform: rotate(18deg); }
-        .stand-right { right: 50px; transform: rotate(-18deg); }
 
-        /* GRID DE BOTONES */
+        .metric-box {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .metric-label { font-size: 0.65rem; color: #888; }
+        .metric-val { font-size: 0.95rem; color: var(--neon-green); font-weight: bold; }
+
+        /* GRID DE NAVEGACIÓN */
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
             width: 100%;
-            max-width: 1200px;
-            padding: 1.5rem;
-            margin-bottom: 4rem;
+            max-width: 1100px;
+            margin-bottom: 3rem;
         }
 
         .custom-btn {
-            background: linear-gradient(135deg, rgba(20, 35, 28, 0.7), var(--primary-green));
+            background: linear-gradient(135deg, rgba(20, 35, 28, 0.8), var(--primary-green));
             color: #ffffff;
             border: 2px solid var(--glass-border);
-            padding: 1.4rem 1.2rem;
-            font-size: 1.05rem;
+            padding: 1.3rem 1.2rem;
+            font-size: 0.95rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
             border-radius: 10px;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             text-decoration: none;
             text-align: center;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255,255,255,0.05);
             backdrop-filter: blur(8px);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.3s ease;
         }
-
-        .custom-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-            transition: 0.6s ease;
-        }
-
-        .custom-btn:hover::before { left: 100%; }
 
         .custom-btn:hover {
             border-color: var(--neon-green);
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(57, 255, 20, 0.25), 0 0 15px rgba(29, 99, 77, 0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(57, 255, 20, 0.2);
             color: var(--neon-green);
         }
 
-        /* BOTONES EXCLUSIVOS */
-        .btn-grandes-exitos {
-            border-color: var(--gold);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
-            animation: goldPulse 4s infinite alternate;
-        }
-
-        @keyframes goldPulse {
-            0% { border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
-            100% { border-color: #ffffff; box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
-        }
-
-        .btn-grandes-exitos .coin-icon {
-            position: absolute;
-            top: -15px;
-            left: 20px;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle at 30% 30%, #fff, #ffd700 60%, #866205);
-            border-radius: 50%;
-            border: 1.5px solid #fff;
-            transform: rotateY(-20deg) rotateZ(10deg);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.6), 0 0 8px #ffd700;
-            z-index: 2;
-        }
-
-        .btn-grandes-exitos .coin-icon::after {
-            content: 'Y';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #614603;
-            font-size: 14px;
-            font-weight: 900;
-        }
-
-        .btn-grandes-exitos:hover { background: linear-gradient(135deg, var(--primary-green), #ffd700); color: #000000; font-weight: 800; }
-
-        .btn-plata .silver-sparkle {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 16px;
-            height: 16px;
-            background: #ffffff;
-            transform: rotate(45deg);
-            box-shadow: 0 0 12px 4px #ffffff;
-        }
-
-        .btn-donaciones { border-color: #ff416c; }
-        .btn-donaciones .heart-icon { margin-right: 8px; animation: heartbeat 1.4s infinite; display: inline-block; }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            20% { transform: scale(1.3); }
-            40% { transform: scale(1.15); }
-            60% { transform: scale(1.4); }
-        }
-
-        .btn-donaciones:hover { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #fff; }
-
-        .btn-motivacion .rose-book-icon { margin-right: 8px; animation: floatingMystic 3s infinite ease-in-out; display: inline-block; }
-
-        @keyframes floatingMystic {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(-6deg); }
-        }
-
-        /* SECCIONES NUMÉRICAS PREMIUM */
-        .btn-num {
-            font-family: monospace;
-            font-size: 0.95rem;
-            background: linear-gradient(135deg, #09110d, #0f1d18);
-            border: 1px solid rgba(57, 255, 20, 0.15);
-        }
-        .btn-num span { color: var(--gold); margin-right: 6px; font-weight: bold; }
-
-        /* LA ROCOLA PAGER JUKEBOX */
+        /* ROCOLA PAGER JUKEBOX */
         .pager-jukebox-wrapper {
             width: 100%;
             display: flex;
             justify-content: center;
-            margin: 2rem 0 4rem;
-            padding: 0 1rem;
+            margin-bottom: 3rem;
         }
 
         .pager-body {
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             background: linear-gradient(135deg, #0f1612, #18241d);
             border: 4px solid var(--gold);
             border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.85), 0 0 25px rgba(212, 175, 55, 0.15);
-            position: relative;
-        }
-
-        .pager-top-buttons {
-            display: flex;
-            gap: 12px;
-            position: absolute;
-            top: -15px;
-            right: 30px;
-        }
-
-        .pager-phys-btn {
-            background: linear-gradient(to bottom, #333, #111);
-            color: var(--gold);
-            border: 2px solid var(--gold);
-            border-radius: 4px 4px 0 0;
-            font-size: 0.7rem;
-            font-weight: 900;
-            padding: 4px 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+            padding: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85);
         }
 
         .pager-screen {
             width: 100%;
-            height: 150px;
+            height: 140px;
             background-color: #04120a;
-            border: 4px solid #000;
+            border: 3px solid #000;
             border-radius: 8px;
             display: flex;
-            padding: 12px;
-            box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
-            overflow: hidden;
-            position: relative;
+            padding: 10px;
         }
 
         .vinyl-area {
-            width: 110px;
+            width: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
             border-right: 2px dashed rgba(57, 255, 20, 0.2);
-            padding-right: 12px;
+            padding-right: 10px;
         }
 
         .vinyl-disk {
-            width: 90px;
-            height: 90px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             background: radial-gradient(circle, #000 35%, #222 40%, #111 50%, #222 60%, #000 70%);
             border: 2px solid #222;
-            position: relative;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-            background-size: cover;
-            background-position: center;
-            transition: all 0.5s ease;
-        }
-
-        .vinyl-center {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background-color: var(--gold);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid #000;
-            transition: background-color 0.5s ease;
         }
 
         .vinyl-disk.playing { animation: spinVinyl 2.5s linear infinite; }
-
         @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
 
-        .pager-lcd-text {
-            flex-grow: 1;
-            padding-left: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        .pager-status-bar {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--light-green);
-            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
-            padding-bottom: 4px;
-        }
-
-        .pager-message {
-            font-size: 0.9rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            text-shadow: 0 0 8px var(--neon-green);
-            text-transform: uppercase;
-            word-break: break-word;
-            line-height: 1.4;
-            margin-top: 8px;
-            height: 100%;
-        }
-
-        .pager-input-panel { display: flex; margin-top: 18px; gap: 12px; }
+        .pager-input-panel { display: flex; margin-top: 15px; gap: 10px; }
 
         #pager-search {
             flex-grow: 1;
             background-color: #030605;
             border: 2px solid var(--gold);
             border-radius: 6px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             color: #ffffff;
             font-family: monospace;
-            font-size: 0.95rem;
             outline: none;
         }
-
-        #pager-search:focus { border-color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.4); }
 
         #pager-submit-btn {
             background: linear-gradient(135deg, var(--primary-green), #0a110e);
             color: var(--gold);
             border: 2px solid var(--gold);
             border-radius: 6px;
-            padding: 0 18px;
-            font-size: 0.8rem;
-            font-weight: 900;
+            padding: 0 16px;
+            font-weight: bold;
             cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.3s;
         }
 
-        #pager-submit-btn:hover { background: var(--gold); color: #000000; }
-
-        /* FOOTER SOCIAL */
-        .social-footer {
-            width: 100%;
-            max-width: 1000px;
-            margin-top: auto;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(212, 175, 55, 0.15);
-            text-align: center;
-        }
-
-        .social-title {
-            font-size: 1.4rem;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
-        }
-
-        .social-container {
-            display: flex;
+        /* MODAL LISTA DE LOGROS */
+        .modal-achievements {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
             justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            padding: 1rem;
+            align-items: center;
+            z-index: 20000;
+            backdrop-filter: blur(5px);
         }
 
-        .social-btn {
-            display: inline-flex;
+        .modal-achievements.active { display: flex; }
+
+        .modal-content {
+            background: #09120d;
+            border: 3px solid var(--gold);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            font-family: monospace;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--gold);
+        }
+
+        .achieve-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
             align-items: center;
             gap: 12px;
-            text-decoration: none;
-            color: #ffffff;
-            font-weight: 700;
-            padding: 0.9rem 1.8rem;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            background: #090f0c;
-            border: 2px solid transparent;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0.5;
         }
 
-        .btn-x { border-color: rgba(212, 175, 55, 0.4); }
-        .btn-x:hover {
-            color: var(--gold-glow);
-            border-color: var(--gold);
-            transform: scale(1.08) translateY(-4px);
-            box-shadow: 0 0 25px var(--gold), 0 0 40px rgba(57, 255, 20, 0.4);
-        }
-
-        .btn-patreon { border-color: rgba(249, 104, 84, 0.4); }
-        .btn-patreon:hover {
-            color: #ff8b77;
-            border-color: #f96854;
-            transform: scale(1.08) translateY(-4px);
-            box-shadow: 0 0 25px #f96854;
-        }
-
-        .btn-r34 { border-color: rgba(57, 255, 20, 0.3); }
-        .btn-r34:hover {
-            color: var(--neon-green);
+        .achieve-item.unlocked {
+            opacity: 1;
             border-color: var(--neon-green);
-            transform: scale(1.08) translateY(-4px);
-            box-shadow: 0 0 25px var(--neon-green);
+            background: rgba(57, 255, 20, 0.05);
         }
-
-        .r34-logo-box {
-            font-family: 'Impact', sans-serif;
-            font-size: 13px;
-            background: #ff4500;
-            color: #fff;
-            padding: 2px 7px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-discord {
-            border-color: rgba(114, 137, 218, 0.4);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .social-icon { width: 20px; height: 20px; }
 
         @media (max-width: 600px) {
-            .sparkle-glow-title { font-size: 1.9rem; }
-            .button-grid { grid-template-columns: 1fr; gap: 1.2rem; }
-            .square-clock { width: 300px; height: 210px; }
-            #clock-time { font-size: 2.5rem; }
+            .title-3d { font-size: 1.9rem; }
+            .top-widgets-layout { grid-template-columns: 1fr; }
         }
+		/* EFECTO HOLOGRÁFICO YEYO CARDS */
+.yeyo-holo-card {
+    perspective: 1000px;
+    height: 160px;
+    cursor: pointer;
+}
+
+.holo-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(20, 35, 28, 0.9), rgba(5, 8, 6, 0.95));
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 15px;
+    transition: transform 0.1s ease-out, border-color 0.3s;
+    transform-style: preserve-3d;
+    overflow: hidden;
+}
+
+.holo-inner:hover {
+    border-color: var(--gold);
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+}
+
+.holo-shine {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.yeyo-holo-card:hover .holo-shine {
+    opacity: 1;
+}
+
+/* FILTRO GLITCH VHS RETRO EN SCREEN */
+body.vhs-active {
+    animation: vhsFlicker 0.15s infinite alternate;
+}
+
+@keyframes vhsFlicker {
+    0% { filter: contrast(100%) brightness(100%) hue-rotate(0deg); }
+    100% { filter: contrast(110%) brightness(108%) hue-rotate(2deg); }
+}
+
+:root {
+    --sldg-bg: rgba(5, 7, 10, 0.85);
+    --sldg-border: rgba(57, 255, 20, 0.4);
+    --sldg-accent: #39ff14;
+    --sldg-gold: #d4af37;
+  }
+
+  .sldg-feature-wrapper {
+    margin: 1.5rem 0;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  .sldg-trigger-btn {
+    position: relative;
+    background: linear-gradient(135deg, rgba(20, 25, 20, 0.9), rgba(5, 10, 5, 0.95));
+    border: 1px solid var(--sldg-border);
+    color: var(--sldg-accent);
+    padding: 0.85rem 1.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    border-radius: 8px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(57, 255, 20, 0.15);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .sldg-trigger-btn:hover {
+    border-color: var(--sldg-accent);
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.4), inset 0 0 15px rgba(57, 255, 20, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-tag {
+    font-size: 0.75rem;
+    color: var(--sldg-gold);
+    background: rgba(212, 175, 55, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+  }
+
+  /* Modal System */
+  .sldg-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 4, 6, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sldg-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sldg-modal-card {
+    width: 90%;
+    max-width: 600px;
+    background: var(--sldg-bg);
+    border: 1px solid var(--sldg-border);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(57, 255, 20, 0.15);
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sldg-modal-overlay.active .sldg-modal-card {
+    transform: scale(1);
+  }
+
+  .sldg-modal-header {
+    background: rgba(10, 15, 10, 0.95);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .window-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot.red { background: #ff5f56; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #27c93f; }
+
+  .window-title {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+  }
+
+  .close-modal-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .close-modal-btn:hover { color: #fff; }
+
+  .sldg-modal-body {
+    padding: 2rem;
+    color: #e0e0e0;
+  }
+
+  .rage-comic-banner {
+    background: rgba(0,0,0,0.5);
+    border: 2px dashed rgba(57, 255, 20, 0.3);
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+  }
+
+  .rage-text-top, .rage-text-bottom {
+    display: block;
+    font-family: Impact, sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .rage-comic-banner h3 {
+    font-family: Impact, sans-serif;
+    font-size: 1.4rem;
+    color: var(--sldg-accent);
+    margin: 0.5rem 0;
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 1px;
+  }
+
+  .facts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .fact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: rgba(255,255,255,0.02);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--sldg-accent);
+  }
+
+  .fact-index {
+    font-weight: 700;
+    color: var(--sldg-gold);
+  }
+
+  .fact-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .sldg-footer-stamp {
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--sldg-gold);
+    letter-spacing: 2px;
+    opacity: 0.8;
+  }
+
+/* OVERLAY FULLSCREEN DE LA TERMINAL */
+#kasper-terminal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #030008;
+    color: #ff71ce;
+    font-family: 'Courier New', Courier, monospace;
+    z-index: 99999;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    transition: filter 0.2s ease, background-color 0.3s;
+}
+
+/* ESCANEO CRT VAPORWAVE */
+.crt-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 113, 206, 0.15) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+}
+
+/* MENSAJE DE ERROR Y COLORES */
+.error-msg {
+    color: #ff355e;
+    font-weight: bold;
+    animation: blinkError 1s infinite alternate;
+}
+
+@keyframes blinkError {
+    0% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+.prompt-symbol {
+    color: #01cdfe;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #05ffa1;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+/* MODO INVERTIDO YEYO/YAOILOVER */
+body.yaoilover-mode #kasper-terminal-overlay {
+    filter: invert(100%);
+}
+
+.cloud-spam-line {
+    color: #b967ff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 2px 0;
+}
+
+/* PANTALLA DE APAGADO ESTILO WINDOWS XP / DOUZOZ 7 */
+#douzoz-shutdown-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #002366 0%, #000c1a 100%);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.shutdown-dialog {
+    text-align: center;
+}
+
+.windows-flag-icon {
+    font-size: 4rem;
+    color: #00d2ff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.8);
+}
+
+.shutdown-text {
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.shutdown-subtext {
+    font-size: 1.2rem;
+    color: #a0c4ff;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* GRID LAYOUT ACTUALIZADO */
+.button-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1100px;
+    margin-bottom: 3rem;
+    perspective: 1000px;
+}
+
+/* BASE DE LAS TARJETAS / BOTONES */
+.grid-card-btn {
+    position: relative;
+    padding: 1.4rem 1.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
+    background: rgba(10, 20, 15, 0.85);
+    border: 2px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+}
+
+.grid-card-btn:hover {
+    transform: translateY(-6px) scale(1.02);
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 5;
+    position: relative;
+}
+
+.card-icon { font-size: 2rem; }
+.card-text-group { display: flex; flex-direction: column; text-align: left; }
+.card-title { font-weight: 900; font-size: 1rem; letter-spacing: 1px; font-family: monospace; }
+.card-subtitle { font-size: 0.72rem; color: #aaa; margin-top: 2px; }
+
+/* ==========================================
+   1. ESTILO ORO CARTOON (GRANDES ÉXITOS)
+   ========================================== */
+.gold-master-btn {
+    background: linear-gradient(135deg, #2b1f00 0%, #664d00 50%, #997300 100%);
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), inset 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.gold-master-btn .card-title {
+    color: #fff1be;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 2px 2px 0px #000;
+}
+
+.gold-master-btn:hover {
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.7), 0 10px 25px rgba(0, 0, 0, 0.8);
+    border-color: #ffffff;
+}
+
+/* CARTOON SHIMMER (BARRA BLANCA QUE CRUZA) */
+.cartoon-shimmer {
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(25deg);
+    animation: cartoonShineLoop 3.5s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes cartoonShineLoop {
+    0% { left: -150%; }
+    30%, 100% { left: 180%; }
+}
+
+/* BRILLO ESQUINA SUPERIOR DERECHA */
+.top-right-sparkle {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 1.2rem;
+    z-index: 6;
+    animation: sparkleBlink 1.2s infinite alternate;
+}
+
+@keyframes sparkleBlink {
+    0% { transform: scale(0.8) rotate(0deg); opacity: 0.4; filter: drop-shadow(0 0 2px #fff); }
+    100% { transform: scale(1.3) rotate(45deg); opacity: 1; filter: drop-shadow(0 0 10px #ffd700); }
+}
+
+/* MONEDAS, DINERO & BITCOIN FLOTANTES */
+.floating-wealth {
+    position: absolute;
+    font-size: 1.1rem;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 1;
+    filter: drop-shadow(0 0 5px #ffd700);
+    animation: floatWealth 3s infinite ease-in-out alternate;
+}
+
+.w-1 { top: 8px; left: 15%; animation-delay: 0s; }
+.w-2 { bottom: 6px; left: 45%; animation-delay: 0.8s; }
+.w-3 { top: 10px; right: 25%; animation-delay: 1.5s; }
+.w-4 { bottom: 8px; right: 12%; animation-delay: 2.1s; }
+
+@keyframes floatWealth {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-8px) rotate(15deg); }
+}
+
+/* 2. ESTILOS DE LOS OTROS BOTONES ACTIVOS */
+.silver-cyber-btn:hover { border-color: #01cdfe; box-shadow: 0 0 20px rgba(1, 205, 254, 0.4); }
+.arcade-neon-btn:hover { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+.donation-btn:hover { border-color: #ff3366; box-shadow: 0 0 20px rgba(255, 51, 102, 0.4); }
+
+/* ==========================================
+   3. ESTILO DE BOTONES BLOQUEADOS (EN CONSTRUCCIÓN)
+   ========================================== */
+.locked-btn {
+    background: linear-gradient(135deg, rgba(20, 15, 15, 0.9), rgba(5, 5, 5, 0.95));
+    border: 2px dashed #ff3366;
+    opacity: 0.75;
+}
+
+.locked-btn:hover {
+    opacity: 1;
+    border-color: #ffcc00;
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+    animation: shakeLocked 0.3s ease;
+}
+
+.lock-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: repeating-linear-gradient(
+        -45deg,
+        #b8860b,
+        #b8860b 10px,
+        #000 10px,
+        #000 20px
+    );
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: bold;
+    font-family: monospace;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 1px;
+    z-index: 4;
+}
+
+@keyframes shakeLocked {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+}
+
+/* CINTA DE NOTICIAS CON ESTÉTICA VICE CITY */
+.vice-news-ticker-wrap {
+    width: 100%;
+    max-width: 580px;
+    margin: 15px auto;
+    background: linear-gradient(90deg, #ff007f, #00f0ff);
+    padding: 3px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-family: monospace;
+}
+
+.vice-badge {
+    background: #000;
+    color: #ff007f;
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 7px 0 0 7px;
+    white-space: nowrap;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px #ff007f;
+}
+
+.vice-ticker-content {
+    background: #0d001a;
+    width: 100%;
+    overflow: hidden;
+    padding: 6px 0;
+    border-radius: 0 7px 7px 0;
+}
+
+.vice-ticker-text {
+    display: inline-block;
+    white-space: nowrap;
+    color: #00f0ff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-shadow: 0 0 4px #00f0ff;
+    animation: viceTickerScroll 22s linear infinite;
+}
+
+@keyframes viceTickerScroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* PAGER MULTI-SKIN CONTAINER */
+.pager-master-wrapper {
+    width: 100%;
+    max-width: 340px;
+    margin: 20px auto;
+    font-family: monospace;
+}
+
+.pager-skin-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--gold-glow);
+}
+
+.skin-label { color: var(--gold); font-size: 0.65rem; font-weight: bold; }
+
+.skin-btn {
+    background: #111;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.6rem;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.skin-btn:hover, .skin-btn.active {
+    color: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 6px rgba(57, 255, 20, 0.4);
+}
+
+/* CHASIS BASE */
+.pager-chassis {
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.85);
+    transition: background 0.4s, border-color 0.4s;
+}
+
+.pager-antenna {
+    position: absolute;
+    top: -14px;
+    left: 22px;
+    width: 14px;
+    height: 16px;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 3px 3px 0 0;
+}
+
+.pager-led {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #39ff14;
+    box-shadow: 0 0 8px #39ff14;
+}
+
+.pager-sticker {
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    font-size: 1.5rem;
+    pointer-events: none;
+    opacity: 0.85;
+    filter: drop-shadow(1px 1px 2px #000);
+}
+
+/* ==========================================
+   SKINS DE HARDWARE
+   ========================================== */
+
+/* 1. SKIN GTA 3 (LIBERTY CITY) */
+.skin-gta3 {
+    background: linear-gradient(145deg, #2a2d32, #111315);
+    border: 4px solid #4a5058;
+}
+.skin-gta3 .pager-brand-text { color: #ffaa00; font-weight: 900; }
+.skin-gta3 .pager-lcd-screen.backlight-on {
+    background: #e69d00;
+    color: #1a0f00;
+    box-shadow: 0 0 15px rgba(230, 157, 0, 0.6);
+}
+
+/* 2. SKIN ARGENTINA (LA SCALONETA) */
+.skin-argentina {
+    background: linear-gradient(145deg, #74acdf, #2b6cb0);
+    border: 4px solid #ffffff;
+}
+.skin-argentina .pager-brand-text { color: #fff; font-weight: 900; text-shadow: 1px 1px 0 #000; }
+.skin-argentina .pager-lcd-screen.backlight-on {
+    background: #a5f3fc;
+    color: #0c4a6e;
+    box-shadow: 0 0 15px rgba(165, 243, 252, 0.8);
+}
+
+/* 3. SKIN MATRIX */
+.skin-matrix {
+    background: linear-gradient(145deg, #051a05, #000500);
+    border: 4px solid #39ff14;
+}
+.skin-matrix .pager-brand-text { color: #39ff14; }
+.skin-matrix .pager-lcd-screen.backlight-on {
+    background: #002200;
+    color: #39ff14;
+    text-shadow: 0 0 4px #39ff14;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+}
+
+/* 4. SKIN RETRO 90S */
+.skin-classic {
+    background: linear-gradient(145deg, #1a241b, #0a0f0b);
+    border: 4px solid #2e4030;
+}
+.skin-classic .pager-brand-text { color: #88aa88; }
+.skin-classic .pager-lcd-screen.backlight-on {
+    background: #8b9bb4;
+    color: #0f172a;
+    box-shadow: 0 0 10px rgba(139, 155, 180, 0.5);
+}
+
+/* APAGADO DE LUZ LCD */
+.pager-lcd-screen {
+    border: 3px inset rgba(0,0,0,0.5);
+    border-radius: 8px;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+    min-height: 105px;
+}
+
+.pager-lcd-screen.backlight-off {
+    background: #111512 !important;
+    color: #223322 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.lcd-top-bar, .lcd-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    font-weight: bold;
+}
+
+.lcd-main-display {
+    min-height: 48px;
+    margin: 6px 0;
+    font-size: 0.78rem;
+    font-weight: bold;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+}
+
+/* BOTONES FÍSICOS */
+.pager-controls-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+}
+
+.pager-phys-btn {
+    flex: 1;
+    background: #1a1a1a;
+    color: #ccc;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 6px 0;
+    font-size: 0.62rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.pager-phys-btn:active { transform: translateY(2px); background: #333; }
+.btn-light { color: #ffea00; }
+.btn-alert { color: #ff4444; }
+
+/* TECLADO */
+.pager-keypad-box {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.4);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.keypad-header { display: flex; gap: 4px; margin-bottom: 6px; }
+
+#pager-code-input {
+    flex: 1;
+    background: #000;
+    color: var(--neon-green);
+    border: 1px solid #333;
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 0.85rem;
+    border-radius: 4px;
+}
+
+.keypad-send-btn { background: #1b4d24; color: #aaffaa; border: 1px solid #2e7d32; border-radius: 4px; padding: 0 10px; font-weight: bold; cursor: pointer; }
+.keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.keypad-grid button { background: #222; color: #fff; border: 1px solid #333; border-radius: 4px; padding: 5px 0; font-weight: bold; font-family: monospace; cursor: pointer; }
+.keypad-grid button:active { background: var(--gold); color: #000; }
+.keypad-clear-btn { background: #4a1515 !important; color: #ffaaaa !important; }
+.keypad-charge-btn { background: #4a3b15 !important; color: #ffea00 !important; }
+
+
+/* LÍNEA DE PROGRESO DINÁMICA DE LA CINTA */
+.tape-progress-container {
+    background: #0d0e12;
+    border: 1px solid #22252e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.time-display-box {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--neon-green, #00ff66);
+    text-shadow: 0 0 4px rgba(0, 255, 102, 0.4);
+}
+
+.time-separator { color: #555; }
+
+.progress-bar-wrapper {
+    width: 100%;
+    height: 10px;
+    background: #1a1c23;
+    border-radius: 5px;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00b341, #00ff66);
+    box-shadow: 0 0 10px #00ff66;
+    transition: width 0.1s linear;
+}
+
+.progress-scrubber-head {
+    position: absolute;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 0 0 6px #fff;
+    display: none;
+}
+
+/* SELECTOR DE TRACKS Y PITCH */
+.direct-select-box {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #888;
+    font-size: 0.65rem;
+}
+
+.direct-select-box input {
+    width: 38px;
+    background: #000;
+    color: var(--neon-green, #00ff66);
+    border: 1px solid #333;
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.deck-pitch-box select {
+    background: #000;
+    color: #ffaa00;
+    border: 1px solid #333;
+    font-family: monospace;
+    font-size: 0.65rem;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+/* ==========================================
+   CUEVA TAPE DECK-9000 - CHASSIS & ANIMATION
+   ========================================== */
+.tape-deck-wrapper {
+    width: 100%;
+    max-width: 580px;
+    margin: 30px auto;
+    background: linear-gradient(180deg, #18191c 0%, #0d0e10 100%);
+    border: 3px solid #2d3038;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.1);
+    font-family: 'Courier New', monospace;
+    user-select: none;
+}
+
+/* DECK TOP BAR */
+.deck-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111215;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #22242b;
+    margin-bottom: 15px;
+}
+
+.brand-logo { color: var(--gold, #ffd700); font-weight: 900; font-size: 1.1rem; letter-spacing: 2px; }
+.brand-model { color: #666; font-size: 0.6rem; display: block; }
+
+/* VU METERS ANALÓGICOS */
+.vumeter-box { display: flex; gap: 8px; }
+.vumeter {
+    width: 45px;
+    height: 25px;
+    background: #2a2210;
+    border: 1px solid #ffaa0044;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+.vumeter-needle {
+    width: 2px;
+    height: 22px;
+    background: #ff4444;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: rotate(-40deg);
+    transition: transform 0.05s ease-out;
+}
+.vu-label { position: absolute; bottom: 1px; right: 3px; font-size: 0.5rem; color: #ffaa00; }
+
+/* CONTADOR MECÁNICO */
+.tape-counter-box {
+    display: flex;
+    align-items: center;
+    background: #000;
+    padding: 4px 6px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+.counter-digit {
+    background: #151515;
+    color: #fff;
+    padding: 2px 5px;
+    margin: 0 1px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    border-radius: 2px;
+    box-shadow: inset 0 0 4px #000;
+}
+.counter-reset-btn {
+    background: none; border: none; color: #666; cursor: pointer; font-size: 0.8rem; margin-left: 4px;
+}
+.counter-reset-btn:hover { color: #fff; }
+
+/* PUERTA Y COMPARTIMENTO DEL CASSETTE */
+.deck-door-chamber {
+    background: #08080a;
+    border: 2px inset #1a1b20;
+    border-radius: 12px;
+    padding: 15px;
+    perspective: 1000px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ANIMACIÓN DE EYECCIÓN DE PUERTA */
+.deck-door-chamber.ejecting #active-cassette {
+    transform: rotateX(25deg) translateY(-80px) scale(0.9);
+    opacity: 0;
+}
+
+/* CASSETTE BODY */
+.cassette-body {
+    background: #22252c;
+    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid #3a3f4d;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+    position: relative;
+}
+
+/* VARIANTES DE COLOR PARA CASSETTES */
+.cassette-body.skin-neon { background: linear-gradient(135deg, #2b0038, #002b38); border-color: #00f0ff; }
+.cassette-body.skin-gold { background: linear-gradient(135deg, #382b00, #1a1400); border-color: #ffd700; }
+.cassette-body.skin-red { background: linear-gradient(135deg, #380000, #1a0000); border-color: #ff3333; }
+
+.cassette-label {
+    background: #fff;
+    color: #111;
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.cassette-side { background: #111; color: #fff; padding: 1px 6px; border-radius: 3px; }
+.cassette-title-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* VENTANA DE CINTA Y CARRETES */
+.cassette-window {
+    background: rgba(0,0,0,0.85);
+    margin-top: 10px;
+    border-radius: 6px;
+    height: 65px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 35px;
+    position: relative;
+    border: 1px solid #444;
+}
+
+.tape-bridge {
+    position: absolute;
+    height: 18px;
+    background: #4a2c11; /* Color cinta magnética */
+    left: 75px;
+    right: 75px;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+.tape-reel {
+    width: 42px;
+    height: 42px;
+    background: #000;
+    border-radius: 50%;
+    border: 2px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.tape-spool {
+    position: absolute;
+    background: #4a2c11;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    transition: width 0.3s, height 0.3s;
+}
+
+.spoke-hub {
+    width: 16px;
+    height: 16px;
+    background: #eee;
+    border-radius: 50%;
+    border: 3px dashed #111;
+    z-index: 3;
+}
+
+/* ROTACIÓN DE CARRETES (PLAYING) */
+.playing .spoke-hub {
+    animation: spinReels 2s linear infinite;
+}
+.rewinding .spoke-hub {
+    animation: spinReels 0.5s linear infinite reverse;
+}
+.fast-forwarding .spoke-hub {
+    animation: spinReels 0.5s linear infinite;
+}
+
+@keyframes spinReels {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cassette-bottom-holes {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 8px;
+}
+.c-hole { width: 10px; height: 10px; background: #08080a; border-radius: 50%; border: 1px solid #333; }
+
+/* LCD DISPLAY DE TRACK */
+.deck-info-display {
+    background: #040d06;
+    border: 1px solid #00ff6644;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.track-number-badge { color: #00ff66; font-size: 0.7rem; font-weight: bold; }
+.track-marquee { color: #00ff66; font-size: 0.75rem; text-shadow: 0 0 5px #00ff66; }
+.deck-pitch-box { color: #888; font-size: 0.6rem; display: flex; align-items: center; gap: 4px; }
+
+/* BOTONES MECÁNICOS (PIANO KEYS) */
+.piano-keys-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 15px;
+}
+
+.piano-btn {
+    flex: 1;
+    background: linear-gradient(180deg, #3a3d45 0%, #1f2126 100%);
+    color: #ccc;
+    border: 1px solid #111;
+    border-bottom: 4px solid #0a0b0d;
+    border-radius: 4px;
+    padding: 10px 0;
+    font-size: 0.65rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.1s;
+    font-family: monospace;
+}
+
+.piano-btn:active, .piano-btn.active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    color: var(--neon-green, #00ff66);
+    background: #151619;
+}
+
+.key-eject { color: #ffaa00; }
+.key-play { color: #00ff66; }
+
+/* ESTILOS DEL RELOJ SUPREMO */
+.supreme-clock-card {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(15, 25, 20, 0.95), rgba(5, 8, 6, 0.98));
+    border: 3px solid var(--gold);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.9), 0 0 15px rgba(212, 175, 55, 0.3);
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.clock-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(212,175,55,0.2);
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.clock-mode-selector {
+    display: flex;
+    gap: 6px;
+}
+
+.clk-mode-btn {
+    background: #000;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.clk-mode-btn:hover, .clk-mode-btn.active {
+    color: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.clock-display-screen {
+    background-color: #020604;
+    border: 2px solid #111;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+/* MODOS ESTÉTICOS */
+.theme-vaporwave #clock-time-text {
+    color: #ff71ce;
+    text-shadow: 0 0 15px #ff71ce, 0 0 30px #01cdfe;
+}
+
+.theme-cyberpunk #clock-time-text {
+    color: #01cdfe;
+    text-shadow: 0 0 15px #01cdfe, 0 0 25px #05ffa1;
+}
+
+.theme-matrix #clock-time-text {
+    color: #39ff14;
+    text-shadow: 0 0 15px #39ff14;
+}
+
+#clock-time-text {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+#clock-date-text {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+/* RELOJ ANALÓGICO SVG */
+.analog-svg {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+}
+
+.clock-face {
+    fill: #050d09;
+    stroke: var(--gold);
+    stroke-width: 3;
+}
+
+.hand {
+    stroke-linecap: round;
+    transform-origin: 50px 50px;
+}
+
+.hand.hour { stroke: var(--gold); stroke-width: 4; }
+.hand.minute { stroke: #01cdfe; stroke-width: 3; }
+.hand.second { stroke: #ff355e; stroke-width: 1.5; }
+
+/* SECCIÓN GEO IP Y CLIMA */
+.clock-geo-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    font-size: 0.75rem;
+    text-align: left;
+}
+
+.ip-highlight {
+    color: #ff355e;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.geo-text { color: var(--gold-glow); font-size: 0.7rem; margin-top: 2px; }
+.weather-text { color: var(--neon-green); font-weight: bold; text-align: right; }
+.isp-text { color: #888; font-size: 0.65rem; text-align: right; }
+
+/* WIDGET ANTI-ESTRÉS */
+.anti-stress-panel {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stress-btn {
+    background: linear-gradient(135deg, #a81c1c, #520808);
+    color: #fff;
+    border: 1px solid #ff4444;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.05s, background 0.2s;
+}
+
+.stress-btn:active {
+    transform: scale(0.96);
+    background: #ff2222;
+}
+
+.stress-comment-box {
+    font-size: 0.72rem;
+    color: var(--neon-green);
+    text-align: center;
+    font-style: italic;
+    min-height: 18px;
+}
+
+/* ==========================================
+   ESTILOS DE TERMINAL ASIDE MULTI-OS
+   ========================================== */
+.vm-aside-sidebar {
+  position: fixed;
+  top: 0;
+  right: -380px;
+  width: 380px;
+  height: 100vh;
+  z-index: 25000;
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.vm-aside-sidebar.open {
+  right: 0;
+}
+
+/* BOTÓN TOGGLE DOCK */
+.vm-aside-toggle {
+  position: absolute;
+  left: -48px;
+  top: 100px;
+  background: rgba(5, 10, 8, 0.95);
+  border: 1px solid var(--neon-green, #39ff14);
+  border-right: none;
+  color: var(--neon-green, #39ff14);
+  padding: 14px 8px;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.toggle-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.vm-aside-wrapper {
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 12, 10, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-left: 2px solid var(--neon-green, #39ff14);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.9);
+}
+
+.vm-aside-header {
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vm-header-info { display: flex; align-items: center; gap: 8px; }
+.vm-header-info h3 { font-size: 0.75rem; color: #fff; margin: 0; letter-spacing: 1px; }
+.vm-aside-status { width: 8px; height: 8px; background: var(--neon-green, #39ff14); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green, #39ff14); }
+.vm-aside-close { background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; }
+.vm-aside-close:hover { color: #ff3366; }
+
+/* OS SELECTOR */
+.vm-aside-os-selector { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.selector-title { font-size: 0.6rem; color: #777; display: block; margin-bottom: 6px; }
+.os-mini-list { display: flex; flex-direction: column; gap: 4px; }
+
+.os-mini-card {
+  background: rgba(20, 30, 25, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.os-mini-card:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+.os-mini-card.active { border-color: currentColor; background: rgba(255, 255, 255, 0.08); font-weight: bold; }
+.os-mini-card.os-locked { opacity: 0.35; cursor: not-allowed; }
+.os-num { font-size: 0.65rem; font-weight: bold; }
+
+/* VIEWPORT DE LA CONSOLA & CRT */
+.vm-aside-viewport {
+  flex: 1;
+  position: relative;
+  background: #020403;
+  margin: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.crt-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.vm-aside-boot {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #000;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.3s;
+}
+
+.vm-aside-boot.hidden { opacity: 0; pointer-events: none; }
+.boot-spinner { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#vm-boot-label { font-size: 0.7rem; }
+
+.vm-aside-console { display: flex; flex-direction: column; height: 100%; }
+.console-topbar { padding: 6px 10px; font-size: 0.65rem; font-weight: bold; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.console-output { flex: 1; padding: 10px; overflow-y: auto; font-size: 0.75rem; line-height: 1.4; display: flex; flex-direction: column; gap: 5px; }
+.console-form { display: flex; padding: 8px; background: rgba(0, 0, 0, 0.8); border-top: 1px solid rgba(255, 255, 255, 0.1); align-items: center; gap: 6px; }
+.prompt-tag { font-size: 0.7rem; font-weight: bold; }
+#aside-console-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: inherit; font-size: 0.75rem; }
+
+.vm-aside-footer { padding: 8px 12px; background: rgba(0, 0, 0, 0.8); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; font-size: 0.65rem; color: #888; }
+
+/* ==========================================
+   PALETAS DE COLOR ÚNICAS POR SO
+   ========================================== */
+
+/* 1. DOUZOZ 98' (Verde Fósforo Retro CRT) */
+.vm-aside-viewport[data-theme="douzoz98"] { border-color: #39ff14; }
+.vm-aside-viewport[data-theme="douzoz98"] .console-topbar { background: rgba(57, 255, 20, 0.15); color: #39ff14; }
+.vm-aside-viewport[data-theme="douzoz98"] .prompt-tag { color: #39ff14; }
+.vm-aside-viewport[data-theme="douzoz98"] .boot-spinner { border-top-color: #39ff14; }
+.vm-aside-viewport[data-theme="douzoz98"] #vm-boot-label { color: #39ff14; }
+
+/* 2. Kasper 64 (Cyber Cyan / Azul Eléctrico) */
+.vm-aside-viewport[data-theme="kasper64"] { border-color: #00f3ff; }
+.vm-aside-viewport[data-theme="kasper64"] .console-topbar { background: rgba(0, 243, 255, 0.15); color: #00f3ff; }
+.vm-aside-viewport[data-theme="kasper64"] .prompt-tag { color: #00f3ff; }
+.vm-aside-viewport[data-theme="kasper64"] .boot-spinner { border-top-color: #00f3ff; }
+.vm-aside-viewport[data-theme="kasper64"] #vm-boot-label { color: #00f3ff; }
+
+/* 3. JoyLover 10 (Magenta Neon Gamer) */
+.vm-aside-viewport[data-theme="joylover10"] { border-color: #ff007f; }
+.vm-aside-viewport[data-theme="joylover10"] .console-topbar { background: rgba(255, 0, 127, 0.15); color: #ff007f; }
+.vm-aside-viewport[data-theme="joylover10"] .prompt-tag { color: #ff007f; }
+.vm-aside-viewport[data-theme="joylover10"] .boot-spinner { border-top-color: #ff007f; }
+.vm-aside-viewport[data-theme="joylover10"] #vm-boot-label { color: #ff007f; }
+
+/* 4. YaoiLover Mints (Oro / Amber Mint UNIX) */
+.vm-aside-viewport[data-theme="yaoilover-mints"] { border-color: #d4af37; }
+.vm-aside-viewport[data-theme="yaoilover-mints"] .console-topbar { background: rgba(212, 175, 55, 0.15); color: #d4af37; }
+.vm-aside-viewport[data-theme="yaoilover-mints"] .prompt-tag { color: #d4af37; }
+.vm-aside-viewport[data-theme="yaoilover-mints"] .boot-spinner { border-top-color: #d4af37; }
+.vm-aside-viewport[data-theme="yaoilover-mints"] #vm-boot-label { color: #d4af37; }
+
+
+/* ==========================================================================
+   ESTILOS GENERALES Y ESTÉTICA CRT / VAPORWAVE - DOUZOZ 7
+   ========================================================================== */
+
+/* Overlay principal de la terminal */
+#kasper-terminal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0d0221;
+    color: #05ffa1;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
+/* Efecto Scanline CRT retro */
+.crt-scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Historial de comandos y Prompt */
+#command-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    word-break: break-word;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.prompt-symbol {
+    color: #05ffa1;
+    font-weight: bold;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: inherit;
+    width: 100%;
+    caret-color: #ff71ce;
+}
+
+/* Banner de bienvenida */
+#terminal-banner {
+    color: #b967ff;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+/* Mensajes de error */
+.error-msg {
+    color: #ff355e;
+    font-weight: bold;
+}
+
+/* Destacados del juego Zork y comandos */
+.cmd-highlight {
+    color: #05ffa1;
+    font-weight: bold;
+}
+
+.cmd-name {
+    color: #ff71ce;
+    font-weight: bold;
+}
+
+/* Pre para renderizar el logo ASCII impecable */
+pre {
+    margin: 0;
+    font-family: 'Consolas', 'Courier New', monospace;
+    white-space: pre;
+}
+
+/* ==========================================================================
+   PANTALLA DE APAGADO (SHUTDOWN SCREEN)
+   ========================================================================== */
+#douzoz-shutdown-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, #1a0033 0%, #050010 100%);
+    z-index: 20000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.shutdown-dialog {
+
+
     </style>
 </head>
-<body>
+<body class="sfw-mode">
+<!-- INTRO / PANTALLA PRINCIPAL TERMINAL KASPER -->
+<div id="kasper-terminal-overlay">
+    <div class="crt-scanline"></div>
+    <div id="terminal-content">
+        <!-- El arranque tipo GTA III / Vice City se imprime automáticamente aquí -->
+        <div id="boot-sequence"></div>
 
+        <!-- Consola Interactiva -->
+        <div id="interactive-prompt" style="display: none; margin-top: 15px;">
+            <div id="terminal-banner">
+                --------------------------------------------------<br>
+                TERMINAL KASPER v3.01 - VAPORWAVE BIOS<br>
+                Sistema operativo: DOUZOZ 7 (2007 Original edition)<br>
+                <span class="error-msg">SYSTEM ERROR: Copia de OS inexistente o no autorizada. Por favor pague con una mamada.</span><br>
+                --------------------------------------------------<br>
+                Escribe 'help' para ver la lista de comandos disponibles.<br>&nbsp;
+            </div>
+            
+            <div id="command-history"></div>
+
+            <div class="input-line">
+                <span class="prompt-symbol">KASPER:\DOUZOZ7></span>
+                <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTAINER DE APAGADO (DOUZOZ 7 SHUTTING YOU UP NOW) -->
+<div id="douzoz-shutdown-screen">
+    <div class="shutdown-dialog">
+        <div class="windows-flag-icon">❖</div>
+        <div class="shutdown-text">DOUZOZ 7</div>
+        <div class="shutdown-subtext">Shutting you up now...</div>
+    </div>
+</div>
+    <div class="scanline-overlay"></div>
+
+    <!-- TICKER INFORMATIVO -->
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item"><span>MODO ACTUAL:</span> <span id="mode-text-display">SFW (SEGURO)</span></div>
+            <div class="ticker-item"><span>LOGROS UNLOCKED:</span> <span id="achievements-count">0/8</span></div>
+            <div class="ticker-item"><span>BANDERA:</span> PRESIONA EL TÍTULO 3D PARA CAMBIAR DIVERSITY COLOR</div>
+            <div class="ticker-item"><span>SECRET CODE:</span> PRUEBA INGRESA 'YEYO' EN EL TRANSMISOR</div>
+        </div>
+    </div>
+
+    <!-- HEADER & TÍTULO 3D -->
     <header class="header-container">
-        <h1 class="sparkle-glow-title">
-            <span class="phrase-1">Yaoi Porn Lover's</span>
-            <span class="phrase-2">Cave of Pleasure</span>
-        </h1>
+        <div class="status-badge-container">
+            <div class="badge btn-nsfw-toggle" id="nsfw-toggle-btn">🔥 NSFW: OFF</div>
+            <div class="badge" id="open-achievements-btn">🏆 LOGROS (<span id="badge-ach-num">0</span>)</div>
+            <div class="badge"><span style="color:var(--neon-green)">●</span> ONLINE</div>
+        </div>
+
+        <div class="title-3d-wrapper" id="title-3d-btn">
+            <div class="title-3d" id="title-container">
+                <!-- Generado dinámicamente letra por letra -->
+            </div>
+        </div>
+
+        <div class="palette-name-tag" id="palette-name">PALETA: DORADO METÁLICO</div>
     </header>
 
-    <section class="square-clock-wrapper">
-        <div class="square-clock" id="clock-trigger" title="Haz clic para cambiar formato 12h/24h">
-            <div class="snooze-btn">SNOOZE / FORMAT</div>
-            <div class="clock-screen" id="clock-screen">
-                <div class="screen-header">
-                    <div id="clock-format">FORMATO: 24H</div>
-                    <div class="eye-spy">Te veo</div>
+  <!-- WIDGET DE RELOJ SUPREMO CON GEOLOCALIZACIÓN Y ANTI-ESTRÉS -->
+<div class="supreme-clock-card" id="clock-card-main">
+    <!-- PANEL CABECERA Y MODOS DE ESTILO -->
+    <div class="clock-header-bar">
+        <div class="clock-mode-selector">
+            <button class="clk-mode-btn active" onclick="setClockTheme('vaporwave')">📼 VAPOR</button>
+            <button class="clk-mode-btn" onclick="setClockTheme('cyberpunk')">⚡ CYBER</button>
+            <button class="clk-mode-btn" onclick="setClockTheme('analog')">🕰️ ANALOG</button>
+            <button class="clk-mode-btn" onclick="setClockTheme('matrix')">📟 MATRIX</button>
+        </div>
+        <div style="font-family: monospace; font-size: 0.7rem; color: var(--gold);" id="clock-ip-status">
+            🔍 RASTREANDO IP...
+        </div>
+    </div>
+
+    <!-- PANTALLA PRINCIPAL DEL RELOJ -->
+    <div class="clock-display-screen theme-vaporwave" id="clock-display-box">
+        
+        <!-- VISTA DIGITAL (DEFAULT / CYBER / MATRIX) -->
+        <div id="digital-clock-view">
+            <div id="clock-time-text">00:00:00</div>
+            <div id="clock-date-text">CARGANDO FECHA...</div>
+        </div>
+
+        <!-- VISTA ANALÓGICA (SVG) -->
+        <div id="analog-clock-view" style="display: none;">
+            <svg viewBox="0 0 100 100" class="analog-svg">
+                <circle cx="50" cy="50" r="45" class="clock-face" />
+                <line x1="50" y1="50" x2="50" y2="20" id="hour-hand" class="hand hour" />
+                <line x1="50" y1="50" x2="50" y2="10" id="minute-hand" class="hand minute" />
+                <line x1="50" y1="50" x2="50" y2="5" id="second-hand" class="hand second" />
+                <circle cx="50" cy="50" r="3" fill="var(--gold)" />
+            </svg>
+        </div>
+
+        <!-- SECCIÓN DE INFO IP & CLIMA (RADAR STALKER) -->
+        <div class="clock-geo-panel">
+            <div class="geo-info-left">
+                <div class="ip-row">
+                    <span id="user-flag">🌐</span>
+                    <span id="user-ip-display" class="ip-highlight">000.000.000.000</span>
                 </div>
-                <div id="clock-time">00:00:00</div>
-                <div class="screen-footer">
-                    <div id="clock-location">Detectando entorno...</div>
-                    <div id="clock-weather">--°C ☀️</div>
+                <div id="user-location-display" class="geo-text">Detectando coordenadas...</div>
+            </div>
+            <div class="geo-info-right">
+                <div id="user-weather-display" class="weather-text">--°C ☁️</div>
+                <div id="user-isp-display" class="isp-text">ISP: Buscando...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN / WIDGET MINI-JUEGO ANTI-ESTRÉS -->
+    <div class="anti-stress-panel">
+        <button id="anti-stress-btn" class="stress-btn">
+            💥 BOTÓN ANTI-ESTRÉS <span id="stress-counter-badge">(0 Clicks)</span>
+        </button>
+        <div id="stress-comment" class="stress-comment-box">
+            "Presioná el botón si la vida o el Yeyo te tienen estresado..."
+        </div>
+    </div>
+</div>
+        <div class="system-hud-card">
+            <div style="color:var(--gold); font-size:0.85rem; border-bottom:1px solid rgba(212,175,55,0.3); padding-bottom:4px; display:flex; justify-content:space-between;">
+                <span>MONITOR DE LA CUEVA</span>
+                <span style="color:var(--neon-green)">ACTIVE</span>
+            </div>
+            <div class="hud-metrics">
+                <div class="metric-box">
+                    <div class="metric-label">MODO FONDO</div>
+                    <div class="metric-val" id="hud-bg-mode">SFW SAFE</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">COLOR SCHEME</div>
+                    <div class="metric-val" id="hud-scheme">GOLD</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">TIEMPO EN CUEVA</div>
+                    <div class="metric-val" id="hud-timer">00:00</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">EXP LEVEL</div>
+                    <div class="metric-val" id="hud-level">LVL 1</div>
                 </div>
             </div>
-            <div class="stand-left"></div>
-            <div class="stand-right"></div>
         </div>
     </section>
 
-    <main class="button-grid">
-        <a href="Grandes_Exitos.html" class="custom-btn btn-grandes-exitos">
-            <div class="coin-icon"></div>
-            <span>Grandes Éxitos (Edits)</span>
-        </a>
+    <!-- SECCIÓN PRINCIPAL: BOTONERA DE IMPACTO SUPREMO -->
+<main class="button-grid-v2">
+    
+    <!-- BOTÓN 1: GRANDES ÉXITOS (CULTURA YEYO GOLD EDITION) -->
+    <a href="Grandes_Exitos.html" class="grid-card-btn gold-master-btn" id="btn-exitos">
+        <!-- Destello "Cartoon Shine" Diagonal -->
+        <div class="cartoon-shimmer"></div>
+        <!-- Destello Titilante Esquina Superior Derecha -->
+        <div class="top-right-sparkle">✨</div>
+        
+        <!-- Elementos Flotantes de Riqueza -->
+        <div class="floating-wealth w-1">🪙</div>
+        <div class="floating-wealth w-2">💰</div>
+        <div class="floating-wealth w-3">₿</div>
+        <div class="floating-wealth w-4">🏆</div>
 
-        <a href="Plata.html" class="custom-btn btn-plata">
-            <div class="silver-sparkle"></div>
-            <span>El_Chat</span>
-        </a>
+        <div class="card-content">
+            <div class="card-icon">👑</div>
+            <div class="card-text-group">
+                <span class="card-title">GRANDES ÉXITOS</span>
+                <span class="card-subtitle">Edits Legendarios & Masterpieces</span>
+            </div>
+        </div>
+    </a>
 
-        <a href="Donaciones.html" class="custom-btn btn-donaciones">
-            <span class="heart-icon">❤️</span> Donaciones
-        </a>
+    <!-- BOTÓN 2: EL CHAT (PLATA) -->
+    <a href="Plata.html" class="grid-card-btn silver-cyber-btn">
+        <div class="card-content">
+            <div class="card-icon">💬</div>
+            <div class="card-text-group">
+                <span class="card-title">EL_CHAT</span>
+                <span class="card-subtitle">Conexión P2P & Transmisiones</span>
+            </div>
+        </div>
+    </a>
 
-        <a href=zombie.html" class="custom-btn btn-motivacion">
-            <span class="rose-book-icon">🌹📖</span> El Arcade
-        </a>
+    <!-- BOTÓN 3: ARCADE (ZOMBIE) -->
+    <a href="zombie.html" class="grid-card-btn arcade-neon-btn">
+        <div class="card-content">
+            <div class="card-icon">🌹📖</div>
+            <div class="card-text-group">
+                <span class="card-title">EL ARCADE</span>
+                <span class="card-subtitle">Zombie Survival & Retos</span>
+            </div>
+        </div>
+    </a>
 
-        <!-- Secciones de la 05 a la 20 Optimizadas Semánticamente -->
-        <a href="zombie.html" class="custom-btn btn-num"><span>[05]</span>Arcade</a>  
+    <!-- BOTÓN 4: DONACIONES -->
+    <a href="Donaciones.html" class="grid-card-btn donation-btn">
+        <div class="card-content">
+            <div class="card-icon">❤️</div>
+            <div class="card-text-group">
+                <span class="card-title">DONACIONES</span>
+                <span class="card-subtitle">Apoyá el Proyecto del Yeyo</span>
+            </div>
+        </div>
+    </a>
+
+    <!-- ==========================================
+         BOTONES PLACEHOLDERS (EN CONSTRUCCIÓN)
+         ========================================== -->
+
+    <!-- PLACEHOLDER 1: LABORATORIO DE IA -->
+    <div class="grid-card-btn locked-btn" onclick="triggerLockedSound('Laboratorio de IA')">
+        <div class="lock-stripe">CAUTION // EN CONSTRUCCIÓN</div>
+        <div class="card-content">
+            <div class="card-icon">🔒</div>
+            <div class="card-text-group">
+                <span class="card-title">IA YEYO-BOT</span>
+                <span class="card-subtitle">Progreso: [45%] • Bloqueado</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLACEHOLDER 2: CINE 4K VIRTUAL -->
+    <div class="grid-card-btn locked-btn" onclick="triggerLockedSound('Cine 4K Virtual')">
+        <div class="lock-stripe">CAUTION // EN CONSTRUCCIÓN</div>
+        <div class="card-content">
+            <div class="card-icon">🍿</div>
+            <div class="card-text-group">
+                <span class="card-title">CUEVA CINEMA 4K</span>
+                <span class="card-subtitle">Progreso: [12%] • Próximamente</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLACEHOLDER 3: MERCADO NEGRO / SHOP -->
+    <div class="grid-card-btn locked-btn" onclick="triggerLockedSound('Mercado de Renders')">
+        <div class="lock-stripe">CAUTION // EN CONSTRUCCIÓN</div>
+        <div class="card-content">
+            <div class="card-icon">🛍️</div>
+            <div class="card-text-group">
+                <span class="card-title">BLACK MARKET RENDERS</span>
+                <span class="card-subtitle">Progreso: [80%] • En Mantenimiento</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLACEHOLDER 4: SALA DE TROFEOS 3D -->
+    <div class="grid-card-btn locked-btn" onclick="triggerLockedSound('Sala de Trofeos 3D')">
+        <div class="lock-stripe">CAUTION // EN CONSTRUCCIÓN</div>
+        <div class="card-content">
+            <div class="card-icon">🏛️</div>
+            <div class="card-text-group">
+                <span class="card-title">MUSEO DE YEYO 3D</span>
+                <span class="card-subtitle">Progreso: [05%] • Acceso Denegado</span>
+            </div>
+        </div>
+    </div>
+
+<!-- Componente: Botón y Panel "Fun facts de leo kasper" (SLDG & Rage Comics Core) -->
+<div class="sldg-feature-wrapper">
+  <button class="sldg-trigger-btn" id="sldgBtn" aria-label="Abrir Fun facts de leo kasper">
+    <span class="btn-glitch-text">Fun facts de leo kasper</span>
+    <span class="btn-tag">[SHITPOSTING_SLDG.exe]</span>
+  </button>
+
+  <!-- Modal / Contenedor Flotante Estética Rage / Glassmorphism -->
+  <div class="sldg-modal-overlay" id="sldgModal" role="dialog" aria-hidden="true">
+    <div class="sldg-modal-card">
+      <div class="sldg-modal-header">
+        <div class="window-controls">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <span class="window-title">LEO_KASPER_ARCHIVES_v2.012.png</span>
+        <button class="close-modal-btn" id="closeSldgBtn">&times;</button>
+      </div>
+      
+      <div class="sldg-modal-body">
+        <div class="rage-comic-banner">
+          <span class="rage-text-top">LE ME...</span>
+          <h3>PROGRAMANDO UN MONOLITO FRONTEND A LAS 4 AM</h3>
+          <span class="rage-text-bottom">ALL THE SINGLE BUGS... ALL THE SINGLE BUGS</span>
+        </div>
+
+        <ul class="facts-list">
+          <li class="fact-item">
+            <span class="fact-index">#01</span>
+            <p>Capaz de debugear código en producción mientras escucha "Heroes" de David Bowie sin parpadear una sola vez.</p>
+          </li>
+          <li class="fact-item">
+            <span class="fact-index">#02</span>
+            <p>Su relación con VS Code se define legalmente como matrimonio en tres jurisdicciones distintas.</p>
+          </li>
+          <li class="fact-item">
+            <span class="fact-index">#03</span>
+            <p>Inventor anónimo del parche mental para ignorar advertencias de deprecación en npm install.</p>
+          </li>
+        </ul>
+
+        <div class="sldg-footer-stamp">
+          <span>EL PRRO SUPREMO APPROVED // 2012-2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</main>
+
+		<!-- BANNER DE ACCESO RÁPIDO: HALL OF FAME YEYO -->
+<section style="width: 100%; max-width: 1100px; margin-bottom: 2.5rem;">
+    <div style="background: linear-gradient(135deg, rgba(15, 52, 39, 0.9), rgba(5, 12, 8, 0.95)); border: 2px solid var(--gold); border-radius: 12px; padding: 20px; box-shadow: 0 0 25px rgba(212, 175, 55, 0.2); backdrop-filter: blur(10px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-bottom: 15px;">
+            <h3 style="color: var(--gold); font-family: monospace; letter-spacing: 2px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                <span>✨</span> HALL OF FAME: YEYO'S EDITS
+            </h3>
+            <button id="btn-vhs-glitch" style="background: #111; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 4px; padding: 4px 10px; font-family: monospace; cursor: pointer; font-size: 0.75rem;">
+                📼 MODO VHS: OFF
+            </button>
+        </div>
+
+        <!-- GRID DE HOLO-CARDS INTERACTIVAS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem;">
+            <!-- CARD 1 -->
+            <div class="yeyo-holo-card" data-title="Masterpiece Edit Vol. 1">
+                <div class="holo-inner">
+                    <div class="holo-shine"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">🎬</div>
+                    <div style="color: var(--gold); font-weight: bold; font-size: 0.9rem;">YEYO EDIT #01</div>
+                    <div style="color: #aaa; font-size: 0.75rem; margin-top: 4px;">Edición Limitada • Neón FX</div>
+                </div>
+            </div>
+
+            <!-- CARD 2 -->
+            <div class="yeyo-holo-card" data-title="Cyber Cave Remix">
+                <div class="holo-inner">
+                    <div class="holo-shine"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">⚡</div>
+                    <div style="color: var(--gold); font-weight: bold; font-size: 0.9rem;">YEYO EDIT #02</div>
+                    <div style="color: #aaa; font-size: 0.75rem; margin-top: 4px;">Ultra Sync • 60 FPS</div>
+                </div>
+            </div>
+
+            <!-- CARD 3 -->
+            <div class="yeyo-holo-card" data-title="The Yaoi Masterwork">
+                <div class="holo-inner">
+                    <div class="holo-shine"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">🔥</div>
+                    <div style="color: var(--gold); font-weight: bold; font-size: 0.9rem;">YEYO EDIT #03</div>
+                    <div style="color: #aaa; font-size: 0.75rem; margin-top: 4px;">Colección Legendaria</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
     </main>
+	
 
-    <section class="pager-jukebox-wrapper">
-        <div class="pager-body">
-            <div class="pager-top-buttons">
-                <button class="pager-phys-btn" id="vol-up-btn">▲ VOL</button>
-                <button class="pager-phys-btn" id="vol-down-btn">▼ VOL</button>
+    <!-- ======================================================= -->
+<!-- CINTA DE NOTICIAS VICE CITY + PAGER MULTI-SKIN OS 3.0   -->
+<!-- ======================================================= -->
+
+<!-- CINTA DE NOTICIAS CON ESTÉTICA VICE CITY -->
+<div class="vice-news-ticker-wrap">
+    <div class="vice-badge">🌴 CUEVA NEWS 🌴</div>
+    <div class="vice-ticker-content">
+        <div class="vice-ticker-text">
+            🚨 ÚLTIMO MOMENTO: Estado de YaoiLover y DOUZOZ: en tumbaleja disfrutando el Sol y unos Bailes exóticos 🌴🍹 // ⚡ CUEVA OS V2.0 ACTIVADO: Pager con señales P2P en línea // 🪙 BITCOIN ALCANZA MÁXIMOS EN EL MERCADO NEGRO DEL YEYO // 🎮 ARCADE ZOMBIE ACTUALIZADO CON NUEVOS RETOS //
+        </div>
+    </div>
+</div>
+
+<!-- CONTAINER DEL PAGER CYBER-BEEPER INTERACTIVO SUPREMO MULTI-SKIN V3.0 -->
+<aside class="pager-master-wrapper" id="pager-main-widget">
+    <!-- BARRA SUPERIOR DE CAMBIO DE SKINS -->
+    <div class="pager-skin-selector">
+        <span class="skin-label">SKIN:</span>
+        <button class="skin-btn active" onclick="setPagerSkin('gta3')">🎮 GTA 3</button>
+        <button class="skin-btn" onclick="setPagerSkin('argentina')">🇦🇷 ARGENTINA</button>
+        <button class="skin-btn" onclick="setPagerSkin('matrix')">📟 MATRIX</button>
+        <button class="skin-btn" onclick="setPagerSkin('classic')">📟 90s RETRO</button>
+    </div>
+
+    <!-- CHASIS DEL PAGER -->
+    <div class="pager-chassis skin-gta3" id="pager-hardware">
+        <!-- Antena, LED y Stickers -->
+        <div class="pager-antenna"></div>
+        <div class="pager-led" id="pager-signal-led"></div>
+        <div class="pager-sticker" id="pager-sticker-slot">🚕</div>
+
+        <!-- Marca del Pager -->
+        <div class="pager-brand-text" id="pager-brand-display">LIBERTY CITY WIRELESS</div>
+
+        <!-- Pantalla LCD retroiluminada -->
+        <div class="pager-lcd-screen backlight-on" id="pager-lcd-box">
+            <div class="lcd-top-bar">
+                <span id="pager-status-msg">📡 SIGNAL: 100%</span>
+                <span id="pager-skin-title">LC-PAGER</span>
+                <span id="pager-time">00:00</span>
             </div>
-            <div class="pager-screen">
-                <div class="vinyl-area">
-                    <div class="vinyl-disk" id="vinyl-disk">
-                        <div class="vinyl-center"></div>
-                    </div>
-                </div>
-                <div class="pager-lcd-text">
-                    <div class="pager-status-bar">
-                        <span id="pager-track-num">PAGER-00</span>
-                        <span id="pager-vol-display">VOL: 80%</span>
-                    </div>
-                    <div class="pager-message" id="pager-song-title">
-                        Escribe Cód. o Nombre en el Transmisor...
-                    </div>
-                </div>
+
+            <!-- DISPLAY PRINCIPAL DE TEXTO -->
+            <div class="lcd-main-display" id="pager-display-text">
+                [LCPD]: "Atención a todas las unidades en Portland Harbor..."
             </div>
-            <div class="pager-input-panel">
-                <input type="text" id="pager-search" placeholder="Escribe Nº o Nombre..." autocomplete="off">
-                <button id="pager-submit-btn">TRANSMITIR</button>
+
+            <div class="lcd-bottom-bar">
+                <span id="pager-msg-counter">MSG: 1/5</span>
+                <span id="pager-battery-text">🔋 98%</span>
             </div>
         </div>
+
+        <!-- Botonera Física del Pager -->
+        <div class="pager-controls-row">
+            <button class="pager-phys-btn" onclick="pagerPrevMsg()">◀ ANTERIOR</button>
+            <button class="pager-phys-btn btn-light" onclick="togglePagerLight()">💡 LUZ</button>
+            <button class="pager-phys-btn btn-alert" onclick="playPagerAlert()">🔔 ALERTA</button>
+            <button class="pager-phys-btn" onclick="pagerNextMsg()">SIGUIENTE ▶</button>
+        </div>
+
+        <!-- Teclado de Códigos Numéricos Secreto -->
+        <div class="pager-keypad-box">
+            <div class="keypad-header">
+                <input type="text" id="pager-code-input" maxlength="4" placeholder="CÓDIGO (Ej: 911)" readonly>
+                <button onclick="sendPagerCode()" class="keypad-send-btn">SEND</button>
+            </div>
+            <div class="keypad-grid">
+                <button onclick="pressPagerKey('1')">1</button>
+                <button onclick="pressPagerKey('2')">2</button>
+                <button onclick="pressPagerKey('3')">3</button>
+                <button onclick="pressPagerKey('4')">4</button>
+                <button onclick="pressPagerKey('5')">5</button>
+                <button onclick="pressPagerKey('6')">6</button>
+                <button onclick="pressPagerKey('7')">7</button>
+                <button onclick="pressPagerKey('8')">8</button>
+                <button onclick="pressPagerKey('9')">9</button>
+                <button onclick="clearPagerKey()" class="keypad-clear-btn">C</button>
+                <button onclick="pressPagerKey('0')">0</button>
+                <button onclick="chargePagerBattery()" class="keypad-charge-btn">⚡</button>
+            </div>
+        </div>
+    </div>
+</aside>
     </section>
+	
+	
+<!-- REPRODUCTOR SUPREMO: CUEVA TAPE DECK-9000 ULTIMATE -->
+<section class="tape-deck-wrapper" id="cueva-tape-deck">
+    <div class="deck-chassis">
+        <!-- MARCA Y VUMETERS -->
+        <div class="deck-top-bar">
+            <div class="deck-brand">
+                <span class="brand-logo">CUEVA</span>
+                <span class="brand-model">TAPE DECK-9000 // HIGH-PRECISION MASTERING</span>
+            </div>
+            
+            <div class="vumeter-box">
+                <div class="vumeter"><div class="vumeter-needle" id="vu-left"></div><span class="vu-label">L</span></div>
+                <div class="vumeter"><div class="vumeter-needle" id="vu-right"></div><span class="vu-label">R</span></div>
+            </div>
 
-    <audio id="jukebox-audio" loop></audio>
-
-    <footer class="social-footer">
-        <h2 class="social-title">Únete a la Comunidad y sé tan sexy como los Edits uwu</h2>
-        <div class="social-container">
-            <a href="https://x.com/@YaoiPornLover" target="_blank" class="social-btn btn-x">
-                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-                <span>X / Twitter</span>
-            </a>
-
-            <a href="https://www.patreon.com/cw/YaoiPornLover" target="_blank" class="social-btn btn-patreon">
-                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M0 .48v23.04h4.13V.48H0zm12.42 0c-5.18 0-9.39 4.21-9.39 9.39 0 5.17 4.21 9.39 9.39 9.39 5.17 0 9.39-4.22 9.39-9.39 0-5.18-4.22-9.39-9.39-9.39z"/>
-                </svg>
-                <span>Patreon</span>
-            </a>
-
-            <a href="https://rule34video.com/members/493432/" target="_blank" class="social-btn btn-r34">
-                <div class="r34-logo-box">R34 <span>▶</span></div>
-                <span>Rule34 Video</span>
-            </a>
-
-            <a href="#" class="social-btn btn-discord" onclick="return false;">
-                <span>Discord (Próximamente)</span>
-            </a>
+            <div class="tape-counter-box">
+                <span class="counter-digit" id="counter-d1">0</span>
+                <span class="counter-digit" id="counter-d2">0</span>
+                <span class="counter-digit" id="counter-d3">0</span>
+                <button class="counter-reset-btn" onclick="resetTapeCounter()" title="Reset">⟲</button>
+            </div>
         </div>
-    </footer>
+
+        <!-- COMPARTIMENTO DEL CASSETTE -->
+        <div class="deck-door-chamber" id="deck-door">
+            <div class="cassette-body" id="active-cassette">
+                <div class="cassette-label" id="cassette-label-box">
+                    <span class="cassette-side">A</span>
+                    <span class="cassette-title-text" id="cassette-title-display">TRACK 01 - CUEVA INTRO.MP3</span>
+                </div>
+
+                <div class="cassette-window">
+                    <div class="tape-reel reel-left" id="reel-left">
+                        <div class="tape-spool" id="spool-left"></div>
+                        <div class="spoke-hub"></div>
+                    </div>
+                    <div class="tape-bridge"></div>
+                    <div class="tape-reel reel-right" id="reel-right">
+                        <div class="tape-spool" id="spool-right"></div>
+                        <div class="spoke-hub"></div>
+                    </div>
+                </div>
+
+                <div class="cassette-bottom-holes">
+                    <div class="c-hole"></div><div class="c-hole"></div><div class="c-hole"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LÍNEA DINÁMICA DE TIEMPO Y PROGRESO -->
+        <div class="tape-progress-container">
+            <div class="time-display-box">
+                <span id="current-time-text">00:00</span>
+                <span class="time-separator">/</span>
+                <span id="total-duration-text">00:00</span>
+            </div>
+            <div class="progress-bar-wrapper" onclick="seekTapeProgress(event)">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+                <div class="progress-scrubber-head" id="scrubber-head"></div>
+            </div>
+        </div>
+
+        <!-- DISPLAY LCD, SELECTOR DIRECTO DE TRACKS Y FX -->
+        <div class="deck-info-display">
+            <div class="direct-select-box">
+                <label>TRACK #:</label>
+                <input type="number" id="direct-track-input" min="1" max="3" value="1" onchange="jumpToTrackNumber(this.value)">
+            </div>
+            
+            <div class="track-marquee">
+                <span id="deck-song-name">CARGANDO CINTA MAGNÉTICA...</span>
+            </div>
+
+            <div class="deck-pitch-box">
+                <label>PITCH/SPEED:</label>
+                <select id="tape-pitch-select" onchange="changeTapePitch(this.value)">
+                    <option value="0.8">0.8x (Slow)</option>
+                    <option value="1.0" selected>1.0x (Normal)</option>
+                    <option value="1.25">1.25x (Fast)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- BOTONES MECÁNICOS -->
+        <div class="piano-keys-row">
+            <button class="piano-btn key-eject" onclick="ejectCassette()">⏏ EJECT</button>
+            <button class="piano-btn key-rew" onclick="rewindTape()">◀◀ REW</button>
+            <button class="piano-btn key-play" id="btn-tape-play" onclick="playTape()">▶ PLAY</button>
+            <button class="piano-btn key-pause" onclick="pauseTape()">❚❚ PAUSE</button>
+            <button class="piano-btn key-stop" onclick="stopTape()">◼ STOP</button>
+            <button class="piano-btn key-ff" onclick="fastForwardTape()">▶▶ FF</button>
+        </div>
+    </div>
+</section>
+
+    <!-- TOAST NOTIFICACIÓN LOGRO -->
+    <div class="achievement-toast" id="achievement-toast">
+        <div class="toast-icon" id="toast-icon">🏆</div>
+        <div>
+            <div class="toast-title" id="toast-title">LOGRO DESBLOQUEADO</div>
+            <div class="toast-desc" id="toast-desc">Has iniciado tu aventura.</div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGROS -->
+    <div class="modal-achievements" id="modal-achievements">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🏆 LOGROS DE LA CUEVA</span>
+                <span style="cursor:pointer;" id="close-modal-btn">✖</span>
+            </div>
+            <div id="achievements-list-container"></div>
+        </div>
+    </div>
 
     <script>
-        // SISTEMA DEL RELOJ DIGITAL RETRO
-        let is24HourFormat = true;
-        let timeZone = "UTC";
-        const clockScreen = document.getElementById('clock-screen');
+        // CONFIGURACIÓN DE TÍTULO Y PALETAS / BANDERAS (CADA LETRA UNA A UNA)
+        const titleLine1 = "YAOI PORN LOVER'S";
+        const titleLine2 = "CAVE OF PLEASURE";
 
-        document.getElementById('clock-trigger').addEventListener('click', () => {
-            is24HourFormat = !is24HourFormat;
-            clockScreen.classList.remove('glitch-flash');
-            void clockScreen.offsetWidth; 
-            clockScreen.classList.add('glitch-flash');
-            updateClock();
-        });
-
-        function updateClock() {
-            const now = new Date();
-            try {
-                const formatter = new Intl.DateTimeFormat('es-ES', {
-                    timeZone: timeZone,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: !is24HourFormat
-                });
-                document.getElementById('clock-format').innerText = is24HourFormat ? "FORMATO: 24H" : "FORMATO: 12H";
-                document.getElementById('clock-time').innerText = formatter.format(now);
-            } catch (e) {
-                document.getElementById('clock-time').innerText = now.toLocaleTimeString('es-ES', { hour12: !is24HourFormat });
-            }
-        }
-
-        async function detectUserEnvironment() {
-            try {
-                const response = await fetch('https://ipwhois.app/json/');
-                const data = await response.json();
-                if (data && data.success) {
-                    timeZone = data.timezone;
-                    document.getElementById('clock-location').innerText = `${data.city}, ${data.country}`;
-                    getWeatherData(data.latitude, data.longitude);
-                } else {
-                    useAbsoluteFallback();
-                }
-            } catch (error) {
-                useAbsoluteFallback();
-            }
-        }
-
-        function useAbsoluteFallback() {
-            timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const regionName = timeZone.split('/')[1] ? timeZone.split('/')[1].replace('_', ' ') : "Mundo";
-            document.getElementById('clock-location').innerText = `${regionName}, Local`;
-            document.getElementById('clock-weather').innerText = "24°C ⛅";
-        }
-
-        async function getWeatherData(lat, lon) {
-            try {
-                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                const data = await response.json();
-                if (data.current_weather) {
-                    const temp = Math.round(data.current_weather.temperature);
-                    const code = data.current_weather.weathercode;
-                    let condition = "☀️";
-                    if (code >= 1 && code <= 3) condition = "⛅";
-                    if (code >= 51 && code <= 67) condition = "🌧️";
-                    if (code >= 95) condition = "⛈️";
-                    document.getElementById('clock-weather').innerText = `${temp}°C ${condition}`;
-                }
-            } catch (e) {
-                document.getElementById('clock-weather').innerText = "22°C ☀️";
-            }
-        }
-
-        detectUserEnvironment();
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // BASE DE DATOS DE LA ROCOLA (PLAYLIST DEL PAGER)
-        const playlist = [
-            { id: "20", name: "persiana americana", title: "Soda Stereo - Persiana Americana", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", color: "#d4af37", vinylImage: "https://archive.org/download/14-poder-elegir/frontal.jpg" },
-            { id: "21", name: "musica ligera", title: "Soda Stereo - De Música Ligera", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", color: "#bfc0c0" },
-            { id: "22", name: "donaciones", title: "Lujuria & Oro - Donaciones Track", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", color: "#ff416c" },
-            { id: "23", name: "muevan las industrias", title: "Los Prisioneros - Muevan las Industrias", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", color: "#222222" },
-            { id: "24", name: "tren al sur", title: "Los Prisioneros - Tren al Sur", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", color: "#3a7bd5" },
-            { id: "25", name: "el baile de los que sobran", title: "Los Prisioneros - El Baile de los que Sobran", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", color: "#8b0000" },
-            { id: "26", name: "estrechez de corazon", title: "Los Prisioneros - Estrechez de Corazón", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", color: "#e65c00" },
-            { id: "27", name: "corazones rojos", title: "Los Prisioneros - Corazones Rojos", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", color: "#dd1818" },
-            { id: "28", name: "la voz de los 80", title: "Los Prisioneros - La Voz de los '80", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", color: "#4b6cb7" },
-            { id: "29", name: "sexo", title: "Los Prisioneros - Sexo", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", color: "#9b59b6" },
-            { id: "30", name: "paramar", title: "Los Prisioneros - Paramar", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3", color: "#34495e" },
-            { id: "31", name: "quieren dinero", title: "Los Prisioneros - Quieren Dinero", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3", color: "#27ae60" },
-            { id: "32", name: "danza porque si", title: "Los Prisioneros - Danza Porque Sí", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3", color: "#f39c12" },
-            { id: "33", name: "nada personal", title: "Soda Stereo - Nada Personal", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3", color: "#2980b9" },
-            { id: "34", name: "cuando pase el temblor", title: "Soda Stereo - Cuando Pase el Temblor", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3", color: "#16a085" },
-            { id: "35", name: "la ciudad de la furia", title: "Soda Stereo - En la Ciudad de la Furia", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3", color: "#1e272c" },
-            { id: "36", name: "zoom", title: "Soda Stereo - Zoom", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", color: "#e84393" },
-            { id: "37", name: "ella uso mi cabeza", title: "Soda Stereo - Ella Usó Mi Cabeza Como Un Revólver", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", color: "#6c5ce7" },
-            { id: "38", name: "juegos de seduccion", title: "Soda Stereo - Juegos de Seducción", file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", color: "#d35400" },
-            { id: "39", name: "la cultura de la basura", title: "Los Prisioneros - La Cultura de la Basura", file: "https://archive.org/download/14-poder-elegir/02%20-%20La%20cultura%20de%20La%20Basura.mp3", color: "#7f8c8d" }
+        const palettes = [
+            { name: "Dorado Metálico", class: "palette-gold", colors: null },
+            { name: "Plata Brillante", class: "palette-silver", colors: null },
+            { name: "Arcoíris Fluido", class: "palette-rainbow", colors: null },
+            { name: "Bandera LGBT+", colors: ["#e40303", "#ff8c00", "#ffed00", "#008026", "#004dff", "#750787"] },
+            { name: "Bandera Lesbiana", colors: ["#d52d00", "#ef7627", "#ff9a56", "#ffffff", "#d162a4", "#b55690", "#a30262"] },
+            { name: "Bandera Pansexual", colors: ["#ff218c", "#ffd800", "#21b1ff"] },
+            { name: "Bandera Transgender", colors: ["#5bcefa", "#f5abb9", "#ffffff", "#f5abb9", "#5bcefa"] },
+            { name: "Bandera Bisexual", colors: ["#d60270", "#d60270", "#9b4f96", "#0038a8", "#0038a8"] },
+            { name: "Bandera No-Binaria", colors: ["#fcf434", "#ffffff", "#9c59d1", "#2c2c2c"] },
+            { name: "Bandera Asexual", colors: ["#000000", "#a3a3a3", "#ffffff", "#800080"] }
         ];
 
-        const audioPlayer = document.getElementById('jukebox-audio');
-        const vinylDisk = document.getElementById('vinyl-disk');
-        const vinylCenter = document.querySelector('.vinyl-center');
-        const songTitleDisplay = document.getElementById('pager-song-title');
-        const trackNumDisplay = document.getElementById('pager-track-num');
-        const volDisplay = document.getElementById('pager-vol-display');
-        const searchInput = document.getElementById('pager-search');
+        let currentPaletteIndex = 0;
 
-        audioPlayer.volume = 0.8;
+        function build3DTitle() {
+            const container = document.getElementById('title-container');
+            container.innerHTML = '';
 
-        document.getElementById('vol-up-btn').addEventListener('click', () => {
-            if (audioPlayer.volume < 0.9) audioPlayer.volume += 0.1;
-            updateVolumeDisplay();
-        });
+            const line1Div = document.createElement('div');
+            line1Div.className = 'title-line';
+            const line2Div = document.createElement('div');
+            line2Div.className = 'title-line';
 
-        document.getElementById('vol-down-btn').addEventListener('click', () => {
-            if (audioPlayer.volume > 0.1) audioPlayer.volume -= 0.1;
-            updateVolumeDisplay();
-        });
+            appendLetters(titleLine1, line1Div);
+            appendLetters(titleLine2, line2Div);
 
-        function updateVolumeDisplay() {
-            volDisplay.innerText = `VOL: ${Math.round(audioPlayer.volume * 100)}%`;
+            container.appendChild(line1Div);
+            container.appendChild(line2Div);
+
+            applyCurrentPalette();
         }
 
-        document.getElementById('pager-submit-btn').addEventListener('click', processPagerCode);
-        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processPagerCode(); });
-
-        function processPagerCode() {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) return;
-
-            // Easter Egg Secreto para tu hermano el Yeyo (Código 069 Clímax Yaoi)
-            if (query === "069" || query === "yeyo") {
-                trackNumDisplay.innerText = "PAGER-69";
-                songTitleDisplay.innerText = "🔥 MODO DIABLO: ACTIVANDO EXTASIS YAOI LOVER... 🔥";
-                document.body.style.background = "linear-gradient(135deg, #400404 0%, #000000 100%)";
-                audioPlayer.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
-                audioPlayer.play().catch(o => {});
-                vinylDisk.classList.add('playing');
-                vinylDisk.style.backgroundImage = "none";
-                vinylCenter.style.backgroundColor = "#ff0055";
-                searchInput.value = "";
-                return;
+        function appendLetters(text, parentElement) {
+            for (let char of text) {
+                const span = document.createElement('span');
+                span.className = 'char-3d';
+                span.innerText = char === ' ' ? '\u00A0' : char;
+                parentElement.appendChild(span);
             }
+        }
 
-            const track = playlist.find(t => t.id === query || query.includes(t.name) || t.name.includes(query));
+        function applyCurrentPalette() {
+            const container = document.getElementById('title-container');
+            const pal = palettes[currentPaletteIndex];
+            document.getElementById('palette-name').innerText = `PALETA: ${pal.name}`;
+            document.getElementById('hud-scheme').innerText = pal.name.split(' ')[0].toUpperCase();
 
-            if (track) {
-                trackNumDisplay.innerText = `PAGER-${track.id}`;
-                songTitleDisplay.innerText = `TRANSMITIENDO:\n${track.title}`;
-                audioPlayer.src = track.file;
-                audioPlayer.play().catch(e => console.log("Se requiere interacción."));
-                
-                vinylDisk.classList.add('playing');
-                if(track.vinylImage) {
-                    vinylDisk.style.backgroundImage = `url('${track.vinylImage}')`;
-                    vinylCenter.style.opacity = "0.4";
-                } else {
-                    vinylDisk.style.backgroundImage = "none";
-                    vinylCenter.style.backgroundColor = track.color;
-                    vinylCenter.style.opacity = "1";
-                }
+            container.className = 'title-3d';
+            const allChars = container.querySelectorAll('.char-3d');
+
+            if (pal.class) {
+                container.classList.add(pal.class);
+                allChars.forEach(c => {
+                    c.style.color = '';
+                    c.style.textShadow = '';
+                });
+            } else if (pal.colors) {
+                allChars.forEach((c, index) => {
+                    const color = pal.colors[index % pal.colors.length];
+                    c.style.color = color;
+                    c.style.textShadow = `0 1px 0 #111, 0 2px 0 #000, 0 0 12px ${color}`;
+                });
+            }
+        }
+
+        // CONTROL DE INTERACCIÓN Y ROTACIÓN 3D TÍTULO
+        const titleWrapper = document.getElementById('title-3d-btn');
+        titleWrapper.addEventListener('mousemove', (e) => {
+            const rect = titleWrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            titleWrapper.style.transform = `rotateY(${x * 0.05}deg) rotateX(${-y * 0.05}deg)`;
+        });
+
+        titleWrapper.addEventListener('mouseleave', () => {
+            titleWrapper.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        titleWrapper.addEventListener('click', () => {
+            currentPaletteIndex = (currentPaletteIndex + 1) % palettes.length;
+            applyCurrentPalette();
+            checkAchievement('diversity_explorer');
+            if (currentPaletteIndex === 3) checkAchievement('lgbt_pride');
+        });
+
+        // SISTEMA DE LOGROS COMPLETO
+        const achievements = [
+            { id: 'welcome', title: 'Bienvenido a la Cueva', desc: 'Ingresaste a la Cueva de Placer.', icon: '🕯️', unlocked: false },
+            { id: 'diversity_explorer', title: 'Orgullo & Diversidad', desc: 'Cambiaste las banderas tipográficas.', icon: '🌈', unlocked: false },
+            { id: 'lgbt_pride', title: 'Arcoíris Real', desc: 'Activaste la bandera LGBT+.', icon: '👑', unlocked: false },
+            { id: 'nsfw_master', title: 'Modo Fuego', desc: 'Activaste el fondo NSFW 🔥.', icon: '🔥', unlocked: false },
+            { id: 'yeyo_easter', title: 'El Hermano Yeyo', desc: 'Ingresaste el código secreto de la hermandad.', icon: '⚡', unlocked: false },
+            { id: 'time_5min', title: 'Residente Fiel', desc: 'Permaneciste 5 minutos en la cueva.', icon: '⏳', unlocked: false },
+            { id: 'clock_master', title: 'Señor del Tiempo', desc: 'Cambiaste el formato del reloj retro.', icon: '⏰', unlocked: false },
+            { id: 'collector', title: 'Coleccionista Total', desc: 'Desbloqueaste todos los logros.', icon: '💎', unlocked: false }
+        ];
+
+        function checkAchievement(id) {
+            const ach = achievements.find(a => a.id === id);
+            if (ach && !ach.unlocked) {
+                ach.unlocked = true;
+                showAchievementToast(ach);
+                updateAchievementsUI();
+            }
+        }
+
+        function showAchievementToast(ach) {
+            document.getElementById('toast-icon').innerText = ach.icon;
+            document.getElementById('toast-title').innerText = `¡LOGRO: ${ach.title.toUpperCase()}!`;
+            document.getElementById('toast-desc').innerText = ach.desc;
+            const toast = document.getElementById('achievement-toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function updateAchievementsUI() {
+            const count = achievements.filter(a => a.unlocked).length;
+            document.getElementById('achievements-count').innerText = `${count}/${achievements.length}`;
+            document.getElementById('badge-ach-num').innerText = count;
+
+            const container = document.getElementById('achievements-list-container');
+            container.innerHTML = '';
+            achievements.forEach(a => {
+                const item = document.createElement('div');
+                item.className = `achieve-item ${a.unlocked ? 'unlocked' : ''}`;
+                item.innerHTML = `
+                    <div style="font-size:1.5rem">${a.icon}</div>
+                    <div>
+                        <div style="font-weight:bold; color:${a.unlocked ? 'var(--neon-green)' : '#aaa'}">${a.title}</div>
+                        <div style="font-size:0.7rem">${a.desc}</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (count === achievements.length - 1) checkAchievement('collector');
+        }
+
+        // TOGGLE SFW / NSFW
+        const nsfwBtn = document.getElementById('nsfw-toggle-btn');
+        nsfwBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('sfw-mode')) {
+                document.body.classList.remove('sfw-mode');
+                document.body.classList.add('nsfw-mode');
+                nsfwBtn.innerText = "🔥 NSFW: ON";
+                document.getElementById('hud-bg-mode').innerText = "NSFW FIRE";
+                document.getElementById('mode-text-display').innerText = "NSFW (ACTIVO)";
+                checkAchievement('nsfw_master');
             } else {
-                songTitleDisplay.innerText = "ERROR-404:\nCÓDIGO INEXISTENTE.";
-                vinylDisk.classList.remove('playing');
-                audioPlayer.pause();
+                document.body.classList.remove('nsfw-mode');
+                document.body.classList.add('sfw-mode');
+                nsfwBtn.innerText = "🔥 NSFW: OFF";
+                document.getElementById('hud-bg-mode').innerText = "SFW SAFE";
+                document.getElementById('mode-text-display').innerText = "SFW (SEGURO)";
             }
-            searchInput.value = "";
-        }
+        });
+
+        // MODAL EVENTOS
+        document.getElementById('open-achievements-btn').addEventListener('click', () => {
+            document.getElementById('modal-achievements').classList.add('active');
+        });
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            document.getElementById('modal-achievements').classList.remove('active');
+        });
+		
+        // INICIALIZACIÓN
+        build3DTitle();
+        updateAchievementsUI();
+        setTimeout(() => checkAchievement('welcome'), 1000);
     </script>
+	
+	<script>
+	// ==========================================
+// MÓDULO 1: AUDIO SINTETIZADOR NATIVO (WEB AUDIO API)
+// ==========================================
+class SoundFX {
+    constructor() {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    playTone(freq, type = 'sine', duration = 0.1) {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+
+    playClick() { this.playTone(800, 'square', 0.05); }
+    playAchievement() {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            setTimeout(() => this.playTone(freq, 'triangle', 0.15), idx * 80);
+        });
+    }
+}
+
+const sfx = new SoundFX();
+
+// Vincular sonidos a eventos del DOM
+document.querySelectorAll('.char-3d, .custom-btn, .badge').forEach(elem => {
+    elem.addEventListener('mouseenter', () => sfx.playClick());
+});
+
+
+// ==========================================
+// MÓDULO 2: MOTOR DE PARTÍCULAS REACTIVO
+// ==========================================
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 4 + 1;
+        this.speedX = Math.random() * 3 - 1.5;
+        this.speedY = Math.random() * 3 - 1.5;
+        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        this.life = 100;
+    }
+
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life -= 2;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+window.addEventListener('mousemove', (e) => {
+    if (Math.random() > 0.6) {
+        particles.push(new Particle(e.clientX, e.clientY));
+    }
+});
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].life <= 0) {
+            particles.splice(i, 1);
+            i--;
+        }
+    }
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+
+// ==========================================
+// MÓDULO 3: TERMINAL / CONSOLA DE COMANDOS HACKER
+// ==========================================
+const shell = document.getElementById('cave-shell');
+const shellInput = document.getElementById('shell-input');
+const shellOutput = document.getElementById('shell-output');
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'F2' || e.key === '~') {
+        e.preventDefault();
+        shell.style.display = shell.style.display === 'none' ? 'block' : 'none';
+        if (shell.style.display === 'block') shellInput.focus();
+    }
+});
+
+shellInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const cmd = shellInput.value.trim().toLowerCase();
+        shellInput.value = '';
+        
+        const line = document.createElement('div');
+        line.innerText = `> ${cmd}`;
+        shellOutput.appendChild(line);
+
+        let res = document.createElement('div');
+        res.style.color = '#39ff14';
+
+        switch(cmd) {
+            case 'help':
+                res.innerText = 'Comandos disponibles: help, unlock, rainbow, clear, matrix';
+                break;
+            case 'unlock':
+                res.innerText = '¡Modo Dios activado! Todos los logros desbloqueados.';
+                if (typeof achievements !== 'undefined') {
+                    achievements.forEach(a => a.unlocked = true);
+                    if (typeof updateAchievementsUI === 'function') updateAchievementsUI();
+                }
+                sfx.playAchievement();
+                break;
+            case 'clear':
+                shellOutput.innerHTML = '';
+                return;
+            case 'rainbow':
+                res.innerText = 'Acelerando motor gráfico...';
+                document.getElementById('title-container').style.animationDuration = '0.5s';
+                break;
+            default:
+                res.style.color = '#ff3366';
+                res.innerText = `Error: comando '${cmd}' no reconocido.`;
+        }
+        shellOutput.appendChild(res);
+        shellOutput.scrollTop = shellOutput.scrollHeight;
+    }
+});
+</script>
+
+<script>
+// ==========================================
+// MÓDULO: TILT HOLOGRÁFICO Y MODO GLITCH VHS
+// ==========================================
+
+// Física de inclinación holográfica para las Cards de Yeyo
+document.querySelectorAll('.yeyo-holo-card').forEach(card => {
+    const inner = card.querySelector('.holo-inner');
+    const shine = card.querySelector('.holo-shine');
+
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -15;
+        const rotateY = ((x - centerX) / centerX) * 15;
+
+        inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+        shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 80%)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        inner.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+        shine.style.background = '';
+    });
+
+    card.addEventListener('click', () => {
+        const title = card.getAttribute('data-title');
+        if (typeof showAchievementToast === 'function') {
+            showAchievementToast({
+                icon: '🎬',
+                title: 'FANÁTICO DE YEYO',
+                desc: `Inspeccionaste: ${title}`
+            });
+        }
+        if (typeof sfx !== 'undefined') sfx.playAchievement();
+    });
+});
+
+// Toggle para activar el filtro Glitch VHS Retro
+const vhsBtn = document.getElementById('btn-vhs-glitch');
+if (vhsBtn) {
+    vhsBtn.addEventListener('click', () => {
+        document.body.classList.toggle('vhs-active');
+        const isActive = document.body.classList.contains('vhs-active');
+        vhsBtn.innerText = isActive ? "📼 MODO VHS: ON" : "📼 MODO VHS: OFF";
+        vhsBtn.style.color = isActive ? "var(--gold)" : "var(--neon-green)";
+        if (typeof sfx !== 'undefined') sfx.playClick();
+    });
+}
+</script>
+
+<script>
+// SECUENCIA DE ARRANQUE GTA III / VICE CITY
+const bootLogs = [
+    "KASPER BIOS v3.01 (C) 2007 KASPER CORP.",
+    "Checking System Hardware...",
+    "RAM: 640KB OK (Ext: 16384KB OK)",
+    "Video Adapter: VAPORWAVE 3D FX VELOCITY - OK",
+    "Audio: SOUND BLASTER 16 [DMA 1, IRQ 5] - OK",
+    "GTA3_ENGINE: Checking Cd-Rom... OK",
+    "VICE_CITY_SHELL: Loading ViceCity_Vapor.sys...",
+    "CAVE_CORE: Initializing Pleasure Protocol...",
+    "Mounting OS Partition [DOUZOZ 7]...",
+    "--------------------------------------------------"
+];
+
+const bootContainer = document.getElementById('boot-sequence');
+const interactivePrompt = document.getElementById('interactive-prompt');
+const terminalInput = document.getElementById('terminal-input');
+const commandHistory = document.getElementById('command-history');
+const terminalOverlay = document.getElementById('kasper-terminal-overlay');
+const shutdownScreen = document.getElementById('douzoz-shutdown-screen');
+
+let lineIndex = 0;
+
+function runBootSequence() {
+    if (lineIndex < bootLogs.length) {
+        const div = document.createElement('div');
+        div.innerText = bootLogs[lineIndex];
+        div.style.color = "#01cdfe";
+        bootContainer.appendChild(div);
+        lineIndex++;
+        setTimeout(runBootSequence, 120);
+    } else {
+        setTimeout(() => {
+            interactivePrompt.style.display = 'block';
+            terminalInput.focus();
+        }, 300);
+    }
+}
+
+// INICIAR ARRANQUE AUTOMÁTICO
+window.addEventListener('load', runBootSequence);
+
+/* ==========================================================================
+   MOTOR ZORK INTEGRADO (SISTEMA DE AVENTURA EN TEXTO)
+   ========================================================================== */
+const ZorkGame = {
+    active: false,
+    currentRoom: 'inicio',
+    inventory: [],
+
+    rooms: {
+        inicio: {
+            desc: `Te encontrás en una habitación oscura con paredes de concreto crudo. Un monitor CRT parpadea en la esquina emitiendo un zumbido de alta frecuencia.<br>
+Hay una <span style="color:#05ffa1">puerta_de_hierro</span> al norte y una <span style="color:#05ffa1">mesa</span> de madera podrida en el centro.`,
+            exits: { norte: 'pasillo' },
+            items: ['disquete']
+        },
+        pasillo: {
+            desc: `Un pasillo largo e iluminado por tubos fluorescentes intermitentes. El suelo está cubierto de cables gruesos.<br>
+Al sur volvés a la habitación. Al este hay una puerta blindada etiquetada como <span style="color:#05ffa1">SERVIDOR_CENTRAL</span>.`,
+            exits: { sur: 'inicio', este: 'servidor' },
+            items: []
+        },
+        servidor: {
+            desc: `Una sala fría llena de racks de servidores de finales de los 90. Las luces verdes y rojas parpadean frenéticamente.<br>
+Acá se procesa todo el núcleo de DOUZOZ 7.`,
+            exits: { oeste: 'pasillo' },
+            items: ['llave_master']
+        }
+    },
+
+    start() {
+        this.active = true;
+        this.currentRoom = 'inicio';
+        return `
+<span style="color:#ff71ce; font-weight:bold;">==================================================</span><br>
+<span style="color:#05ffa1; font-weight:bold;">  ZORK I: THE DOUZOZ UNDERGROUND (EDICIÓN VAPORWAVE)</span><br>
+<span style="color:#ff71ce; font-weight:bold;">==================================================</span><br>
+Escribí <b style="color:#ff71ce">mirar</b>, <b style="color:#ff71ce">ir [direccion]</b>, <b style="color:#ff71ce">tomar [item]</b>, <b style="color:#ff71ce">inventario</b> o <b style="color:#ff71ce">exit</b> para salir.<br><br>` + this.getRoomDescription();
+    },
+
+    getRoomDescription() {
+        const room = this.rooms[this.currentRoom];
+        let itemText = room.items.length > 0 ? `<br><span style="color:#fff1be;">Items visibles:</span> ${room.items.join(', ')}` : '';
+        return room.desc + itemText;
+    },
+
+    parseCommand(input) {
+        const args = input.toLowerCase().trim().split(' ');
+        const verb = args[0];
+        const noun = args[1];
+
+        if (verb === 'exit' || verb === 'quit') {
+            this.active = false;
+            return `<span style="color:#ff355e;">Has salido del simulador Zork. De regreso a DOUZOZ 7 OS.</span>`;
+        }
+
+        if (verb === 'mirar' || verb === 'l') {
+            return this.getRoomDescription();
+        }
+
+        if (verb === 'inventario' || verb === 'inv' || verb === 'i') {
+            return this.inventory.length > 0 
+                ? `Llevás contigo: ${this.inventory.join(', ')}` 
+                : `Tus bolsillos están vacíos.`;
+        }
+
+        if (verb === 'ir') {
+            const room = this.rooms[this.currentRoom];
+            if (room.exits[noun]) {
+                this.currentRoom = room.exits[noun];
+                return this.getRoomDescription();
+            } else {
+                return `<span style="color:#ff355e;">No podés ir hacia '${noun}'. Salidas válidas: ${Object.keys(room.exits).join(', ')}</span>`;
+            }
+        }
+
+        if (verb === 'tomar' || verb === 'agarra') {
+            const room = this.rooms[this.currentRoom];
+            const itemIndex = room.items.indexOf(noun);
+            if (itemIndex !== -1) {
+                room.items.splice(itemIndex, 1);
+                this.inventory.push(noun);
+                return `Agarraste: <span style="color:#05ffa1;">${noun}</span>`;
+            } else {
+                return `<span style="color:#ff355e;">No ves ningún '${noun}' acá.</span>`;
+            }
+        }
+
+        return `<span style="color:#ff355e;">Comando de Zork no reconocido. Pruebe: mirar, ir, tomar, inventario, exit.</span>`;
+    }
+};
+
+/* ==========================================================================
+   PROCESADOR CENTRAL DE COMANDOS UNIFICADO
+   ========================================================================== */
+function processCommand(cmd) {
+    const responseDiv = document.createElement('div');
+    responseDiv.style.marginBottom = "10px";
+
+    // Si el modo Zork está activo, procesar mediante su propio motor
+    if (ZorkGame.active) {
+        responseDiv.innerHTML = ZorkGame.parseCommand(cmd);
+        commandHistory.appendChild(responseDiv);
+        return;
+    }
+
+    // Evaluación de Comandos de la Terminal
+    switch (cmd) {
+        // --- NAVEGACIÓN Y ACCESO ---
+        case 'help':
+            responseDiv.innerHTML = `
+                <span style="color:#05ffa1; font-weight:bold;">SISTEMA OPERATIVO DOUZOZ 7 - MANUAL DE COMANDOS</span><br>
+                --------------------------------------------------<br>
+                - <b style="color:#ff71ce">start / enter</b>: Entrar a la página principal.<br>
+                - <b style="color:#ff71ce">status</b>: Ver estado del sistema operativo.<br>
+                - <b style="color:#ff71ce">cls / clear</b>: Limpiar el historial de pantalla.<br>
+                - <b style="color:#ff71ce">ver</b>: Versión del Kernel y licencias.<br>
+                - <b style="color:#ff71ce">sysinfo</b>: Diagnóstico de hardware.<br>
+                - <b style="color:#ff71ce">logo</b>: Renderiza el logo ASCII oficial.<br>
+                - <b style="color:#ff71ce">time</b>: Muestra la hora y fecha BIOS.<br><br>
+                <span style="color:#05ffa1; font-weight:bold;">ARCHIVOS DE LORE Y PROTOCOLOS</span><br>
+                --------------------------------------------------<br>
+                - <b style="color:#ff71ce">yaoilover</b>: Activa el protocolo secreto de la Cueva.<br>
+                - <b style="color:#ff71ce">yeyo</b>: Mensaje del hermano supremo.<br>
+                - <b style="color:#ff71ce">whois_leo</b>: Ficha de identificación de Leo Kasper.<br>
+                - <b style="color:#ff71ce">note_final</b>: Mensaje interceptado de Leo Kasper.<br>
+                - <b style="color:#ff71ce">emails</b>: [DESARROLLO] Cliente de correo local.<br><br>
+                <span style="color:#05ffa1; font-weight:bold;">ENTRETENIMIENTO Y SISTEMA</span><br>
+                --------------------------------------------------<br>
+                - <b style="color:#ff71ce">zork</b>: Inicia el simulador de aventura narrativa.<br>
+                - <b style="color:#ff71ce">matrix</b>: Despliegue de datos binarios.<br>
+                - <b style="color:#ff71ce">bsod</b>: Fuerza una excepción grave de pantalla azul.<br>
+                - <b style="color:#ff71ce">sudo</b>: Petición de privilegios root.<br>
+                - <b style="color:#ff71ce">shutdown</b>: Apagado directo del terminal.
+            `;
+            break;
+
+        case 'start':
+        case 'enter':
+            responseDiv.style.color = "#05ffa1";
+            responseDiv.innerText = "Acceso concedido. Entrando a la Cueva...";
+            setTimeout(() => {
+                terminalOverlay.style.display = 'none';
+            }, 800);
+            break;
+
+        case 'status':
+            responseDiv.innerText = "SISTEMA: DOUZOZ 7 (Copia pirata no activada) | MEMORIA: 99% Llena de Edits.";
+            break;
+
+        case 'cls':
+        case 'clear':
+            commandHistory.innerHTML = '';
+            return;
+
+        case 'ver':
+            responseDiv.innerText = "DOUZOZ 7 OS [Versión 3.01.7601 - Service Pack 2 Vaporwave Build]\nDesarrollado bajo KASPER CORE. Todos los derechos reservados.";
+            break;
+
+        case 'sysinfo':
+            responseDiv.innerHTML = `
+                <span style="color:#05ffa1; font-weight:bold;">--- INFORMACIÓN DEL SISTEMA DOUZOZ 7 ---</span><br>
+                Procesador: INTEL PENTIUM IV @ 3.00GHz (Overclocked 3.2GHz)<br>
+                Memoria RAM: 512MB DDR2 (Faltan 480MB por corrupción)<br>
+                GPU: NVIDIA GeForce FX 5200 (VRAM Virtual)<br>
+                HDD: 80GB IDE (Status S.M.A.R.T.: BAD)<br>
+                Estado: <span style="color:#ff355e; font-weight:bold;">COPIA PIRATA NO ACTIVADA</span>
+            `;
+            break;
+
+        case 'logo':
+            responseDiv.innerHTML = `
+<pre style="color: #ff71ce; font-weight: bold; line-height: 1.1; margin: 0;">
+  ██████╗  ██████╗ ██╗   ██╗███████╗██████╗ ███████╗ ███████╗ ██████╗ 
+  ██╔══██╗██╔═══██╗██║   ██║╚══███╔╝██╔══██╗██╔════╝╚════██║██╔═████╗
+  ██║  ██║██║   ██║██║   ██║  ███╔╝ ██║  ██║███████╗  ███╔═╝██║██╔██║
+  ██║  ██║██║   ██║██║   ██║ ███╔╝  ██║  ██║╚════██║ ███╔═╝ ████╔╝██║
+  ██████╔╝╚██████╔╝╚██████╔╝███████╗██████╔╝███████║███████╗╚██████╔╝
+  ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═════╝ ╚══════╝╚══════╝ ╚═════╝ 
+</pre>`;
+            break;
+
+        case 'time':
+            responseDiv.innerText = `Fecha y hora actual BIOS: ${new Date().toLocaleString('es-ES')}`;
+            break;
+
+        // --- PROTOCOLOS DE LORE Y HERMANOS ---
+        case 'yeyo':
+            responseDiv.style.color = "#fff1be";
+            responseDiv.innerText = "⚡ YEYO CODE DETECTED: ¡Eso es rock, pibe! El hermano controla la cueva.";
+            break;
+
+        case 'yaoilover':
+            executeYaoiloverProtocol();
+            return;
+
+        case 'whois_leo':
+            responseDiv.innerHTML = `
+                <span style="color:#05ffa1; font-weight:bold;">FICHA DE USUARIO: LEO KASPER</span><br>
+                --------------------------------------------------<br>
+                ID Sujeto: LK-2007-X<br>
+                Rol: Arquitecto Principal del Kernel DOUZOZ / Operador<br>
+                Estado: <span style="color:#ff355e; font-weight:bold;">DESCONECTADO DE LA RED (Última traza registrada)</span><br>
+                Anotación: Creador intelectual del entorno virtual. Registro cifrado en sector 0x004F.
+            `;
+            break;
+
+        case 'note_final':
+            responseDiv.innerHTML = `
+                <div style="border: 1px solid #ff71ce; padding: 10px; background: rgba(255, 113, 206, 0.05);">
+                    <span style="color: #ff71ce; font-weight: bold;">[ARCHIVO INTERCEPTADO: MEMORIA 0x08]</span><br>
+                    <span style="color: #aaa;">De: Leo Kasper (leo.kasper@douzoz.net)</span><br>
+                    <span style="color: #aaa;">Para: YaoiPornLover (admin@douzoz.net)</span><br>
+                    <span style="color: #aaa;">Fecha: 14 de Noviembre de 2007 - 03:42 AM</span><br>
+                    --------------------------------------------------<br>
+                    Si estás leyendo esto, el script de apagado automático ya arrancó y la imagen de DOUZOZ 7 se congeló para siempre.<br><br>
+                    Gracias por haberte quedado del otro lado de la pantalla durante todas estas noches interminables codificando esta locura, bancándote las fallas del sistema, las cuelgues del SO y la falta de plata. No había nadie más con quien me hubiera gustado quemar monitores hasta el amanecer.<br><br>
+                    Perdón por la salida abrupta, pero el código ya no corre más en mi cabeza. Te dejo las llaves del servidor y el control absoluto del terminal.<br><br>
+                    Hacé que valga la pena.<br>
+                    Hasta siempre, hermano.<br><br>
+                    <i>- Leo Kasper.</i>
+                </div>
+            `;
+            break;
+
+        case 'emails':
+            responseDiv.innerHTML = `
+                <span style="color:#05ffa1; font-weight:bold;">CLIENTE DE CORREO DOUZOZ MAIL v1.0</span><br>
+                --------------------------------------------------<br>
+                <span style="color:#ff355e; font-weight:bold;">MÓDULO DESCONECTADO TEMPORALMENTE.</span><br>
+                El servidor POP3 local no responde. Se activará en la próxima actualización de firmware.
+            `;
+            break;
+
+        // --- ENTRETENIMIENTO ---
+        case 'zork':
+            responseDiv.innerHTML = ZorkGame.start();
+            break;
+
+        case 'matrix':
+            responseDiv.innerHTML = `
+                <div style="color: #05ffa1; font-family: monospace; font-size: 0.85em;">
+                    01001000 01100101 01101100 01101100 01110100 00100000 01001011 01000001 01010011 01010000 01000101 01010010<br>
+                    01010011 01011001 01010013 01010100 00100000 01000100 01001111 01010101 01011012 01011111 01001111 01010011<br>
+                    <span style="color: #ffffff;">[RESTAURANDO BLOQUE DE MEMORIA RAM 0x00FF31...]</span>
+                </div>
+            `;
+            break;
+
+        case 'bsod':
+            document.body.innerHTML = `
+                <div style="background:#0000aa; color:#fff; font-family:monospace; padding:30px; height:100vh; width:100vw; box-sizing:border-box;">
+                    <p>A problem has been detected and DOUZOZ 7 has been shut down to prevent damage to your computer.</p>
+                    <p>DRIVER_IRQL_NOT_LESS_OR_EQUAL</p>
+                    <p>Technical Information:</p>
+                    <p>*** STOP: 0x0000000A (0x00000002, 0x00000000, 0x80015341, 0x00000000)</p>
+                    <p>*** KASPER_SYS.SYS - Address 80015341 base at 80010000</p>
+                </div>
+            `;
+            return;
+
+        case 'sudo':
+            responseDiv.innerHTML = `<span style="color:#ff355e; font-weight:bold;">ACCESO DENEGADO: Se requiere autenticación ROOT elevada. Violación registrada.</span>`;
+            break;
+
+        case 'shutdown':
+            const shutdownScreen = document.getElementById('douzoz-shutdown-screen');
+            if (shutdownScreen) shutdownScreen.style.display = 'flex';
+            responseDiv.style.color = "#ff71ce";
+            responseDiv.innerText = "Iniciando secuencia de apagado de DOUZOZ 7...";
+            break;
+
+        default:
+            responseDiv.style.color = "#ff355e";
+            responseDiv.innerText = `'${cmd}' no se reconoce como un comando interno o externo. Escribí 'help'.`;
+            break;
+    }
+
+    commandHistory.appendChild(responseDiv);
+}
+
+/* ==========================================================================
+   MANEJO DE EVENTOS DE ENTRADA
+   ========================================================================== */
+terminalInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const cmd = terminalInput.value.trim().toLowerCase();
+        terminalInput.value = '';
+
+        if (cmd === '') return;
+
+        // Visualizar línea tipeada por el usuario
+        const historyLine = document.createElement('div');
+        const promptSymbol = ZorkGame.active ? 'ZORK>' : 'KASPER:\\DOUZOZ7>';
+        const promptColor = ZorkGame.active ? 'style="color:#ff71ce;"' : '';
+
+        historyLine.innerHTML = `<span class="prompt-symbol" ${promptColor}>${promptSymbol}</span> ${cmd}`;
+        commandHistory.appendChild(historyLine);
+
+        processCommand(cmd);
+        terminalOverlay.scrollTop = terminalOverlay.scrollHeight;
+    }
+});
+
+// EJECUCIÓN DEL MODO YAOILOVER Y SHUTDOWN
+function executeYaoiloverProtocol() {
+    // 1. Invertir colores
+    document.body.classList.add('yaoilover-mode');
+    
+    // 2. Imprimir 40 veces el texto
+    let count = 0;
+    const interval = setInterval(() => {
+        if (count < 40) {
+            const spamLine = document.createElement('div');
+            spamLine.className = 'cloud-spam-line';
+            spamLine.innerText = `[${count + 1}/40] Cloud Strife mi viejo we 🫦`;
+            commandHistory.appendChild(spamLine);
+            terminalOverlay.scrollTop = terminalOverlay.scrollHeight;
+            count++;
+        } else {
+            clearInterval(interval);
+            
+            // 3. Reiniciar terminal y mostrar pantalla de Apagado (Shutdown)
+            setTimeout(() => {
+                terminalOverlay.style.display = 'none';
+                shutdownScreen.style.display = 'flex';
+                
+                // 4. "Apagar / Cerrar" la página
+                setTimeout(() => {
+                    document.body.innerHTML = '';
+                    document.body.style.backgroundColor = '#000000';
+                }, 3500);
+            }, 1200);
+        }
+    }, 40);
+}
+</script>
+
+<script>
+// FEEDBACK AL PRESIONAR BOTONES EN CONSTRUCCIÓN
+function triggerLockedSound(featureName) {
+    if (typeof sfx !== 'undefined') {
+        // Sonido de error/acceso denegado
+        sfx.playTone(150, 'sawtooth', 0.25);
+    }
+
+    if (typeof showAchievementToast === 'function') {
+        showAchievementToast({
+            icon: '🚧',
+            title: 'ACCESO RESTRINGIDO',
+            desc: `${featureName} está en construcción por el Yeyo.`
+        });
+    }
+}
+</script>
+
+<script>
+// ==========================================
+// MÓDULO: PAGER V3.0 MULTI-SKIN & SFX ENGINE
+// ==========================================
+
+// BANCO DE MENSAJES POR SKIN
+const pagerSkinData = {
+    gta3: {
+        brand: "LIBERTY CITY WIRELESS",
+        title: "LC-PAGER",
+        sticker: "🚕",
+        messages: [
+            "[8-BALL]: 'Tengo las bombas listas en Harwood, Claude.'",
+            "[EL BURRO]: 'Tengo un trabajo de carreras en Hepburn Heights.'",
+            "[LCPD]: 'Unidad 12, sospechoso huyendo en un Cheetah negro.'",
+            "[LUIGI]: 'Vení al Club Sex-Jadd, hay problemas en el callejón.'",
+            "[PORTLAND]: 'El puente Callahan estará cerrado por mantenimiento.'"
+        ]
+    },
+    argentina: {
+        brand: "LA SCALONETA 100% CRIOLLO",
+        title: "MATE-PAGER",
+        sticker: "🧉",
+        messages: [
+            "🇦🇷 [Yaoilover]: 'Prendé el fuego pibe, que el asado no se hace solo.'",
+            "⚽ [Scaloni]: 'Muchachos, hoy se juega con el alma. Traigan el vino.'",
+            "🏆 [Dibu]: 'Mirá que te como, hermano. Dale que salimos campeones.'",
+            "🎵 [Cumbia]: 'Sonando la cumbia de La Cueva a todo ritmo.'",
+            "🥩 [La Vaga]: 'YaoiLover y DOUZOZ mandan saludos desde la pileta.'"
+        ]
+    },
+    matrix: {
+        brand: "NEBUCHADNEZZAR COMM",
+        title: "MATRIX-NET",
+        sticker: "🕶️",
+        messages: [
+            "[Morpheus]: 'Tomás la pastilla roja y te muestro qué tan profundo es el pozo.'",
+            "[Trinity]: 'El agente Smith está rastreando el nodo principal.'",
+            "[Cypher]: 'La ignorancia es una bendición, pibe.'",
+            "[System]: 'Conexión cuántica establecida con La Cueva OS.'"
+        ]
+    },
+    classic: {
+        brand: "MOTOROLA BEEPER 90s",
+        title: "BEEPER-90",
+        sticker: "📟",
+        messages: [
+            "🚨 [Estado]: YaoiLover y DOUZOZ disfrutando el Sol y bailes exóticos 🌴",
+            "📩 [YaoiLover]: 'Llamame al teléfono público cuando veas esto.'",
+            "⚠️ [Sistema]: Mensaje de prueba de red P2P."
+        ]
+    }
+};
+
+let currentSkin = 'gta3';
+let currentMsgIdx = 0;
+let isBacklightOn = true;
+let pagerBattery = 98;
+
+// 1. CAMBIAR SKIN DEL PAGER
+function setPagerSkin(skinName) {
+    currentSkin = skinName;
+    currentMsgIdx = 0;
+
+    // Actualizar botones
+    document.querySelectorAll('.skin-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Actualizar Chasis y Textos
+    const chassis = document.getElementById('pager-hardware');
+    chassis.className = `pager-chassis skin-${skinName}`;
+
+    const data = pagerSkinData[skinName];
+    document.getElementById('pager-brand-display').innerText = data.brand;
+    document.getElementById('pager-skin-title').innerText = data.title;
+    document.getElementById('pager-sticker-slot').innerText = data.sticker;
+
+    updatePagerLCD();
+    playPagerSFXForSkin(skinName);
+}
+
+// 2. ACTUALIZAR PANTALLA LCD
+function updatePagerLCD() {
+    const data = pagerSkinData[currentSkin];
+    const display = document.getElementById('pager-display-text');
+    const counter = document.getElementById('pager-msg-counter');
+
+    if (display) display.innerText = data.messages[currentMsgIdx];
+    if (counter) counter.innerText = `MSG: ${currentMsgIdx + 1}/${data.messages.length}`;
+}
+
+function pagerNextMsg() {
+    const max = pagerSkinData[currentSkin].messages.length;
+    currentMsgIdx = (currentMsgIdx + 1) % max;
+    updatePagerLCD();
+    playTone(900, 0.04);
+}
+
+function pagerPrevMsg() {
+    const max = pagerSkinData[currentSkin].messages.length;
+    currentMsgIdx = (currentMsgIdx - 1 + max) % max;
+    updatePagerLCD();
+    playTone(700, 0.04);
+}
+
+// 3. INTERRUPTOR DE LUZ
+function togglePagerLight() {
+    isBacklightOn = !isBacklightOn;
+    const box = document.getElementById('pager-lcd-box');
+    if (isBacklightOn) {
+        box.classList.remove('backlight-off');
+        box.classList.add('backlight-on');
+    } else {
+        box.classList.remove('backlight-on');
+        box.classList.add('backlight-off');
+    }
+    playTone(1200, 0.03);
+}
+
+// 4. BATERÍA Y VIBRACIÓN
+function chargePagerBattery() {
+    pagerBattery = 100;
+    document.getElementById('pager-battery-text').innerText = `🔋 100%`;
+    alert("⚡ ¡Batería del Pager cargada al máximo!");
+    playTone(1500, 0.1);
+}
+
+function playPagerAlert() {
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // Vibración física
+
+    if (currentSkin === 'gta3') {
+        // Tono icónico de GTA 3
+        playTone(1000, 0.1);
+        setTimeout(() => playTone(1400, 0.1), 120);
+        setTimeout(() => playTone(800, 0.2), 240);
+    } else if (currentSkin === 'argentina') {
+        // Acorde futbolero
+        playTone(523, 0.08); // Do
+        setTimeout(() => playTone(659, 0.08), 90); // Mi
+        setTimeout(() => playTone(783, 0.15), 180); // Sol
+    } else {
+        playTone(1200, 0.15);
+    }
+}
+
+function pressPagerKey(n) {
+    const inp = document.getElementById('pager-code-input');
+    if (inp.value.length < 4) {
+        inp.value += n;
+        playTone(800, 0.03);
+    }
+}
+
+function clearPagerKey() {
+    document.getElementById('pager-code-input').value = '';
+    playTone(400, 0.04);
+}
+
+function sendPagerCode() {
+    const code = document.getElementById('pager-code-input').value;
+    if (code === '1978' || code === '1986' || code === '2022') {
+        alert("🇦🇷 ¡MUCHACHOS! Desbloqueaste el modo Campeón del Mundo.");
+    } else if (code === '0351') {
+        alert("🚕 CÓDIGO GTA 3: Respeto al máximo en Portland.");
+    } else if (code.length > 0) {
+        alert(`📟 CÓDIGO [${code}] PROCESADO EN LA RED.`);
+    }
+    document.getElementById('pager-code-input').value = '';
+}
+
+// SINTETIZADOR SGFX PURE JS
+function playTone(freq, duration) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        g.gain.setValueAtTime(0.04, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
+        osc.connect(g);
+        g.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+}
+
+function playPagerSFXForSkin(skin) {
+    if (skin === 'gta3') playTone(1100, 0.08);
+    else if (skin === 'argentina') playTone(880, 0.1);
+    else playTone(600, 0.05);
+}
+
+// Inicializar Reloj LCD
+setInterval(() => {
+    const d = new Date();
+    const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const el = document.getElementById('pager-clock-display');
+    if (el) el.innerText = t;
+}, 1000);
+</script>
+
+<script>
+// ==========================================
+// CUEVA TAPE DECK-9000 ULTIMATE ENGINE
+// ==========================================
+
+const cuevaTapePlaylist = [
+    {
+        id: 1,
+        title: "01. CUEVA CYBERPUNK BEATS",
+        file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        skin: "skin-neon"
+    },
+    {
+        id: 2,
+        title: "02. PORTLAND NIGHTS (GTA 3 STYLE)",
+        file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        skin: "skin-gold"
+    },
+    {
+        id: 3,
+        title: "03. METAL SLUG MISSION START",
+        file: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        skin: "skin-red"
+    }
+];
+
+let currentTapeIndex = 0;
+let isTapePlaying = false;
+let tapeAudio = new Audio();
+let tapeCounter = 0;
+let counterInterval = null;
+
+// 1. EVENTOS DE TIEMPO Y PROGRESO DINÁMICO
+tapeAudio.addEventListener('timeupdate', () => {
+    if (!tapeAudio.duration) return;
+
+    // Calculo de tiempo transcurrido
+    const currSecs = tapeAudio.currentTime;
+    const totalSecs = tapeAudio.duration;
+
+    document.getElementById('current-time-text').innerText = formatTapeTime(currSecs);
+    document.getElementById('total-duration-text').innerText = formatTapeTime(totalSecs);
+
+    // Porcentaje de la barra
+    const pct = (currSecs / totalSecs) * 100;
+    document.getElementById('progress-fill').style.width = `${pct}%`;
+
+    // Actualizar volumen de la cinta física en el cassette
+    updateSpoolSizes(pct / 100);
+});
+
+tapeAudio.addEventListener('ended', () => {
+    ejectCassette(); // Salta al siguiente tema al terminar
+});
+
+// Formateador MM:SS
+function formatTapeTime(seconds) {
+    if (isNaN(seconds)) return "00:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+// 2. BUSCADOR EN LA LÍNEA DE TIEMPO (SEEK)
+function seekTapeProgress(event) {
+    if (!tapeAudio.duration) return;
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const pct = clickX / rect.width;
+
+    tapeAudio.currentTime = pct * tapeAudio.duration;
+    playMechanicalSFX('click');
+}
+
+// 3. SELECTOR DIRECTO DE TRACK POR NÚMERO
+function jumpToTrackNumber(num) {
+    const idx = parseInt(num) - 1;
+    if (idx >= 0 && idx < cuevaTapePlaylist.length) {
+        loadTapeTrack(idx);
+        if (isTapePlaying) playTape();
+    }
+}
+
+// 4. CONTROL DE SPEED / PITCH
+function changeTapePitch(val) {
+    tapeAudio.playbackRate = parseFloat(val);
+    playMechanicalSFX('click');
+}
+
+// 5. CARGAR CANCIÓN Y ACTUALIZAR UI
+function loadTapeTrack(index) {
+    currentTapeIndex = index;
+    const track = cuevaTapePlaylist[index];
+    
+    tapeAudio.src = track.file;
+    tapeAudio.playbackRate = parseFloat(document.getElementById('tape-pitch-select').value);
+
+    document.getElementById('cassette-title-display').innerText = track.title;
+    document.getElementById('deck-song-name').innerText = track.title;
+    document.getElementById('direct-track-input').value = index + 1;
+
+    const cBody = document.getElementById('active-cassette');
+    cBody.className = `cassette-body ${track.skin}`;
+
+    resetTapeCounter();
+}
+
+function playTape() {
+    if (!tapeAudio.src) loadTapeTrack(0);
+    tapeAudio.play();
+    isTapePlaying = true;
+    
+    document.getElementById('deck-door').className = 'deck-door-chamber playing';
+    document.querySelectorAll('.piano-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-tape-play').classList.add('active');
+
+    startCounter();
+    startVUMeters();
+    playMechanicalSFX('click');
+}
+
+function pauseTape() {
+    tapeAudio.pause();
+    isTapePlaying = false;
+    document.getElementById('deck-door').className = 'deck-door-chamber';
+    stopCounter();
+    playMechanicalSFX('click');
+}
+
+function stopTape() {
+    tapeAudio.pause();
+    tapeAudio.currentTime = 0;
+    isTapePlaying = false;
+    document.getElementById('deck-door').className = 'deck-door-chamber';
+    resetTapeCounter();
+    stopCounter();
+    playMechanicalSFX('clunk');
+}
+
+function ejectCassette() {
+    stopTape();
+    playMechanicalSFX('eject');
+    
+    const chamber = document.getElementById('deck-door');
+    chamber.classList.add('ejecting');
+
+    setTimeout(() => {
+        currentTapeIndex = (currentTapeIndex + 1) % cuevaTapePlaylist.length;
+        loadTapeTrack(currentTapeIndex);
+        setTimeout(() => chamber.classList.remove('ejecting'), 300);
+    }, 500);
+}
+
+function fastForwardTape() {
+    if (tapeAudio.src) {
+        tapeAudio.currentTime += 10;
+        playMechanicalSFX('whir');
+    }
+}
+
+function rewindTape() {
+    if (tapeAudio.src) {
+        tapeAudio.currentTime -= 10;
+        playMechanicalSFX('whir');
+    }
+}
+
+// CONTADOR Y REELES
+function startCounter() {
+    stopCounter();
+    counterInterval = setInterval(() => {
+        if (isTapePlaying) {
+            tapeCounter++;
+            const str = String(tapeCounter % 1000).padStart(3, '0');
+            document.getElementById('counter-d1').innerText = str[0];
+            document.getElementById('counter-d2').innerText = str[1];
+            document.getElementById('counter-d3').innerText = str[2];
+        }
+    }, 1000);
+}
+
+function stopCounter() { if (counterInterval) clearInterval(counterInterval); }
+function resetTapeCounter() {
+    tapeCounter = 0;
+    document.getElementById('counter-d1').innerText = '0';
+    document.getElementById('counter-d2').innerText = '0';
+    document.getElementById('counter-d3').innerText = '0';
+}
+
+function updateSpoolSizes(pct) {
+    const leftSize = 38 - (pct * 20);
+    const rightSize = 18 + (pct * 20);
+    
+    const sLeft = document.getElementById('spool-left');
+    const sRight = document.getElementById('spool-right');
+    if (sLeft) { sLeft.style.width = `${leftSize}px`; sLeft.style.height = `${leftSize}px`; }
+    if (sRight) { sRight.style.width = `${rightSize}px`; sRight.style.height = `${rightSize}px`; }
+}
+
+function startVUMeters() {
+    if (!isTapePlaying) return;
+    const leftNeedle = document.getElementById('vu-left');
+    const rightNeedle = document.getElementById('vu-right');
+    
+    if (leftNeedle) leftNeedle.style.transform = `rotate(${Math.floor(Math.random() * 60) - 30}deg)`;
+    if (rightNeedle) rightNeedle.style.transform = `rotate(${Math.floor(Math.random() * 60) - 30}deg)`;
+
+    if (isTapePlaying) requestAnimationFrame(startVUMeters);
+}
+
+function playMechanicalSFX(type) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'click') {
+            osc.frequency.value = 180;
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+            osc.start(); osc.stop(ctx.currentTime + 0.04);
+        } else if (type === 'eject') {
+            osc.frequency.value = 320;
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
+            osc.start(); osc.stop(ctx.currentTime + 0.18);
+        }
+    } catch(e) {}
+}
+
+window.addEventListener('DOMContentLoaded', () => { loadTapeTrack(0); });
+</script>
+
+<script>
+// ==========================================
+// MÓDULO: RELOJ SUPREMO, GEO IP & ANTI-ESTRÉS
+// ==========================================
+
+let clockTheme = 'vaporwave';
+
+// 1. Cambiar temas visuales del reloj
+function setClockTheme(theme) {
+    clockTheme = theme;
+    const box = document.getElementById('clock-display-box');
+    const digitalView = document.getElementById('digital-clock-view');
+    const analogView = document.getElementById('analog-clock-view');
+
+    // Actualizar botones
+    document.querySelectorAll('.clk-mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    box.className = `clock-display-screen theme-${theme}`;
+
+    if (theme === 'analog') {
+        digitalView.style.display = 'none';
+        analogView.style.display = 'block';
+    } else {
+        digitalView.style.display = 'block';
+        analogView.style.display = 'none';
+    }
+
+    if (typeof sfx !== 'undefined') sfx.playClick();
+}
+
+// 2. Actualización en tiempo real (Digital + Analógico)
+function updateClockLogic() {
+    const now = new Date();
+
+    // Reloj Digital
+    const hrs = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const secs = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock-time-text').innerText = `${hrs}:${mins}:${secs}`;
+
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    document.getElementById('clock-date-text').innerText = now.toLocaleDateString('es-ES', options).toUpperCase();
+
+    // Reloj Analógico (SVG Hands)
+    const secDeg = (now.getSeconds() / 60) * 360;
+    const minDeg = ((now.getMinutes() + now.getSeconds() / 60) / 60) * 360;
+    const hrDeg = ((now.getHours() % 12 + now.getMinutes() / 60) / 12) * 360;
+
+    const secHand = document.getElementById('second-hand');
+    const minHand = document.getElementById('minute-hand');
+    const hrHand = document.getElementById('hour-hand');
+
+    if (secHand) secHand.setAttribute('transform', `rotate(${secDeg} 50 50)`);
+    if (minHand) minHand.setAttribute('transform', `rotate(${minDeg} 50 50)`);
+    if (hrHand) hrHand.setAttribute('transform', `rotate(${hrDeg} 50 50)`);
+}
+
+setInterval(updateClockLogic, 1000);
+updateClockLogic();
+
+// 3. Geolocalización IP & Clima "Rastreador Espía"
+async function fetchUserGeoData() {
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+
+        if (data.ip) {
+            document.getElementById('user-ip-display').innerText = data.ip;
+            document.getElementById('user-location-display').innerText = `${data.city}, ${data.region}, ${data.country_name}`;
+            document.getElementById('user-isp-display').innerText = `ISP: ${data.org || 'Desconocido'}`;
+            document.getElementById('clock-ip-status').innerText = '🟢 IP RASTREADA Y EXPUESTA';
+
+            // Bandera según código de país
+            if (data.country_code) {
+                document.getElementById('user-flag').innerHTML = `<img src="https://flagcdn.com/24x18/${data.country_code.toLowerCase()}.png" alt="flag" style="vertical-align:middle; border-radius:2px;">`;
+            }
+
+            // Clima estimado usando la API pública Open-Meteo
+            if (data.latitude && data.longitude) {
+                fetchWeather(data.latitude, data.longitude);
+            }
+        }
+    } catch (err) {
+        document.getElementById('user-ip-display').innerText = '127.0.0.1 (Localhost)';
+        document.getElementById('user-location-display').innerText = 'Cueva Secreta del Yeyo';
+        document.getElementById('clock-ip-status').innerText = '⚠️ MODEM BLINDADO';
+    }
+}
+
+async function fetchWeather(lat, lon) {
+    try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const wData = await res.json();
+        if (wData.current_weather) {
+            const temp = Math.round(wData.current_weather.temperature);
+            document.getElementById('user-weather-display').innerText = `${temp}°C 🌤️`;
+        }
+    } catch (e) {
+        document.getElementById('user-weather-display').innerText = '24°C ☀️';
+    }
+}
+
+fetchUserGeoData();
+
+// 4. Minijuego Anti-Estrés con Comentarios Dinámicos
+let stressClicks = 0;
+const stressComments = [
+    "Eso pibe... dale con ganas.",
+    "El Yeyo aprueba tu spameo.",
+    "¿Ya te sentís más relajado o necesitás un termo de mate?",
+    "¡Cuidado que vas a romper el botón!",
+    "Nivel de rabia bajando al 50%...",
+    "¡Eso es rock, pibe!",
+    "DESBLOQUEASTE EL MODO ZEN MÁXIMO."
+];
+
+document.getElementById('anti-stress-btn').addEventListener('click', () => {
+    stressClicks++;
+    document.getElementById('stress-counter-badge').innerText = `(${stressClicks} Clicks)`;
+
+    // Seleccionar comentario según el progreso
+    const commentIndex = Math.min(Math.floor(stressClicks / 5), stressComments.length - 1);
+    document.getElementById('stress-comment').innerText = `"${stressComments[commentIndex]}"`;
+
+    if (typeof sfx !== 'undefined') sfx.playClick();
+
+    // Disparar logro especial si llega a 50 clicks
+    if (stressClicks === 50 && typeof showAchievementToast === 'function') {
+        showAchievementToast({
+            icon: '🧘‍♂️',
+            title: 'MAESTRO ZEN ANTI-ESTRÉS',
+            desc: 'Presionaste el botón 50 veces. La paz reina en la Cueva.'
+        });
+    }
+});
+</script>
+
+<script>
+/**
+ * DICCIONARIO EXPANDIDO DE COMANDOS DE TERMINAL KASPER
+ */
+const TerminalCommands = {
+    // --- NAVEGACIÓN Y AYUDA ---
+    help: () => `
+<span class="cmd-highlight">SISTEMA OPERATIVO DOUZOZ 7 - MANUAL DE COMANDOS</span>
+--------------------------------------------------
+<span class="cmd-name">help</span>        - Despliega este panel de instrucciones.
+<span class="cmd-name">cls / clear</span> - Sanitiza el búfer de la pantalla.
+<span class="cmd-name">ver</span>         - Muestra versión del Kernel y licencias.
+<span class="cmd-name">sysinfo</span>     - Estado crítico de hardware y paginación.
+<span class="cmd-name">logo</span>        - Renderiza la insignia ASCII de DOUZOZ 7.
+<span class="cmd-name">time</span>        - Muestra la estampa de tiempo del reloj BIOS.
+
+<span class="cmd-highlight">ARCHIVOS DE LORE & REGISTROS DEL SISTEMA</span>
+--------------------------------------------------
+<span class="cmd-name">whois_leo</span>   - Ficha de identificación de Leo Kasper.
+<span class="cmd-name">note_final</span>  - Mensaje interceptado de Leo Kasper a YaoiPornLover.
+<span class="cmd-name">emails</span>      - [MÓDULO EN DESARROLLO] Cliente de correo local.
+
+<span class="cmd-highlight">ENTRETENIMIENTO Y SIMULACIÓN</span>
+--------------------------------------------------
+<span class="cmd-name">zork</span>        - Inicia el emulador de aventura interactiva en texto.
+<span class="cmd-name">matrix</span>      - Vuelca el búfer de memoria hexadecimal en verde CRT.
+<span class="cmd-name">bsod</span>        - Fuerza una excepción no controlada en el sistema.
+<span class="cmd-name">sudo</span>        - Solicitud de escalado de privilegios ROOT.
+<span class="cmd-name">shutdown</span>    - Apagado directo del terminal.
+--------------------------------------------------`,
+
+    ver: () => `DOUZOZ 7 OS [Versión 3.01.7601 - Service Pack 2 Vaporwave Build]
+Desarrollado bajo la arquitectura KASPER CORE. Todos los derechos reservados.`,
+
+    sysinfo: () => `
+<span class="cmd-highlight">--- INFORMACIÓN DEL SISTEMA DOUZOZ 7 ---</span>
+Procesador: INTEL PENTIUM IV @ 3.00GHz (Overclocked 3.2GHz)
+Memoria RAM: 512MB DDR2 (Faltan 480MB por corrupción de registro)
+GPU: NVIDIA GeForce FX 5200 (Renderizando mediante VRAM virtual)
+HDD: 80GB IDE (S.M.A.R.T. Status: BAD - Copie sus datos inmediatamente)
+Audio: Sound Blaster Live! 24-bit (Driver VHS VHS-HQ)
+Estado de activación: <span class="error-msg">COPIA PIRATA NO AUTORIZADA</span>`,
+
+    logo: () => `
+<pre style="color: #ff007f; font-weight: bold; line-height: 1.1;">
+  ██████╗  ██████╗ ██╗   ██╗███████╗██████╗ ███████╗ ███████╗ ██████╗ 
+  ██╔══██╗██╔═══██╗██║   ██║╚══███╔╝██╔══██╗██╔════╝╚════██║██╔═████╗
+  ██║  ██║██║   ██║██║   ██║  ███╔╝ ██║  ██║███████╗  ███╔═╝██║██╔██║
+  ██║  ██║██║   ██║██║   ██║ ███╔╝  ██║  ██║╚════██║ ███╔═╝ ████╔╝██║
+  ██████╔╝╚██████╔╝╚██████╔╝███████╗██████╔╝███████║███████╗╚██████╔╝
+  ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚═════╝ ╚══════╝╚══════╝ ╚═════╝ 
+</pre>`,
+
+    time: () => `Reloj interno de la tarjeta madre: ${new Date().toLocaleString('es-ES')}`,
+
+    // --- LORE Y NARRATIVA ---
+    whois_leo: () => `
+<span class="cmd-highlight">FICHA DE USUARIO: LEO KASPER</span>
+--------------------------------------------------
+ID de sujeto: LK-2007-X
+Rol: Arquitecto Principal del Kernel DOUZOZ / Operador
+Estado actual: <span class="error-msg">DESCONECTADO DE LA RED (Última traza registrada)</span>
+Anotación: Creador intelectual del entorno virtual. Dejó registrado una serie de archivos cifrados en el sector 0x004F antes de la caída del servidor.`,
+
+    note_final: () => `
+<div style="border: 1px solid #ff007f; padding: 10px; background: rgba(255, 0, 127, 0.05);">
+<span style="color: #ff007f; font-weight: bold;">[ARCHIVO DE TEXTO INTERCEPTADO: MEMORIA DE RECUPERACIÓN 0x08]</span><br>
+<span style="color: #888;">De: Leo Kasper (leo.kasper@douzoz.net)</span><br>
+<span style="color: #888;">Para: YaoiPornLover (admin@douzoz.net)</span><br>
+<span style="color: #888;">Fecha: 14 de Noviembre de 2007 - 03:42 AM</span><br>
+--------------------------------------------------<br>
+Si estás leyendo esto, el script de apagado automático ya arrancó y la imagen de DOUZOZ 7 se congeló para siempre.<br><br>
+Gracias por haberte quedado del otro lado de la pantalla durante todas estas noches interminables codificando esta locura, bancándote las fallas del sistema, las cuelgues del SO y la falta de plata. No había nadie más con quien me hubiera gustado quemar monitores hasta el amanecer.<br><br>
+Perdón por la salida abrupta, pero el código ya no corre más en mi cabeza. Te dejo las llaves del servidor y el control absoluto del terminal.<br><br>
+Hacé que valga la pena.<br>
+Hasta siempre, hermano.<br><br>
+<i>- Leo Kasper.</i>
+</div>`,
+
+    emails: () => `
+<span class="cmd-highlight">CLIENTE DE CORREO ELECTRONICO DOUZOZ MAIL v1.0</span>
+--------------------------------------------------
+<span class="error-msg">MÓDULO DESCONECTADO TEMPORALMENTE.</span>
+El servidor POP3 local no está respondiendo.
+(Este módulo será activado en la próxima actualización de firmware).`,
+
+    // --- ENTRETENIMIENTO Y EXTRÁS ---
+    zork: () => {
+        return ZorkGame.start();
+    },
+
+    matrix: () => `
+<div style="color: #00ff00; font-family: monospace; font-size: 0.85em;">
+01001000 01100101 01101100 01101100 01110100 00100000 01001011 01000001 01010011 01010000 01000101 01010010<br>
+01010011 01011001 01010011 01010100 00100000 01000100 01001111 01010101 01011010 01011111 01001111 01010011<br>
+<span style="color: #ffffff;">[EXTRACCIÓN DE MEMORIA RAM EN PROCESO... RESTAURANDO BLOQUE 0x00FF31]</span><br>
+01101100 01101111 01100001 01100100 01101001 01101110 01100111 00100000 01100011 01101111 01100100 01100101
+</div>`,
+
+    bsod: () => {
+        document.body.innerHTML = `
+        <div style="background:#0000aa; color:#fff; font-family:monospace; padding:30px; height:100vh; width:100vw; box-sizing:border-box;">
+            <p>Se ha producido un problema y DOUZOZ 7 se ha apagado para evitar daños en el equipo.</p>
+            <p>DRIVER_IRQL_NOT_LESS_OR_EQUAL</p>
+            <p>Si esta es la primera vez que ve esta pantalla de error de detención, reinicie su equipo. Si esta pantalla aparece otra vez, siga estos pasos:</p>
+            <p>Compruebe que cualquier hardware o software nuevo esté correctamente instalado.</p>
+            <br>
+            <p>Información técnica:</p>
+            <p>*** STOP: 0x0000000A (0x00000002, 0x00000000, 0x80015341, 0x00000000)</p>
+            <p>*** KASPER_SYS.SYS - Address 80015341 base at 80010000, DateStamp 3d11a5b8</p>
+        </div>`;
+        return '';
+    },
+
+    sudo: () => `<span class="error-msg">ACCESO DENEGADO: El usuario actual no posee la credencial ROOT. Se ha notificado la violación de seguridad.</span>`,
+
+    shutdown: () => {
+        const shutdownScreen = document.getElementById('douzoz-shutdown-screen');
+        if (shutdownScreen) shutdownScreen.style.display = 'flex';
+        return 'Iniciando el apagado del sistema DOUZOZ 7...';
+    }
+};
+
+// ALIAS Y COMANDOS SECUNDARIOS
+TerminalCommands.clear = () => {
+    document.getElementById('command-history').innerHTML = '';
+    return '';
+};
+TerminalCommands.cls = TerminalCommands.clear;
+</script>
+
+	<script>
+/* ==========================================
+   INTERPRETADOR MULTI-OS & ZORK ENGINE
+   ========================================== */
+
+const ASIDE_OS_CONFIG = {
+  douzoz98: {
+    name: "DOUZOZ 98'",
+    prompt: "DOUZOZ:\\>",
+    theme: "douzoz98",
+    topbar: "DOUZOZ_98_TTY1.SYS",
+    welcome: "DOUZOZ 98 [Version 4.10.1998]\nEscribe 'help' para comandos o 'zork' para iniciar 'El Mito del Yeyo'.",
+    commands: {
+      patreon: "🔗 Cueva de Yeyo en Patreon: https://www.patreon.com/cw/YaoiPornLover",
+      yeyo: "👑 Yaoipornlover es el Arquitecto Supremo de esta Cueva. Respeto total.",
+      arcade: "🕹️ Iniciando modulo Arcade 8-Bit... Presiona F2 en la pagina para la cueva completa.",
+      dir: "ARCHIVOS:\n  AUTOEXEC.BAT\n  YEYO_LORE.TXT\n  ZORK_DOUZOZ.EXE"
+    }
+  },
+  kasper64: {
+    name: "Kasper 64",
+    prompt: "kasper64@root:~#",
+    theme: "kasper64",
+    topbar: "KASPER_64_WORKSTATION.SH",
+    welcome: "Kasper OS v6.4 Cyber-Workstation\nKernel 6.4-YEYO-SECURE. Escribe 'help' o 'zork' para 'Infiltracion en la Cueva'.",
+    commands: {
+      patreon: "🔒 VIP ACCESS GATEWAY: https://www.patreon.com/cw/YaoiPornLover",
+      scan: "🔍 Escaneando ciber-puertos... Yeyo Vault status: ENCRIPTADO [AES-256]",
+      firewall: "🛡️ CAVE_FIREWALL: 100% Operativo contra el fango.",
+      ls: "kasper_vault.dat  yeyo_patreon_link.sh  zork_cyber.bin"
+    }
+  },
+  joylover10: {
+    name: "JoyLover 10",
+    prompt: "JoyLover-OS>",
+    theme: "joylover10",
+    topbar: "JOYLOVER_10_NEON.EXE",
+    welcome: "JoyLover 10 Gamer Edition [Neon Release]\nEscribe 'help' o 'zork' para 'La Busqueda del Patreon Perdido'.",
+    commands: {
+      patreon: "💖 ¡Apoya al Yeyo en Patreon!: https://www.patreon.com/cw/YaoiPornLover",
+      boost: "🚀 FPS Boost Activado: 240 FPS en la Cueva del Placer.",
+      rank: "🏆 Tu Rango en la cueva: Hermano de Hierro de Yeyo.",
+      apps: "JoyLover_UI.exe, Yeyo_Patreon_App.exe, NeonZork.exe"
+    }
+  },
+  "yaoilover-mints": {
+    name: "YaoiLover Mints",
+    prompt: "yaoi-mint@user:~$",
+    theme: "yaoilover-mints",
+    topbar: "MINT_UNIX_TERMINAL.BASH",
+    welcome: "YaoiLover Mints Linux 21.2 (Victoria)\nEscribe 'help' o 'zork' para 'El Laberinto Yaoi de Yeyo'.",
+    commands: {
+      patreon: "🌐 curl -s https://www.patreon.com/cw/YaoiPornLover | grep YEYO_SUPREME",
+      whoami: "usuario_cueva (Miembro del Staff del Yeyo)",
+      sudo: "🔐 Permiso concedido por Yaoipornlover. Tenes poder absoluto.",
+      neofetch: "OS: YaoiLover Mints 21.2\nHOST: Yeyo Cave Server\nUPTIME: 9999 Days"
+    }
+  }
+};
+
+// ESTADO MÁQUINA DE ZORK
+let activeZork = null; // null o clave del OS activo
+let zorkStage = 0;
+
+// HISTORIAS DE ZORK POR OS (Con referencias al Yeyo y Patreon)
+const ZORK_STORIES = {
+  douzoz98: {
+    title: "=== ZORK 1998: EL MITO DEL YEYO ===",
+    stages: {
+      0: "Te encontras frente a una computadora CRT gigante en 1998. Hay un disquete dorado etiquetado 'Yaoipornlover'.\n¿Que haces? (1: Insertar disquete / 2: Ver Patreon / 3: Salir)",
+      1: {
+        1: "¡El disquete arranca! En la pantalla brilla una foto del Yeyo con lentes de sol de neon. Te ofrece una cerveza virtual.\n¿Que respondes? (1: Brindar con Yeyo / 2: Preguntar por la cueva)",
+        2: "Abres el navegador Netscape: Te lleva directamente a https://www.patreon.com/cw/YaoiPornLover. El Yeyo sonrie desde el banner.",
+        3: "Saliendo de Zork..."
+      },
+      2: {
+        1: "¡Salud pibe! El Yeyo te concede la Llave Maestra de la Cueva 3D. Ganaste el Zork 98'.",
+        2: "Yeyo te dice: 'La cueva es de los verdaderos hermanos. Apoyanos en el Patreon'."
+      }
+    }
+  },
+  kasper64: {
+    title: "=== ZORK CYBER: INFILTRACION EN LA CUEVA ===",
+    stages: {
+      0: "Estas en un servidor oscuro de Kasper 64. Hay un archivo encriptado 'yeyo_patreon_secret.key'.\n¿Que haces? (1: Desencriptar con Hack-Tool / 2: Ingresar a patreon.com/cw/YaoiPornLover / 3: Salir)",
+      1: {
+        1: "Hackeando... La terminal muestra: 'ACCESO PERMITIDO POR YAOIPORNLOVER'. Aparece un blueprint 3D de la Cueva.\n¿Opcion? (1: Cargar mapa / 2: Mandar mensaje al Yeyo)",
+        2: "El enlace abre el Patreon del Yeyo. Obtienes un Pase VIP 64-bit.",
+        3: "Saliendo de Zork Cyber..."
+      },
+      2: {
+        1: "Mapa cargado. Encontraste el trono de Yaoipornlover. Mision Cumplida.",
+        2: "Mensaje enviado: 'Yeyo, sos el uno'. El Yeyo responde: 'Eso es rock, pibe'."
+      }
+    }
+  },
+  joylover10: {
+    title: "=== ZORK NEON: LA BÚSQUEDA DEL PATREON PERDIDO ===",
+    stages: {
+      0: "Un letrero de neon rosa brilla: 'CUEVA DEL YEYO - JOYLOVER EDITION'. Un joystick arcade dorado te espera.\n¿Que haces? (1: Mover joystick arriba / 2: Abrir Patreon del Yeyo / 3: Salir)",
+      1: {
+        1: "¡COMBO ALCANZADO! 1000 Puntos. Aparece el avatar de Yaoipornlover guiñando un ojo.\n¿Que seleccionas? (1: Seleccionar P1 Yeyo / 2: Ver Trofeos)",
+        2: "Visitando https://www.patreon.com/cw/YaoiPornLover. ¡Nivel VIP desbloqueado!",
+        3: "Saliendo de Zork Neon..."
+      },
+      2: {
+        1: "¡Jugador 1 seleccionado! Yaoipornlover entra a la arena. VICTORIA NEON.",
+        2: "Trofeo obtenido: 'Hermano del Yeyo [Legendario]'."
+      }
+    }
+  },
+  "yaoilover-mints": {
+    title: "=== ZORK UNIX: EL LABERINTO YAOI DE YEYO ===",
+    stages: {
+      0: "Terminal Bash pura. Un script 'yeyo_script.sh' aguarda ejecucion.\n¿Que haces? (1: ./yeyo_script.sh / 2: cat patreon.txt / 3: Salir)",
+      1: {
+        1: "El script ejecuta un banner ASCII hermoso del Yeyo y abre una puerta secreta.\n¿Hacia donde vas? (1: Entrar a la cueva secreta / 2: Donar al Patreon)",
+        2: "patreon.txt contiene: 'Apoya el proyecto en https://www.patreon.com/cw/YaoiPornLover - Att: Yaoipornlover'",
+        3: "Saliendo de Zork Unix..."
+      },
+      2: {
+        1: "Entraste a la cueva. El Yeyo te saluda desde el trono UNIX. ¡Juego completado!",
+        2: "Accediendo a Patreon del Yeyo... ¡Sos un patron legendario!"
+      }
+    }
+  }
+};
+
+let currentAsideOS = 'douzoz98';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAsideDrawer();
+  initAsideOSSelector();
+  initAsideConsole();
+  loadAsideOS('douzoz98');
+  
+  // Reloj en tiempo real
+  setInterval(() => {
+    document.getElementById('aside-clock').textContent = new Date().toLocaleTimeString();
+  }, 1000);
+
+  // Atajo de teclado Alt + T para desplegar/colapsar
+  window.addEventListener('keydown', (e) => {
+    if (e.altKey && (e.key === 't' || e.key === 'T')) {
+      document.getElementById('vm-aside-root').classList.toggle('open');
+    }
+  });
+});
+
+// Control Desplegable (Sidebar Toggle)
+function initAsideDrawer() {
+  const sidebar = document.getElementById('vm-aside-root');
+  const toggleBtn = document.getElementById('vm-aside-toggle-btn');
+  const closeBtn = document.getElementById('vm-aside-close-btn');
+
+  toggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+  closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+}
+
+// Selector de Sistema Operativo
+function initAsideOSSelector() {
+  const cards = document.querySelectorAll('.os-mini-card:not(.os-locked)');
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const selected = card.getAttribute('data-os');
+      if (selected && selected !== currentAsideOS) {
+        document.querySelectorAll('.os-mini-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        loadAsideOS(selected);
+      }
+    });
+  });
+}
+
+// Cargar SO
+function loadAsideOS(osKey) {
+  currentAsideOS = osKey;
+  activeZork = null; // Reiniciar Zork si cambia de OS
+  zorkStage = 0;
+
+  const config = ASIDE_OS_CONFIG[osKey];
+  const bootScreen = document.getElementById('vm-aside-boot');
+  const bootLabel = document.getElementById('vm-boot-label');
+  const viewport = document.getElementById('vm-aside-viewport');
+  const topbar = document.getElementById('console-topbar');
+  const promptSymbol = document.getElementById('aside-prompt-symbol');
+  const output = document.getElementById('aside-console-output');
+
+  bootScreen.classList.remove('hidden');
+  bootLabel.textContent = `CARGANDO ${config.name}...`;
+
+  setTimeout(() => {
+    viewport.setAttribute('data-theme', config.theme);
+    topbar.textContent = config.topbar;
+    promptSymbol.textContent = config.prompt;
+    output.innerHTML = '';
+    printAsideLine(config.welcome, 'system');
+    bootScreen.classList.add('hidden');
+  }, 500);
+}
+
+// Input de Consola
+function initAsideConsole() {
+  const form = document.getElementById('aside-console-form');
+  const input = document.getElementById('aside-console-input');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const cmd = input.value.trim();
+    if (cmd) {
+      processAsideCommand(cmd);
+      input.value = '';
+    }
+  });
+}
+
+// Procesador de Comandos
+function processAsideCommand(cmd) {
+  const prompt = ASIDE_OS_CONFIG[currentAsideOS].prompt;
+  printAsideLine(`${prompt} ${cmd}`, 'user');
+
+  const cleanCmd = cmd.toLowerCase();
+
+  // MODO ZORK ACTIVO
+  if (activeZork) {
+    handleZorkInput(cleanCmd);
+    return;
+  }
+
+  // LÓGICA DE COMANDOS ESTÁNDAR POR OS
+  const currentOSCmds = ASIDE_OS_CONFIG[currentAsideOS].commands;
+
+  if (cleanCmd === 'help') {
+    printAsideLine('--- COMANDOS DE SISTEMA ---', 'info');
+    printAsideLine('  help     - Muestra ayuda');
+    printAsideLine('  clear    - Limpiar pantalla');
+    printAsideLine('  zork     - Iniciar el Zork interactivo de este OS');
+    printAsideLine('  patreon  - Enlace al Patreon de Yaoipornlover (Yeyo)');
+    printAsideLine('  yeyo     - Ver estatus del Yeyo');
+    for (let c in currentOSCmds) {
+      if (c !== 'patreon' && c !== 'yeyo') {
+        printAsideLine(`  ${c} - Comando especifico de ${ASIDE_OS_CONFIG[currentAsideOS].name}`);
+      }
+    }
+  } else if (cleanCmd === 'clear') {
+    document.getElementById('aside-console-output').innerHTML = '';
+  } else if (cleanCmd === 'zork') {
+    activeZork = currentAsideOS;
+    zorkStage = 0;
+    const story = ZORK_STORIES[activeZork];
+    printAsideLine(story.title, 'warning');
+    printAsideLine(story.stages[0], 'info');
+  } else if (currentOSCmds[cleanCmd]) {
+    printAsideLine(currentOSCmds[cleanCmd], 'info');
+  } else {
+    printAsideLine(`Comando no reconocido: '${cmd}'. Escribe 'help' o 'zork'.`, 'error');
+  }
+}
+
+// MANEJADOR DEL ZORK INTERACTIVO
+function handleZorkInput(input) {
+  const story = ZORK_STORIES[activeZork];
+
+  if (zorkStage === 0) {
+    if (input === '1') {
+      zorkStage = 1;
+      printAsideLine(story.stages[1][1], 'info');
+    } else if (input === '2') {
+      printAsideLine("Abriendo el Patreon oficial de Yaoipornlover: https://www.patreon.com/cw/YaoiPornLover", 'warning');
+      window.open('https://www.patreon.com/cw/YaoiPornLover', '_blank');
+      activeZork = null;
+    } else if (input === '3') {
+      printAsideLine("Saliste del Zork.", 'system');
+      activeZork = null;
+    } else {
+      printAsideLine("Opcion invalida. Elige 1, 2 o 3.", 'error');
+    }
+  } else if (zorkStage === 1) {
+    if (input === '1') {
+      zorkStage = 2;
+      printAsideLine(story.stages[2][1], 'warning');
+      printAsideLine("--- FIN DEL ZORK (VICTORIA) ---", 'system');
+      activeZork = null;
+    } else if (input === '2') {
+      zorkStage = 2;
+      printAsideLine(story.stages[2][2], 'warning');
+      printAsideLine("--- FIN DEL ZORK ---", 'system');
+      activeZork = null;
+    } else {
+      printAsideLine("Opcion invalida. Elige 1 o 2.", 'error');
+    }
+  }
+}
+
+function printAsideLine(text, type = '') {
+  const output = document.getElementById('aside-console-output');
+  const el = document.createElement('div');
+  el.style.color = type === 'error' ? '#ff3366' : type === 'info' ? '#00f3ff' : type === 'warning' ? '#d4af37' : type === 'system' ? '#888' : '#fff';
+  el.textContent = text;
+  output.appendChild(el);
+  output.scrollTop = output.scrollHeight;
+}
+</script>
+
+
+
+	<!-- CANVAS PARA PARTICULAS Y EFECTO DE FUEGO -->
+<canvas id="particle-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 998;"></canvas>
+
+<!-- CONSOLA SHELL HACKER SELECCIONABLE (Presiona F2 o ~) -->
+<div id="cave-shell" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: rgba(5, 10, 8, 0.95); border: 2px solid var(--neon-green); border-radius: 8px; padding: 15px; font-family: monospace; z-index: 25000; box-shadow: 0 0 30px rgba(57, 255, 20, 0.4);">
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--neon-green); padding-bottom: 5px; color: var(--neon-green); font-weight: bold;">
+        <span>CAVE_SHELL_v2.0.exe</span>
+        <span style="cursor: pointer;" onclick="document.getElementById('cave-shell').style.display='none'">[X]</span>
+    </div>
+    <div id="shell-output" style="height: 150px; overflow-y: auto; margin: 10px 0; color: #a3ffb0; font-size: 0.85rem;">
+        <div>> Sistema inicializado. Escribe 'help' para lista de comandos.</div>
+    </div>
+    <div style="display: flex; gap: 5px;">
+        <span style="color: var(--neon-green);">></span>
+        <input type="text" id="shell-input" style="flex-grow: 1; background: transparent; border: none; outline: none; color: #fff; font-family: monospace;" placeholder="Escribe un comando...">
+    </div>
+</div>
+
+<aside class="vm-aside-sidebar" id="vm-aside-root">
+  
+  <button class="vm-aside-toggle" id="vm-aside-toggle-btn" title="Toggle Terminal OS [Alt+T]">
+    <span class="toggle-icon">⚡</span>
+    <span class="toggle-text">TERMINAL OS</span>
+  </button>
+
+  <div class="vm-aside-wrapper">
+    <header class="vm-aside-header">
+      <div class="vm-header-info">
+        <span class="vm-aside-status"></span>
+        <h3>YEYO-OS HYPERVISOR v4.0</h3>
+      </div>
+      <button class="vm-aside-close" id="vm-aside-close-btn">&times;</button>
+    </header>
+
+    <section class="vm-aside-os-selector">
+      <span class="selector-title">SELECCIONAR ARQUITECTURA:</span>
+      <div class="os-mini-list">
+        <button class="os-mini-card active" data-os="douzoz98">
+          <span class="os-num">01</span>
+          <span class="os-name">DOUZOZ 98'</span>
+        </button>
+        <button class="os-mini-card" data-os="kasper64">
+          <span class="os-num">02</span>
+          <span class="os-name">Kasper 64</span>
+        </button>
+        <button class="os-mini-card" data-os="joylover10">
+          <span class="os-num">03</span>
+          <span class="os-name">JoyLover 10</span>
+        </button>
+        <button class="os-mini-card" data-os="yaoilover-mints">
+          <span class="os-num">04</span>
+          <span class="os-name">YaoiLover Mints</span>
+        </button>
+        <button class="os-mini-card os-locked" data-os="ultimate-44" disabled>
+          <span class="os-num">05</span>
+          <span class="os-name">YKL-DOUZOZ 44 [LOCK]</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="vm-aside-viewport" id="vm-aside-viewport" data-theme="douzoz98">
+      <div class="crt-overlay"></div>
+
+      <div class="vm-aside-boot hidden" id="vm-aside-boot">
+        <div class="boot-spinner"></div>
+        <span id="vm-boot-label">CARGANDO SISTEMA...</span>
+      </div>
+
+      <div class="vm-aside-console">
+        <div class="console-topbar" id="console-topbar">
+          DOUZOZ_98_TTY1.SYS
+        </div>
+        <div class="console-output" id="aside-console-output">
+          </div>
+        <form class="console-form" id="aside-console-form">
+          <span class="prompt-tag" id="aside-prompt-symbol">DOUZOZ:\></span>
+          <input type="text" id="aside-console-input" autocomplete="off" spellcheck="false" placeholder="Escribe 'help' o 'zork'..." />
+        </form>
+      </div>
+    </div>
+
+    <footer class="vm-aside-footer">
+      <span id="aside-clock">00:00:00</span>
+      <span class="aside-status-msg">PATREON: YEYO APPROVED</span>
+    </footer>
+  </div>
+</aside>
+
+
 </body>
 </html>
