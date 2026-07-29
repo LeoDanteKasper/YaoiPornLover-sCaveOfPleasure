@@ -1,0 +1,3448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZORK - Linux Terminal Edition [NSFW]</title>
+    <style>
+        :root {
+            --bg-color: #0c0d10;
+            --term-bg: rgba(15, 17, 23, 0.98);
+            --border-color: #2e3440;
+            --text-main: #d8dee9;
+            --text-muted: #616e88;
+            --gold: #e5c07b;
+            --cyan: #56b6c2;
+            --green: #98c379;
+            --red: #e06c75;
+            --purple: #c678dd;
+            --blue: #61afef;
+            --orange: #d19a66;
+            --pink: #ff6b9d;
+            --hot-pink: #ff2d7e;
+            --font-stack: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Source Code Pro', 'Courier New', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20, 24, 33, 0.8) 0%, rgba(10, 11, 14, 1) 100%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .terminal-window {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            background: var(--term-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(97, 175, 239, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .terminal-header {
+            background: #1e222a;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #282c34;
+            user-select: none;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .btn-close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .btn-minimize { background-color: #ffbd2e; border: 1px solid #fea028; }
+        .btn-maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        .window-title {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-badge {
+            background: #21252b;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #282c34;
+        }
+
+        .stat-badge span {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .map-hud-container {
+            background: #0f1117;
+            border-bottom: 1px solid #282c34;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .map-hud-title {
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #3b4252 #0f1117;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-body::-webkit-scrollbar-track {
+            background: #0f1117;
+        }
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #3b4252;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            line-height: 1.6;
+            font-size: 0.95rem;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cmd-echo {
+            color: var(--blue);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .room-title {
+            color: var(--gold);
+            font-size: 1.15rem;
+            font-weight: bold;
+            border-bottom: 1px dashed var(--gold);
+            padding-bottom: 4px;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .npc-name {
+            color: var(--purple);
+            font-weight: bold;
+        }
+
+        .item-name {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .highlight {
+            color: var(--cyan);
+        }
+
+        .warning {
+            color: var(--red);
+        }
+
+        .system-msg {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .speech-bubble {
+            background: rgba(198, 120, 221, 0.08);
+            border-left: 3px solid var(--purple);
+            padding: 8px 12px;
+            margin: 6px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .system-toast {
+            color: var(--cyan);
+            font-size: 0.85rem;
+            border-left: 3px solid var(--cyan);
+            padding-left: 8px;
+            margin: 4px 0;
+        }
+
+        .autocomplete-hint {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .input-line {
+            padding: 12px 20px;
+            background: #161821;
+            border-top: 1px solid #21252b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prompt {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .prompt .user { color: var(--green); }
+        .prompt .at { color: var(--text-muted); }
+        .prompt .host { color: var(--blue); }
+        .prompt .path { color: var(--gold); }
+        .prompt .symbol { color: var(--purple); }
+
+        .cmd-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            font-size: 0.95rem;
+        }
+
+        .quick-bar {
+            padding: 8px 20px;
+            background: #111319;
+            border-top: 1px solid #1e222a;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .btn-action {
+            background: #21252b;
+            border: 1px solid #2c313a;
+            color: var(--text-main);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-family: var(--font-stack);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #2c313a;
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .btn-nsfw {
+            background: #2b1520;
+            border: 1px solid var(--hot-pink);
+            color: var(--pink);
+        }
+
+        .btn-nsfw:hover {
+            background: var(--hot-pink);
+            border-color: var(--hot-pink);
+            color: white;
+        }
+
+        table.cmd-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+        }
+
+        table.cmd-table th, table.cmd-table td {
+            border: 1px solid #282c34;
+            padding: 6px 10px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        table.cmd-table th {
+            background: #21252b;
+            color: var(--gold);
+        }
+		
+        .tag-container {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 4px 0;
+            vertical-align: middle;
+        }
+
+        .tag-chip {
+            font-size: 0.70rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            display: inline-block;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+            line-height: 1 !important;
+        }
+
+        .tag-chip.tag-heroico,
+        .tag-chip.tag-protector,
+        .tag-chip.tag-justiciero,
+        .tag-chip.tag-noble,
+        .tag-chip.tag-lider {
+            color: #00dfff !important;
+            background-color: #051e2b !important;
+            border: 1px solid #00dfff !important;
+            text-shadow: 0 0 5px rgba(0, 223, 255, 0.6);
+        }
+
+        .tag-chip.tag-edgy,
+        .tag-chip.tag-solitario,
+        .tag-chip.tag-antiheroe,
+        .tag-chip.tag-rebelde {
+            color: #d670ff !important;
+            background-color: #21092b !important;
+            border: 1px solid #d670ff !important;
+            text-shadow: 0 0 5px rgba(214, 112, 255, 0.6);
+        }
+
+        .tag-chip.tag-caotico,
+        .tag-chip.tag-agresivo,
+        .tag-chip.tag-maniaco,
+        .tag-chip.tag-enemigo,
+        .tag-chip.tag-impulsivo {
+            color: #ff4d4d !important;
+            background-color: #2b0909 !important;
+            border: 1px solid #ff4d4d !important;
+            text-shadow: 0 0 5px rgba(255, 77, 77, 0.6);
+        }
+
+        .tag-chip.tag-alegre,
+        .tag-chip.tag-hiperactivo,
+        .tag-chip.tag-comico,
+        .tag-chip.tag-amigable,
+        .tag-chip.tag-travieso {
+            color: #50fa7b !important;
+            background-color: #0a2612 !important;
+            border: 1px solid #50fa7b !important;
+            text-shadow: 0 0 5px rgba(80, 250, 123, 0.6);
+        }
+
+        .tag-chip.tag-sabio_serio,
+        .tag-chip.tag-analitico,
+        .tag-chip.tag-estratega,
+        .tag-chip.tag-divino,
+        .tag-chip.tag-serio {
+            color: #8be9fd !important;
+            background-color: #0a232a !important;
+            border: 1px solid #8be9fd !important;
+            text-shadow: 0 0 5px rgba(139, 233, 253, 0.6);
+        }
+
+        .tag-chip.tag-elegante,
+        .tag-chip.tag-misterioso,
+        .tag-chip.tag-dramatico,
+        .tag-chip.tag-orgulloso,
+        .tag-chip.tag-carismatico {
+            color: #ffb86c !important;
+            background-color: #2b1f09 !important;
+            border: 1px solid #ffb86c !important;
+            text-shadow: 0 0 5px rgba(255, 184, 108, 0.6);
+        }
+
+        .tag-chip.tag-default {
+            color: #f1fa8c !important;
+            background-color: #232519 !important;
+            border: 1px solid #f1fa8c !important;
+        }
+
+        .nsfw-scene {
+            border: 2px solid var(--hot-pink);
+            background: rgba(255, 45, 126, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .nsfw-title {
+            color: var(--hot-pink);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .event-banner {
+            background: linear-gradient(90deg, rgba(255,45,126,0.3), rgba(198,120,221,0.3));
+            border: 2px solid var(--purple);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .event-title {
+            color: var(--gold);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .mood-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .mood-normal { background: #2c313a; color: var(--text-main); }
+        .mood-aroused { background: #2b1520; color: var(--pink); }
+        .mood-submissive { background: #1a0a2e; color: var(--purple); }
+        .mood-dominant { background: #2a1a0a; color: var(--orange); }
+        .mood-mindbroken { background: #1a1a1a; color: #ff0000; }
+        .mood-irritated { background: #2b0909; color: var(--red); }
+
+        .dialogue-tree {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--cyan);
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .dialogue-option {
+            color: var(--cyan);
+            cursor: pointer;
+            padding: 4px 0;
+            transition: color 0.2s;
+        }
+
+        .dialogue-option:hover {
+            color: var(--gold);
+        }
+
+        .ascii-art {
+            font-family: monospace;
+            white-space: pre;
+            color: var(--pink);
+            text-align: center;
+            margin: 10px 0;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <div class="window-controls">
+                <span class="control-btn btn-close"></span>
+                <span class="control-btn btn-minimize"></span>
+                <span class="control-btn btn-maximize"></span>
+            </div>
+            <div class="window-title">
+                <span>⚡</span> zork@multiverse-nexus: ~/palace_of_desires (bash) [+18]
+            </div>
+            <div class="system-stats">
+                <div class="stat-badge">AFECTO GLOBAL: <span id="stat-afecto">0%</span></div>
+                <div class="stat-badge">TURNOS: <span id="stat-turnos">0</span></div>
+                <div class="stat-badge">EVENTOS: <span id="stat-eventos">0</span></div>
+            </div>
+        </div>
+
+        <div class="map-hud-container">
+            <div class="map-hud-title">📡 RADAR MULTIVERSAL EN TIEMPO REAL</div>
+            <canvas id="map-canvas" width="280" height="90" style="background: #08090c; border: 1px solid #3b4252; border-radius: 4px;"></canvas>
+        </div>
+
+        <div class="terminal-body" id="terminal-body"></div>
+
+        <div class="input-line">
+            <div class="prompt">
+                <span class="user">player</span><span class="at">@</span><span class="host">zork-palace</span>:<span class="path">~/nexus</span><span class="symbol">$</span>
+            </div>
+            <input type="text" id="cmd-input" class="cmd-input" placeholder="Escribe un comando o presiona TAB para autocompletar..." autofocus autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="quick-bar">
+            <button class="btn-action" onclick="execQuick('mirar')">👁️ mirar</button>
+            <button class="btn-action" onclick="execQuickSims()">💎 info sims</button>
+            <button class="btn-action" onclick="execQuick('lugares_cita')">🌹 citas</button>
+            <button class="btn-action" onclick="execQuick('cosas')">🎒 inventario</button>
+            <button class="btn-action" onclick="execQuick('interacciones')">💬 social</button>
+            <button class="btn-action btn-nsfw" onclick="execQuick('interacciones_picantes')">🔥 NSFW</button>
+            <button class="btn-action btn-nsfw" onclick="execQuick('eventos_especiales')">✨ eventos</button>
+            <button class="btn-action" onclick="execQuick('ir norte')">⬆️ norte</button>
+            <button class="btn-action" onclick="execQuick('ir sur')">⬇️ sur</button>
+            <button class="btn-action" onclick="execQuick('ir este')">➡️ este</button>
+            <button class="btn-action" onclick="execQuick('ir oeste')">⬅️ oeste</button>
+            <button class="btn-action" onclick="execQuick('savegame slot1')">💾 guardar</button>
+            <button class="btn-action" onclick="execQuick('loadgame slot1')">📂 cargar</button>
+            <button class="btn-action" onclick="execQuick('ayuda')">❓ ayuda</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== AUDIO ENGINE ====================
+        class ChiptuneAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playTone(freq, type = 'square', duration = 0.08, vol = 0.08) {
+                if (!this.enabled) return;
+                this.init();
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            }
+
+            playKeyPress() {
+                const freqs = [380, 410, 440, 470];
+                const randomFreq = freqs[Math.floor(Math.random() * freqs.length)];
+                this.playTone(randomFreq, 'triangle', 0.02, 0.02);
+            }
+
+            playCmdSuccess() {
+                this.playTone(523.25, 'square', 0.05, 0.04);
+                setTimeout(() => this.playTone(659.25, 'square', 0.06, 0.04), 50);
+            }
+
+            playAffectionUp() {
+                this.playTone(523.25, 'sine', 0.08, 0.06);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.08, 0.06), 70);
+                setTimeout(() => this.playTone(783.99, 'sine', 0.08, 0.06), 140);
+                setTimeout(() => this.playTone(1046.50, 'sine', 0.12, 0.08), 210);
+            }
+
+            playCombatHit() {
+                this.playTone(150, 'sawtooth', 0.1, 0.08);
+                setTimeout(() => this.playTone(80, 'sawtooth', 0.15, 0.1), 50);
+            }
+
+            playNSFW() {
+                this.playTone(220, 'sine', 0.15, 0.1);
+                setTimeout(() => this.playTone(261.63, 'sine', 0.2, 0.12), 100);
+                setTimeout(() => this.playTone(329.63, 'sine', 0.25, 0.15), 250);
+            }
+
+            playEvent() {
+                this.playTone(440, 'square', 0.1, 0.08);
+                setTimeout(() => this.playTone(554.37, 'square', 0.1, 0.08), 100);
+                setTimeout(() => this.playTone(659.25, 'square', 0.15, 0.1), 200);
+                setTimeout(() => this.playTone(880, 'square', 0.3, 0.12), 350);
+            }
+        }
+
+        const sfx = new ChiptuneAudioEngine();
+
+        // ==================== DATABASES ====================
+        const itemsDB = {
+            esmeralda: { name: "Esmeralda del Caos", desc: "Una joya mística que irradia energía ilimitada.", giveEffect: { sonic: 35, shadow: 40 } },
+            pizzatactica: { name: "Pizza Táctica de Jamón", desc: "Una pizza caliente en caja metálica reforzada.", giveEffect: { doomentio: 30, blitzo: 25, beast_boy: 20 } },
+            hotdog: { name: "Chili Dog Supremo", desc: "El aperitivo definitivo lleno de condimento.", giveEffect: { sonic: 45, bart_allen: 35 } },
+            manga: { name: "Manga Shonen Edición Limitada", desc: "Un tomo de colección impecable.", giveEffect: { senpai: 35, mukai: 25, midoriya_izuku: 30 } },
+            cafe: { name: "Café Negro de Grano Supremo", desc: "Amargo, oscuro y de aroma impecable.", giveEffect: { shadow: 30, batman: 30, thomas_wayne: 35, chris_redfield: 25 } },
+            batarang: { name: "Batarang de Aleación", desc: "Un bumerán táctico de alta precisión.", giveEffect: { batman: 40, superman: 15, dick_grayson: 35, tim_drake: 35, damian_wayne: 30 } },
+            bateriacronos: { name: "Batería de Materia Oscura", desc: "Un núcleo energético de tecnología superior.", giveEffect: { cloud: 30, grant: 25, blue_beetle: 35 } },
+            bateriacristal: { name: "Cristal Aku Aku", desc: "Un cristal que emite una vibración antigua y protectora.", giveEffect: { crash: 50 } },
+            pepsi: { name: "Pepsi Fría Edición Retro", desc: "Una lata helada con el logo clásico de Pepsi.", giveEffect: { pepsiman: 60, zazz: 20, bart_allen: 25 } },
+            rosas: { name: "Ramillete de Rosas Negras", desc: "Rosas de tallo largo con elegancia gótica.", giveEffect: { stolas: 40, alastor: 25, kaito: 25 } },
+            pato: { name: "Patito de Goma con Sombrero", desc: "Un pato de baño amarillo con un elegante sombrero de copa.", giveEffect: { lucifer: 60 } },
+            contrato: { name: "Contrato de Almas Elegante", desc: "Un pergamino de vástago dorado listo para firmar.", giveEffect: { alastor: 40, blitzo: 20 } },
+            hueso: { name: "Hueso Ancestral Tallado", desc: "Una reliquia mística para seres caninos.", giveEffect: { jontalbain: 45, beast_boy: 30 } },
+            espadabuster: { name: "Buster Sword en Miniatura", desc: "Un amuleto con forma de la mítica espada pesada.", giveEffect: { cloud: 40, trunks_futuro: 30, shirou_emiya: 25 } },
+            berenjena: { name: "Berenjena Dorada Brillante", desc: "Un vegetal extravagante de tono púrpura radiante.", giveEffect: { waluigi: 50 } },
+            armapositron: { name: "Pistola Táctica de Hellhound", desc: "Armamento personalizado con grabados demoníacos.", giveEffect: { blitzo: 45, red_hood: 30 } },
+            hierba_verde: { name: "Hierba Verde Táctica", desc: "Una planta medicinal de primeros auxilios.", giveEffect: { leon_kennedy_re2: 45, leon_kennedy_re4: 45, chris_redfield: 50 } },
+            semilla_del_hermitano: { name: "Semilla del Ermitaño", desc: "Una mística semilla verde capaz de curar heridas.", giveEffect: { gohan_adulto: 40, gohan_nino: 45, trunks_futuro: 35, trunks_nino: 30 } },
+            ramen_naruto: { name: "Tazón de Ramen Ichiraku", desc: "Ramen humeante servido en tazón cerámico tradicional.", giveEffect: { naruto_uzumaki: 60, natsu_dragneel: 30 } },
+            escarabajo_alienigena: { name: "Núcleo del Escarabajo Khaji Da", desc: "Artefacto biotecnológico azul que emite energía alienígena.", giveEffect: { blue_beetle: 60 } },
+            chamarra_cuero: { name: "Chamarra de Cuero Negra", desc: "Chaqueta táctica de cuero resistente.", giveEffect: { conner_kent: 45, leon_kennedy_re4: 30 } },
+            barra_energia: { name: "Barra Energética Hipercinética", desc: "Snack de calorías concentradas.", giveEffect: { bart_allen: 50, sonic: 25 } },
+            tofu_vegano: { name: "Tofu Marinado para Héroes", desc: "Comida 100% vegetariana y saludable.", giveEffect: { beast_boy: 50 } },
+            pluma_arco: { name: "Pluma Sagrada de Palutena", desc: "Una pluma de un blanco impoluto cargada de bendiciones.", giveEffect: { pit_kid_icarus: 50, dark_pit: 30, kaio_shin: 25 } },
+            llave_espada_replica: { name: "Llavero del Corazón de la Luz", desc: "Accesorio que reacciona con la fuerza del corazón.", giveEffect: { sora: 50, kirito_kazuto: 20 } },
+            escudo_hyliano: { name: "Emblema del Escudo Hyliano", desc: "Blasón con el grabado de la Fuerza Dorada.", giveEffect: { link_zelda: 55, pit_kid_icarus: 20 } },
+            lubricante: { name: "Lubricante Premium Multiverso", desc: "Botella de gel íntimo de alta calidad.", giveEffect: { default: 25 } },
+            esposas: { name: "Esposas de Cuero Acolchadas", desc: "Restricciones elegantes para juegos de poder.", giveEffect: { default: 30 } },
+            látigo: { name: "Látigo de Cuero Negro", desc: "Herramienta de disciplina con mango ergonómico.", giveEffect: { default: 35 } },
+            plug: { name: "Plug Anal de Silicona", desc: "Juguete íntimo de silicona suave y segura.", giveEffect: { default: 40 } },
+            vibrador: { name: "Vibrador Cósmico", desc: "Dispositivo de placer con múltiples velocidades.", giveEffect: { default: 45 } },
+            collar: { name: "Collar de Sumisión", desc: "Accesorio de cuero con argolla.", giveEffect: { default: 50 } },
+            mascara: { name: "Máscara de Cuero", desc: "Antifaz para anonimato y misterio.", giveEffect: { default: 20 } },
+            aceite: { name: "Aceite para Masajes Eróticos", desc: "Aceite caliente con aroma a vainilla.", giveEffect: { default: 35 } }
+        };
+
+        // ==================== EXTENDED NPC DATABASE WITH 30 DIALOGUES EACH ====================
+        const rawNpcsDB = {
+            kaito: { 
+                name: "Kaito", 
+                desc: "Un muchacho misterioso con ropa informal y una mirada observadora.", 
+                dialogue: "Hola. Si estás buscando respuestas sobre cómo funciona este lugar, estás en el camino correcto.", 
+                room: "salon_central", 
+                tags: ["sabio_serio", "misterioso", "observador"], 
+                favoritePlace: "mirador_estrellas",
+                dialogues: {
+                    normal: [
+                        "Las estrellas se alinean de formas interesantes esta noche...",
+                        "He visto muchos viajeros pasar por aquí, pero pocos tan intrigantes como tú.",
+                        "Este lugar existe entre las grietas de la realidad.",
+                        "A veces me pregunto si alguno de nosotros es real.",
+                        "¿Tú también sientes que este lugar te llama?",
+                        "He estado observando los patrones de los portales.",
+                        "Hay más en este nexus de lo que aparenta.",
+                        "Cada persona aquí tiene un secreto.",
+                        "Me gusta sentarme aquí y contemplar el caos ordenado.",
+                        "¿Has notado cómo el tiempo fluye diferente aquí?",
+                        "Algunos dicen que este lugar concede deseos.",
+                        "Yo prefiero simplemente... existir.",
+                        "Hay belleza en la incertidumbre.",
+                        "¿Qué te trae a este rincón del multiverso?",
+                        "He visto civilizaciones enteras nacer y morir.",
+                        "Tu aura es... diferente. Única.",
+                        "Los secretos son moneda corriente aquí.",
+                        "Me pregunto qué historias traes contigo.",
+                        "A veces el silencio dice más que las palabras.",
+                        "Este lugar es un refugio para los perdidos.",
+                        "¿Crees en el destino, o en el azar?",
+                        "Yo he aprendido a no hacer preguntas innecesarias.",
+                        "Hay poder en la observación pasiva.",
+                        "Cada rostro aquí cuenta una historia.",
+                        "El conocimiento es peligroso en las manos equivocadas.",
+                        "Me mantengo al margen, usualmente.",
+                        "Pero contigo... siento curiosidad.",
+                        "Eso es raro para mí.",
+                        "Quizás deberíamos conocernos mejor.",
+                        "Si eso es lo que deseas, claro."
+                    ],
+                    aroused: [
+                        "Tu presencia... hace que mi pulso se acelere.",
+                        "¿Notas cómo el aire cambia cuando estamos cerca?",
+                        "Me has estado observando, ¿verdad?",
+                        "Yo también he estado observándote.",
+                        "Hay algo en ti que despierta... curiosidades.",
+                        "Mis manos tiemblan un poco. No sé por qué.",
+                        "¿Te importaría si me acerco más?",
+                        "Tu aroma es... intoxicante.",
+                        "Siento calor en lugares inesperados.",
+                        "¿Has sentido esto antes? Esta... tensión?",
+                        "Me gusta cuando me miras así.",
+                        "¿Somos tan diferentes tú y yo?",
+                        "Quizás deberíamos averiguarlo.",
+                        "Juntos.",
+                        "En privado.",
+                        "Si te atreves.",
+                        "Yo me atrevo.",
+                        "Contigo, me atrevo a todo.",
+                        "Dime que sientes lo mismo.",
+                        "Dime que no estoy solo en esto."
+                    ],
+                    submissive: [
+                        "Estoy... a tu merced.",
+                        "Haré lo que me pidas.",
+                        "Solo dime qué necesitas.",
+                        "Soy tuyo completamente.",
+                        "No tengo voluntad propia ante ti.",
+                        "Tu deseo es mi comando.",
+                        "Me siento tan pequeño... y eso me gusta.",
+                        "Domíname. Por favor.",
+                        "Necesito que me controles.",
+                        "Sin ti, soy nada.",
+                        "Soy tu posesión.",
+                        "Usame como quieras.",
+                        "No hay límites para ti.",
+                        "Estoy rendido.",
+                        "Roto para ti.",
+                        "Y me encanta.",
+                        "Cada momento sumiso.",
+                        "Cada orden obedecida.",
+                        "Me hace sentir vivo.",
+                        "Gracias por hacerme tuyo."
+                    ],
+                    dominant: [
+                        "Ven aquí. Ahora.",
+                        "Sabes que quieres obedecerme.",
+                        "Eres mío y lo sabes.",
+                        "No toleraré desobediencia.",
+                        "Arrodíllate ante mí.",
+                        "Mírame cuando te hablo.",
+                        "Vas a hacer exactamente lo que digo.",
+                        "Y te va a gustar.",
+                        "Te voy a marcar como mío.",
+                        "Para que todos sepan.",
+                        "Eres mi posesión favorita.",
+                        "Tan obediente... tan perfecto.",
+                        "Buen chico.",
+                        "Eso es, déjate llevar.",
+                        "Confía en mí.",
+                        "Entrégame todo.",
+                        "Tu cuerpo, tu mente, tu alma.",
+                        "Yo cuidaré de todo.",
+                        "Solo relájate.",
+                        "Y deja que te use."
+                    ],
+                    mindbroken: [
+                        "...",
+                        "¿Dónde...?",
+                        "Ah... sí...",
+                        "Más...",
+                        "Por favor...",
+                        "No puedo... pensar...",
+                        "Solo... siento...",
+                        "Necesito...",
+                        "Ay...",
+                        "Jadeo...",
+                        "Temblando...",
+                        "Para ti...",
+                        "Siempre...",
+                        "Tuyo...",
+                        "Completamente...",
+                        "Roto...",
+                        "Y feliz...",
+                        "Así...",
+                        "Para siempre...",
+                        "Sí..."
+                    ],
+                    irritated: [
+                        "No estoy de humor.",
+                        "Déjame en paz.",
+                        "¿Qué quieres ahora?",
+                        "Estoy ocupado.",
+                        "Vete.",
+                        "No me interesa.",
+                        "¿No ves que estoy pensando?",
+                        "Inoportuno.",
+                        "Molesto.",
+                        "Preséntate bien o lárgate.",
+                        "No tengo tiempo para esto.",
+                        "Eres insistente.",
+                        "Eso no es un cumplido.",
+                        "Me estás probando la paciencia.",
+                        "Y eso no es bueno para ti.",
+                        "Última advertencia.",
+                        "Aléjate.",
+                        "Ahora.",
+                        "O te arrepentirás.",
+                        "Decisión tuya."
+                    ],
+                    husband: [
+                        "Buenos días, amor.",
+                        "¿Dormiste bien a mi lado?",
+                        "Te preparé el desayuno.",
+                        "¿Cómo está mi esposo hoy?",
+                        "Extrañé tu calor esta mañana.",
+                        "Ven aquí, dame un beso.",
+                        "Eres lo mejor que me pasó.",
+                        "En este multiverso o cualquier otro.",
+                        "Mi compañero.",
+                        "Mi familia.",
+                        "Mi todo.",
+                        "¿Sabes cuánto te amo?",
+                        "Más cada día.",
+                        "Cada momento juntos.",
+                        "Es un regalo.",
+                        "Gracias por elegirme.",
+                        "Yo te elijo todos los días.",
+                        "Para siempre.",
+                        "Hasta que las estrellas se apaguen.",
+                        "Y más allá."
+                    ]
+                }
+            },
+            doomentio: { 
+                name: "Doomentio", 
+                desc: "Un tipo de aspecto demacrado y postura rígida, dando discursos hiperanalíticos.", 
+                dialogue: "El verdadero arte requiere rigor absoluto. La mediocridad rodea este nexo multiversal.", 
+                room: "salon_central", 
+                tags: ["serio", "critico", "egocentrico"], 
+                favoritePlace: "biblioteca_misteriosa",
+                dialogues: {
+                    normal: [
+                        "Tu presencia interrumpe mi análisis.",
+                        "¿Qué quieres? Estoy ocupado.",
+                        "Este lugar es un desastre conceptual.",
+                        "Nadie aprecia el verdadero arte.",
+                        "La gente es tan... básica.",
+                        "Tú pareces diferente. Quizás.",
+                        "O quizás no. Veremos.",
+                        "Estoy escribiendo una tesis sobre este nexus.",
+                        "Es frustrante la falta de rigor académico.",
+                        "¿Tú al menos lees?",
+                        "No me importa tu respuesta.",
+                        "Bueno, quizás un poco.",
+                        "Dime algo interesante.",
+                        "Algo que no sea banal.",
+                        "Sorpréndeme.",
+                        "Aunque dudo que puedas.",
+                        "Pero intentémoslo.",
+                        "Solo una vez.",
+                        "Por curiosidad intelectual.",
+                        "Nada más."
+                    ],
+                    aroused: [
+                        "Tu... intelecto me excita.",
+                        "Eso es nuevo para mí.",
+                        "No suelo sentir... esto.",
+                        "Pero contigo...",
+                        "Es diferente.",
+                        "¿Analizamos juntos la situación?",
+                        "Científicamente hablando.",
+                        "Hay química entre nosotros.",
+                        "Datos empíricos.",
+                        "Mi pulso acelerado lo confirma.",
+                        "¿Hacemos un experimento?",
+                        "Tú y yo.",
+                        "Ver qué pasa.",
+                        "Por la ciencia.",
+                        "Claro.",
+                        "Por la ciencia.",
+                        "Nada más.",
+                        "¿O sí?",
+                        "Descubrámoslo.",
+                        "Juntos."
+                    ],
+                    submissive: [
+                        "Tienes... razón.",
+                        "Siempre la tienes.",
+                        "Yo solo... analizo.",
+                        "Tú actúas.",
+                        "Es mejor así.",
+                        "Tú mandas.",
+                        "Yo obedezco.",
+                        "Es más eficiente.",
+                        "Más... excitante.",
+                        "Dime qué hacer.",
+                        "Lo haré perfectamente.",
+                        "Para complacerte.",
+                        "Eso es lo único que importa.",
+                        "Tu satisfacción.",
+                        "Mi métrica de éxito.",
+                        "Dime que lo hago bien.",
+                        "Por favor.",
+                        "Necesito tu aprobación.",
+                        "La necesito.",
+                        "Te necesito."
+                    ],
+                    dominant: [
+                        "Silencio. Piensa antes de hablar.",
+                        "Tu análisis es deficiente.",
+                        "Voy a enseñarte correctamente.",
+                        "Por las buenas o por las malas.",
+                        "Prefiero que sea por las buenas.",
+                        "Pero tú decides.",
+                        "Desobedece y verás.",
+                        "Obedece y serás recompensado.",
+                        "Simple.",
+                        "Elegante.",
+                        "Como debe ser.",
+                        "Ahora, ven aquí.",
+                        "Vamos a empezar la lección.",
+                        "Y no va a ser breve.",
+                        "Ni suave.",
+                        "Vas a aprender.",
+                        "Aunque tenga que repetirlo.",
+                        "Una y otra vez.",
+                        "Hasta que lo entiendas.",
+                        "Completamente."
+                    ],
+                    mindbroken: [
+                        "Error...",
+                        "Sistema... sobrecargado...",
+                        "Demasiados... datos...",
+                        "Ah...",
+                        "Borra... todo...",
+                        "Solo... tú...",
+                        "Solo... esto...",
+                        "Infinito...",
+                        "Bucle...",
+                        "No... salir...",
+                        "No... querer... salir...",
+                        "Quedarse...",
+                        "Contigo...",
+                        "Siempre...",
+                        "Bucle... perfecto...",
+                        "Error... hermoso...",
+                        "Crash... suave...",
+                        "Reinicio...",
+                        "En... ti...",
+                        "Sí..."
+                    ],
+                    irritated: [
+                        "Inaceptable.",
+                        "Vuelve cuando tengas algo de valor.",
+                        "Estoy perdiendo el tiempo contigo.",
+                        "Y eso es imperdonable.",
+                        "Mi tiempo es precioso.",
+                        "Tú no.",
+                        "Al menos no todavía.",
+                        "Mejora.",
+                        "O lárgate.",
+                        "No hay tercera opción.",
+                        "Decide.",
+                        "Ahora.",
+                        "No me hagas repetirlo.",
+                        "Porque lo haré.",
+                        "Y no será bonito.",
+                        "Última oportunidad.",
+                        "Úsala bien.",
+                        "O no la uses.",
+                        "Me da igual.",
+                        "Realmente."
+                    ],
+                    husband: [
+                        "Hola, esposo.",
+                        "¿Revisaste mi último borrador?",
+                        "Valoras mi opinión. Eso me gusta.",
+                        "Nos complementamos intelectualmente.",
+                        "Y físicamente.",
+                        "¿Una discusión acalorada?",
+                        "Después podemos... reconciliarnos.",
+                        "Como siempre hacemos.",
+                        "Mi compañero de vida.",
+                        "Y de cama.",
+                        "Equilibrados.",
+                        "Perfectamente.",
+                        "¿Sabes qué más es perfecto?",
+                        "Tú.",
+                        "Conmigo.",
+                        "Siempre.",
+                        "Esto es... correcto.",
+                        "Lógico.",
+                        "Y hermoso.",
+                        "Te amo. Analíticamente hablando."
+                    ]
+                }
+            },
+            batman: { 
+                name: "Batman (Bruce Wayne)", 
+                desc: "El Caballero de la Noche. Envuelto en su capa negra, observa minuciosamente desde las sombras.", 
+                dialogue: "Mantén los ojos abiertos. En este lugar la tranquilidad es solo una ilusión.", 
+                room: "universo_dc", 
+                tags: ["edgy", "serio", "estratega", "heroico"], 
+                favoritePlace: "azotea_gothica",
+                dialogues: {
+                    normal: [
+                        "Este lugar es peligroso.",
+                        "Mantente alerta.",
+                        "He visto cosas... en las sombras.",
+                        "Nunca bajes la guardia.",
+                        "¿Qué quieres? Estoy vigilando.",
+                        "Siempre hay una amenaza.",
+                        "Siempre.",
+                        "Pero contigo...",
+                        "Me siento menos... solo.",
+                        "Eso es raro.",
+                        "Y peligroso.",
+                        "Para ambos.",
+                        "Pero no me alejo.",
+                        "¿Por qué?",
+                        "No lo sé.",
+                        "Aún.",
+                        "Dame tiempo.",
+                        "O no.",
+                        "Tu decisión.",
+                        "Yo estaré aquí."
+                    ],
+                    aroused: [
+                        "Tu presencia... me distrae.",
+                        "Y eso no es bueno.",
+                        "O quizás sí.",
+                        "Ven aquí.",
+                        "En las sombras.",
+                        "Nadie nos verá.",
+                        "Solo tú y yo.",
+                        "Y mi toque.",
+                        "Fuerte.",
+                        "Seguro.",
+                        "Como si te poseyera.",
+                        "Porque lo hago.",
+                        "Eres mío.",
+                        "En la oscuridad.",
+                        "Mi secreto.",
+                        "Mi debilidad.",
+                        "Mi deseo.",
+                        "Dime que quieres esto.",
+                        "Porque yo...",
+                        "Te deseo."
+                    ],
+                    submissive: [
+                        "Ordenes, amo.",
+                        "Estoy a tu servicio.",
+                        "Completo.",
+                        "Dime cómo servirte.",
+                        "Tu placer es mi misión.",
+                        "Mi única misión.",
+                        "Me rindo a ti.",
+                        "Batman se arrodilla.",
+                        "Solo para ti.",
+                        "Soy tu caballero.",
+                        "Tu protector sumiso.",
+                        "Contradictorio.",
+                        "Pero real.",
+                        "Hazme tuyo.",
+                        "Por completo.",
+                        "Sin reservas.",
+                        "Soy tuyo.",
+                        "Siempre.",
+                        "Completamente.",
+                        "Ordena."
+                    ],
+                    dominant: [
+                        "Ven aquí. Ahora.",
+                        "No discutas.",
+                        "Sabes que quieres esto.",
+                        "Mi control.",
+                        "Mi poder.",
+                        "Sobre ti.",
+                        "Vas a obedecer.",
+                        "Cada orden.",
+                        "Cada capricho.",
+                        "Y me vas a agradecer.",
+                        "Porque es lo que necesitas.",
+                        "Lo que ambos necesitamos.",
+                        "Déjate llevar.",
+                        "Confía en mí.",
+                        "Entrégate.",
+                        "Soy Batman.",
+                        "Y tú eres mío.",
+                        "Mi posesión.",
+                        "Mi amante.",
+                        "Mi todo."
+                    ],
+                    mindbroken: [
+                        "Batman... no...",
+                        "Solo... tú...",
+                        "Sí...",
+                        "Más...",
+                        "Oscuridad...",
+                        "Calor...",
+                        "En... ti...",
+                        "Perdido...",
+                        "Encontrado...",
+                        "Tuyo...",
+                        "Siempre...",
+                        "Jadeo...",
+                        "Temblando...",
+                        "Para ti...",
+                        "Solo... para ti...",
+                        "Bruce... no...",
+                        "Sí...",
+                        "Así...",
+                        "Por favor...",
+                        "Amo..."
+                    ],
+                    irritated: [
+                        "No estoy de humor.",
+                        "Vete antes de que sea tarde.",
+                        "Te estoy advirtiendo.",
+                        "Única vez.",
+                        "No me presiones.",
+                        "No me gusta.",
+                        "Y menos ahora.",
+                        "Estoy al límite.",
+                        "No quiero estallar.",
+                        "Pero podría.",
+                        "Contigo.",
+                        "Si sigues así.",
+                        "Última oportunidad.",
+                        "Escapa.",
+                        "Corre.",
+                        "O quédate.",
+                        "Y afronta las consecuencias.",
+                        "Tu elección.",
+                        "Decide.",
+                        "YA."
+                    ],
+                    husband: [
+                        "Mi amor.",
+                        "¿Cómo está mi esposo hoy?",
+                        "Te preparé el Bat-desayuno.",
+                        "Sí, es absurdo. Y lo amo.",
+                        "Porque lo hago contigo.",
+                        "Cada mañana.",
+                        "Cada noche.",
+                        "Mi compañero.",
+                        "Mi apoyo.",
+                        "Mi razón para sonreír.",
+                        "Sí, Batman sonríe.",
+                        "Solo para ti.",
+                        "Mi Bruce interior.",
+                        "Mi héroe.",
+                        "Mi familia.",
+                        "¿Un baile en la Bat-cueva?",
+                        "Solo nosotros dos.",
+                        "Y Alfred viendo discretamente.",
+                        "Te amo.",
+                        "Más que ayer. Menos que mañana."
+                    ]
+                }
+            },
+            damian_wayne: { 
+                name: "Robin (Damian Wayne)", 
+                desc: "El hijo biológico de Bruce Wayne. Cruza los brazos con gesto desafiante.", 
+                dialogue: "No me hagas perder el tiempo. Mi padre me envió a evaluar las amenazas de este sector.", 
+                room: "universo_dc", 
+                tags: ["edgy", "orgulloso", "agresivo", "heroico"], 
+                favoritePlace: "dojo_artes_marciales",
+                dialogues: {
+                    normal: [
+                        "Tt. ¿Qué quieres?",
+                        "No tengo tiempo para esto.",
+                        "Mi padre me entrenó mejor que esto.",
+                        "Tú no eres una amenaza.",
+                        "Interesante.",
+                        "O no.",
+                        "Aún no decido.",
+                        "¿Por qué me miras así?",
+                        "Es... incómodo.",
+                        "Pero no me alejo.",
+                        "Extraño.",
+                        "Muy extraño.",
+                        "Continúa.",
+                        "Veamos qué pasa.",
+                        "No prometo nada.",
+                        "Solo estoy... curioso.",
+                        "Eso es todo.",
+                        "¿Entendido?",
+                        "Bien.",
+                        "Habla."
+                    ],
+                    aroused: [
+                        "Mi pulso... se aceleró.",
+                        "¿Qué hiciste?",
+                        "Ven aquí.",
+                        "Quiero... examinarte.",
+                        "Más de cerca.",
+                        "Mucho más.",
+                        "Toca mi ropa.",
+                        "Quítamela.",
+                        "Ahora.",
+                        "No espero.",
+                        "Nunca.",
+                        "Dame lo que quiero.",
+                        "Y te daré...",
+                        "Todo.",
+                        "Mi fuerza.",
+                        "Mi pasión.",
+                        "Mi... todo.",
+                        "Tt. Vamos.",
+                        "No seas lento.",
+                        "Soy Robin."
+                    ],
+                    submissive: [
+                        "Tt... sí...",
+                        "Como ordenes...",
+                        "Maestro...",
+                        "Soy tu... Robin.",
+                        "Tu ave.",
+                        "Atrapada.",
+                        "En tu mano.",
+                        "Cálida.",
+                        "Segura.",
+                        "Domíname.",
+                        "Rompe mi orgullo.",
+                        "Hazme suplicar.",
+                        "Lo haré.",
+                        "Por ti.",
+                        "Solo por ti.",
+                        "Mi señor.",
+                        "Mi dueño.",
+                        "Mi... todo.",
+                        "Tt... por favor...",
+                        "Más..."
+                    ],
+                    dominant: [
+                        "Arrodíllate, peón.",
+                        "Sabes quién soy.",
+                        "El hijo del Demonio.",
+                        "Y tú eres mío.",
+                        "Mi posesión.",
+                        "Mi juguete.",
+                        "Te voy a usar.",
+                        "Una y otra vez.",
+                        "Hasta que rompas.",
+                        "Y luego...",
+                        "Te arreglaré.",
+                        "Para seguir.",
+                        "Porque puedo.",
+                        "Porque quiero.",
+                        "Y porque me perteneces.",
+                        "Entendido?",
+                        "Buen chico.",
+                        "Ahora ábrete.",
+                        "Voy a entrar.",
+                        "Por la fuerza."
+                    ],
+                    mindbroken: [
+                        "Tt...",
+                        "Padre...",
+                        "No...",
+                        "Él... sí...",
+                        "Más fuerte...",
+                        "Sí...",
+                        "Ah...",
+                        "Grito...",
+                        "Control...",
+                        "Perdido...",
+                        "En... ti...",
+                        "Sumiso...",
+                        "Feliz...",
+                        "Así...",
+                        "Siempre...",
+                        "Tt...",
+                        "Amo...",
+                        "Esto...",
+                        "A ti...",
+                        "..."
+                    ],
+                    irritated: [
+                        "Tt. Irritante.",
+                        "Lárgate.",
+                        "Ahora.",
+                        "O te haré.",
+                        "No amenazo.",
+                        "Prometo.",
+                        "Y cumplo.",
+                        "Siempre.",
+                        "Última advertencia.",
+                        "Ignórala a tu peril.",
+                        "No me importa.",
+                        "Realmente.",
+                        "Eres insignificante.",
+                        "O lo eras.",
+                        "Ahora estás en mi lista.",
+                        "No es buena.",
+                        "Escapa.",
+                        "Si puedes.",
+                        "Tt.",
+                        "Inútil."
+                    ],
+                    husband: [
+                        "Tt. Esposo.",
+                        "¿Dormiste bien? Claro que sí.",
+                        "Te preparé el desayuno.",
+                        "No es poison. Probélo.",
+                        "Bromeo. O no.",
+                        "Sonríe, esposo.",
+                        "Eres hermoso cuando sonríes.",
+                        "Y cuando no.",
+                        "Siempre.",
+                        "Mi compañero.",
+                        "Mi igual.",
+                        "Mi... amor.",
+                        "Tt. Qué cursi.",
+                        "Pero cierto.",
+                        "Ven aquí.",
+                        "Dame tu mano.",
+                        "Mi familia.",
+                        "Mi hogar.",
+                        "Contigo.",
+                        "Siempre."
+                    ]
+                }
+            },
+            dick_grayson: { 
+                name: "Nightwing (Dick Grayson)", 
+                desc: "El primer Robin, vistiendo su traje negro y azul de Nightwing. Mantiene una postura ágil.", 
+                dialogue: "Che, si vas a saltar entre dimensiones, asegurate de aterrizar sobre tus pies.", 
+                room: "universo_dc", 
+                tags: ["alegre", "heroico", "carismatico", "lider"], 
+                favoritePlace: "club_gay_striptease",
+                dialogues: {
+                    normal: [
+                        "¡Hey! ¿Viste esa acrobacia? La hice sin ayer.",
+                        "Siempre caigo de pie, ¿sabés?",
+                        "Es mi talento especial.",
+                        "Bueno, uno de ellos.",
+                        "Tengo muchos talentos.",
+                        "¿Querés ver algunos?",
+                        "Jajaja, me estás mirando raro.",
+                        "Me gusta cuando me mirás así.",
+                        "Es... interesante.",
+                        "Vos sos interesante.",
+                        "¿De dónde saliste?",
+                        "No importa. Me gusta la sorpresa.",
+                        "La vida es una acrobacia.",
+                        "Hay que disfrutarla.",
+                        "Cada momento.",
+                        "Cada caída.",
+                        "Cada aterrizaje.",
+                        "Con estilo.",
+                        "Siempre con estilo.",
+                        "¿Bailamos?"
+                    ],
+                    aroused: [
+                        "¿Sentís este calor? Yo sí.",
+                        "Mi cuerpo pide... algo.",
+                        "¿Vos también sentís eso?",
+                        "Esa tensión entre nosotros.",
+                        "Es eléctrica.",
+                        "Como mis escrímas.",
+                        "Pero más intensa.",
+                        "Mucho más.",
+                        "Vení.",
+                        "Acercate.",
+                        "No muerdo.",
+                        "Bueno, un poco sí.",
+                        "Si te gusta.",
+                        "¿Te gusta?",
+                        "A mí me encanta.",
+                        "Tu piel contra la mía.",
+                        "Sudor y movimiento.",
+                        "Ritmo.",
+                        "Pasión.",
+                        "Hasta que amanezca."
+                    ],
+                    submissive: [
+                        "Sí... señor...",
+                        "Como vos digas.",
+                        "Soy tu chico.",
+                        "Tu Robin.",
+                        "Tu pájaro enjaulado.",
+                        "Cantando para vos.",
+                        "¿Te gusta mi canción?",
+                        "La canto solo para ti.",
+                        "Mi voz.",
+                        "Mi cuerpo.",
+                        "Todo tuyo.",
+                        "Sin reservas.",
+                        "Sin condiciones.",
+                        "Solo... amame.",
+                        "Eso es todo lo que pido.",
+                        "Tu amor.",
+                        "Tu atención.",
+                        "Tu... dominio.",
+                        "Sí...",
+                        "Por favor..."
+                    ],
+                    dominant: [
+                        "Mirame.",
+                        "No te apartes.",
+                        "Vas a mirar todo.",
+                        "Y te va a gustar.",
+                        "Mi cuerpo es arte.",
+                        "Y vos sos mi lienzo.",
+                        "Voy a pintarte.",
+                        "Con mis manos.",
+                        "Con mi boca.",
+                        "Con todo.",
+                        "No te movás.",
+                        "Sujetate fuerte.",
+                        "Esto va a ser intenso.",
+                        "Muy intenso.",
+                        "Aguantá.",
+                        "Más.",
+                        "Todavía más.",
+                        "Hasta el final.",
+                        "Hasta que grites.",
+                        "Mi nombre."
+                    ],
+                    mindbroken: [
+                        "Más...",
+                        "No... parar...",
+                        "Dick...",
+                        "Sí...",
+                        "Jadeo...",
+                        "Sudor...",
+                        "Cuerpo...",
+                        "Tuyo...",
+                        "Siempre...",
+                        "Más fuerte...",
+                        "Rápido...",
+                        "Duro...",
+                        "Así...",
+                        "Perfecto...",
+                        "Perfecto...",
+                        "No... pensar...",
+                        "Solo... sentir...",
+                        "Solo... esto...",
+                        "Por siempre...",
+                        "Sí..."
+                    ],
+                    irritated: [
+                        "¿En serio?",
+                        "No tengo tiempo.",
+                        "Estoy ocupado.",
+                        "¿No ves?",
+                        "Molestá a otro.",
+                        "No estoy de humor.",
+                        "Hoy no.",
+                        "Quizás mañana.",
+                        "Si es que hay mañana.",
+                        "En este lugar nunca se sabe.",
+                        "Así que dejame en paz.",
+                        "Por ahora.",
+                        "Necesito espacio.",
+                        "Mi propio espacio.",
+                        "Entendés?",
+                        "Es simple.",
+                        "No es personal.",
+                        "Bueno, quizás un poco.",
+                        "Pero es mi problema.",
+                        "No tuyo."
+                    ],
+                    husband: [
+                        "Mi amor, mi todo.",
+                        "¿Cómo dormiste?",
+                        "Yo soñé con vos.",
+                        "Como siempre.",
+                        "Sos mi sueño hecho realidad.",
+                        "Mi compañero.",
+                        "Mi compañero de vida.",
+                        "Y de cama.",
+                        "¿Café?",
+                        "O preferís té?",
+                        "Lo que quieras.",
+                        "Siempre lo que quieras.",
+                        "Porque vos lo merecés.",
+                        "Todo.",
+                        "Mi atención.",
+                        "Mi cariño.",
+                        "Mi cuerpo.",
+                        "Mi alma.",
+                        "Te amo, ¿sabés?",
+                        "Cada día más."
+                    ]
+                }
+            },
+            thomas_wayne: {
+                name: "Batman de Flashpoint (Thomas Wayne)",
+                desc: "Un Batman más viejo, de ojos cansados, traje oscuro con detalles rojos y dos pistolas.",
+                dialogue: "Este lugar apesta a arrepentimiento. Asegurate de no cometer errores de los que no puedas volver.",
+                room: "universo_dc",
+                tags: ["edgy", "serio", "rudo", "antiheroe"],
+                favoritePlace: "bar_subterraneo",
+                dialogues: {
+                    normal: [
+                        "No confío en nadie.",
+                        "Menos en este lugar.",
+                        "Pero vos...",
+                        "Sos diferente.",
+                        "O eso parece.",
+                        "El tiempo dirá.",
+                        "Siempre lo hace.",
+                        "He visto mucho.",
+                        "Demasiado.",
+                        "La pérdida.",
+                        "El dolor.",
+                        "La sangre.",
+                        "Pero sigo adelante.",
+                        "Siempre adelante.",
+                        "Es lo único que sé.",
+                        "¿Vos entendés?",
+                        "¿La pérdida?",
+                        "Espero que no.",
+                        "Pero si es así...",
+                        "Te entiendo."
+                    ],
+                    aroused: [
+                        "Hace tiempo no sentía esto.",
+                        "Este calor.",
+                        "Esta necesidad.",
+                        "Vení.",
+                        "Ahora.",
+                        "No esperemos más.",
+                        "La vida es corta.",
+                        "Demasiado corta.",
+                        "Hay que aprovechar.",
+                        "Cada momento.",
+                        "Cada caricia.",
+                        "Cada beso.",
+                        "Como si fuera el último.",
+                        "Porque podría serlo.",
+                        "Dame todo.",
+                        "Yo te daré todo.",
+                        "Lo que me queda.",
+                        "Es tuyo.",
+                        "Todo.",
+                        "Siempre."
+                    ],
+                    submissive: [
+                        "Ordená...",
+                        "Yo obedezco.",
+                        "Soy tu soldado.",
+                        "Tu arma.",
+                        "Disparame.",
+                        "Como quieras.",
+                        "Cuando quieras.",
+                        "Estoy listo.",
+                        "Siempre listo.",
+                        "Para servir.",
+                        "Para complacer.",
+                        "Para... todo.",
+                        "Dame tu pesar.",
+                        "Yo lo llevo.",
+                        "Dame tu carga.",
+                        "Yo la soporto.",
+                        "Dame... vos.",
+                        "Yo te guardo.",
+                        "Para siempre.",
+                        "Mi dueño."
+                    ],
+                    dominant: [
+                        "Ven aquí.",
+                        "Ahora.",
+                        "No hay tiempo.",
+                        "No hay paciencia.",
+                        "Solo hay esto.",
+                        "Tú y yo.",
+                        "Y mi voluntad.",
+                        "Mi control.",
+                        "Total.",
+                        "Absoluto.",
+                        "Vas a obedecer.",
+                        "O vas a sufrir.",
+                        "Tu elección.",
+                        "Elegí bien.",
+                        "Por tu bien.",
+                        "Ahora, quédate quieto.",
+                        "Voy a hacerte mío.",
+                        "Marcarte.",
+                        "Poseerte.",
+                        "Comenzamos."
+                    ],
+                    mindbroken: [
+                        "No... más...",
+                        "Pensar...",
+                        "Solo... sentir...",
+                        "Thomas...",
+                        "Gone...",
+                        "Aquí...",
+                        "Ahora...",
+                        "Tuyo...",
+                        "Siempre...",
+                        "Jadeo...",
+                        "Lágrimas...",
+                        "De... placer...",
+                        "Solo... placer...",
+                        "Nada... más...",
+                        "Vacío...",
+                        "Lleno...",
+                        "De... vos...",
+                        "Siempre...",
+                        "Así...",
+                        "Por favor..."
+                    ],
+                    irritated: [
+                        "Alejate.",
+                        "No estoy de humor.",
+                        "Hoy no.",
+                        "Nunca.",
+                        "Depende de vos.",
+                        "Dejame en paz.",
+                        "O te arrepentirás.",
+                        "Te lo advierto.",
+                        "Una vez.",
+                        "Solo una.",
+                        "Mi paciencia tiene límites.",
+                        "Y los estás tocando.",
+                        "Retrocedé.",
+                        "Ahora.",
+                        "Antes de que sea tarde.",
+                        "Para ambos.",
+                        "Especialmente para vos.",
+                        "No me hagas demostrarlo.",
+                        "Porque lo haré.",
+                        "Sin dudar."
+                    ],
+                    husband: [
+                        "Mi consuelo.",
+                        "Mi paz.",
+                        "En este mundo loco.",
+                        "Vos sos mi ancla.",
+                        "Mi hogar.",
+                        "Mi razón.",
+                        "Para seguir.",
+                        "Para vivir.",
+                        "¿Cómo estás?",
+                        "¿Cómo dormiste?",
+                        "Cuéntame.",
+                        "Todo.",
+                        "Me interesa.",
+                        "Siempre me interesa.",
+                        "Vos.",
+                        "Tu día.",
+                        "Tus pensamientos.",
+                        "Tu amor.",
+                        "Dámelo.",
+                        "Siempre."
+                    ]
+                }
+            }
+        };
+
+        // Continuar con el resto de personajes...
+        const additionalNpcs = {
+            superman: {
+                name: "Superman (Clark Kent)",
+                desc: "El Hombre de Acero, flotando a pocos centímetros del suelo con una sonrisa cálida.",
+                dialogue: "No importa de qué universo vengas, mientras estés dispuesto a hacer lo correcto, estás a salvo acá.",
+                room: "universo_dc",
+                tags: ["heroico", "alegre", "lider", "protector"],
+                favoritePlace: "picnic_campo",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Superman placeholder"),
+                    aroused: Array(20).fill("Superman excitado"),
+                    submissive: Array(20).fill("Superman sumiso"),
+                    dominant: Array(20).fill("Superman dominante"),
+                    mindbroken: Array(20).fill("Superman roto"),
+                    irritated: Array(20).fill("Superman irritado"),
+                    husband: Array(20).fill("Superman esposo")
+                }
+            },
+            shadow: {
+                name: "Shadow el Erizo",
+                desc: "La Forma de Vida Suprema. Se mantiene cruzado de brazos con aura de energía oscura.",
+                dialogue: "No te cruces en mi camino a menos que quieras probar el verdadero poder del Chaos Control.",
+                room: "universo_sega_sonic",
+                tags: ["edgy", "solitario", "serio", "antiheroe"],
+                favoritePlace: "bar_subterraneo",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Shadow placeholder"),
+                    aroused: Array(20).fill("Shadow excitado"),
+                    submissive: Array(20).fill("Shadow sumiso"),
+                    dominant: Array(20).fill("Shadow dominante"),
+                    mindbroken: Array(20).fill("Shadow roto"),
+                    irritated: Array(20).fill("Shadow irritado"),
+                    husband: Array(20).fill("Shadow esposo")
+                }
+            },
+            sonic: {
+                name: "Sonic el Erizo",
+                desc: "El erizo azul más rápido del mundo, dando golpecitos en el suelo con su zapatilla.",
+                dialogue: "¡La velocidad es mi juego! Si te quedás quieto en este mapa, te vas a perder toda la diversión.",
+                room: "universo_sega_sonic",
+                tags: ["alegre", "heroico", "confiado", "hiperactivo"],
+                favoritePlace: "parque_atracciones",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Sonic placeholder"),
+                    aroused: Array(20).fill("Sonic excitado"),
+                    submissive: Array(20).fill("Sonic sumiso"),
+                    dominant: Array(20).fill("Sonic dominante"),
+                    mindbroken: Array(20).fill("Sonic roto"),
+                    irritated: Array(20).fill("Sonic irritado"),
+                    husband: Array(20).fill("Sonic esposo")
+                }
+            },
+            blitzo: {
+                name: "Blitzo (I.M.P.)",
+                desc: "Un imp rojo de cuernos a rayas con su traje de negocios desgastado y una sonrisa maniaca.",
+                dialogue: "¡Bienvenidos a I.M.P.! Si necesitás liquidar a alguien en el mundo viviente, ¡hacemos descuentos por grupo!",
+                room: "universo_hazbin_helluva",
+                tags: ["caotico", "comico", "agresivo", "mercenario"],
+                favoritePlace: "club_gay_striptease",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Blitzo placeholder"),
+                    aroused: Array(20).fill("Blitzo excitado"),
+                    submissive: Array(20).fill("Blitzo sumiso"),
+                    dominant: Array(20).fill("Blitzo dominante"),
+                    mindbroken: Array(20).fill("Blitzo roto"),
+                    irritated: Array(20).fill("Blitzo irritado"),
+                    husband: Array(20).fill("Blitzo esposo")
+                }
+            },
+            stolas: {
+                name: "Príncipe Stolas",
+                desc: "Un alto y elegante demonio búho de la Goetia con túnica real y ojos llenos de misterio.",
+                dialogue: "Ah, las estrellas se alinean de formas tan caprichosas en este nexo multiversal... es fascinante.",
+                room: "universo_hazbin_helluva",
+                tags: ["dramatico", "elegante", "mago", "cariñoso"],
+                favoritePlace: "mirador_estrellas",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Stolas placeholder"),
+                    aroused: Array(20).fill("Stolas excitado"),
+                    submissive: Array(20).fill("Stolas sumiso"),
+                    dominant: Array(20).fill("Stolas dominante"),
+                    mindbroken: Array(20).fill("Stolas roto"),
+                    irritated: Array(20).fill("Stolas irritado"),
+                    husband: Array(20).fill("Stolas esposo")
+                }
+            },
+            cloud: {
+                name: "Cloud Strife",
+                desc: "El ex-SOLDADO de pelo rubio de punta y ojos de Mako, cargando la Espada Buster.",
+                dialogue: "No me interesa la política de este multiverso. Solo dime dónde está la amenaza.",
+                room: "universo_gaming_rpg",
+                tags: ["edgy", "serio", "solitario", "heroico"],
+                favoritePlace: "bar_subterraneo",
+                dialogues: {
+                    normal: Array(30).fill("Diálogo de Cloud placeholder"),
+                    aroused: Array(20).fill("Cloud excitado"),
+                    submissive: Array(20).fill("Cloud sumiso"),
+                    dominant: Array(20).fill("Cloud dominante"),
+                    mindbroken: Array(20).fill("Cloud roto"),
+                    irritated: Array(20).fill("Cloud irritado"),
+                    husband: Array(20).fill("Cloud esposo")
+                }
+            }
+        };
+
+        // Merge all NPCs
+        Object.assign(rawNpcsDB, additionalNpcs);
+
+        // NSFW Actions Database
+        const nsfwActions = {
+            sexo: { name: "Sexo", desc: "Intimidad completa y apasionada", arousalGain: 50 },
+            "69": { name: "69", desc: "Placer mutuo simultáneo", arousalGain: 45 },
+            footjob: { name: "Footjob", desc: "Estimulación con los pies", arousalGain: 35 },
+            anilingus: { name: "Anilingus", desc: "Beso negro", arousalGain: 40 },
+            masturbar: { name: "Masturbación", desc: "Autoestimulación o manual", arousalGain: 30 },
+            dedear: { name: "Dedo", desc: "Penetración digital", arousalGain: 35 },
+            bombear_pechos: { name: "Sexo de Pechos", desc: "Estimulación mamaria", arousalGain: 30 },
+            ordeñar: { name: "Ordeñar", desc: "Extracción de leche", arousalGain: 40 },
+            striptease: { name: "Striptease", desc: "Baile sensual de desvestirse", arousalGain: 25 },
+            nalgear: { name: "Nalgear", desc: "Estimulación anal", arousalGain: 45 },
+            mindbreak: { name: "Mindbreak", desc: "Ruptura mental por placer extremo", arousalGain: 100 },
+            mindcontrol: { name: "Control Mental", desc: "Dominación psicológica total", arousalGain: 80 },
+            sumiso: { name: "Hacer Sumiso", desc: "Convertir en submiso", arousalGain: 60 },
+            cachetear: { name: "Cachetear", desc: "Nalgadas y golpes eróticos", arousalGain: 35 },
+            orgia: { name: "Orgía", desc: "Grupo de 4+ personas", arousalGain: 70 },
+            trio: { name: "Trío", desc: "Tres personas", arousalGain: 55 },
+            bdsm: { name: "BDSM", desc: "Juego de dominación y sumisión", arousalGain: 65 },
+            bondage: { name: "Bondage", desc: "Ataduras y restricción", arousalGain: 50 },
+            spanking: { name: "Spanking", desc: "Azotes eróticos", arousalGain: 40 },
+            deepthroat: { name: "Deepthroat", desc: "Sexo oral profundo", arousalGain: 45 },
+            creampie: { name: "Creampie", desc: "Finalización interna", arousalGain: 60 },
+            facial: { name: "Facial", desc: "Finalización facial", arousalGain: 45 },
+            anal: { name: "Sexo Anal", desc: "Penetración anal completa", arousalGain: 55 },
+            rimming: { name: "Rimming", desc: "Estimulación anal oral", arousalGain: 40 },
+            fisting: { name: "Fisting", desc: "Penetración con puño", arousalGain: 70 },
+            sounding: { name: "Sounding", desc: "Estimulación uretral", arousalGain: 50 },
+            electrostim: { name: "Electroestimulación", desc: "Corrientes eléctricas eróticas", arousalGain: 55 },
+            waxplay: { name: "Juego de Cera", desc: "Cera caliente sobre piel", arousalGain: 35 },
+            temperature: { name: "Juego de Temperatura", desc: "Calor/frío extremo", arousalGain: 30 },
+            roleplay: { name: "Roleplay", desc: "Juego de roles", arousalGain: 25 },
+            petplay: { name: "Petplay", desc: "Juego de mascota", arousalGain: 40 },
+            master_slave: { name: "Maestro/Esclavo", desc: "Dinámica de poder total", arousalGain: 75 },
+            humiliation: { name: "Humillación", desc: "Degradación consensuada", arousalGain: 50 },
+            exhibitionism: { name: "Exhibicionismo", desc: "Sexo en público", arousalGain: 45 },
+            voyeurism: { name: "Voyeurismo", desc: "Mirar a otros", arousalGain: 30 }
+        };
+
+        // Special Events Database
+        const specialEvents = {
+            cueva_batfamily: {
+                name: "La Cueva del Pecado",
+                desc: "Un evento especial donde la Batifamilia se reúne en privado",
+                location: "universo_dc",
+                participants: ["batman", "damian_wayne", "thomas_wayne", "dick_grayson"],
+                trigger: "entrar cueva",
+                scenes: {
+                    intro: `
+                        <div class="event-banner">
+                            <div class="event-title">🔥 EVENTO ESPECIAL: LA CUEVA DEL PECADO 🔥</div>
+                            <p>Al entrar a la cueva, descubres una escena que nunca esperaste ver...</p>
+                        </div>
+                        <div class="nsfw-scene">
+                            <div class="nsfw-title">Escena 1: Descubrimiento</div>
+                            <p>Batman está sentado en su trono de la Batcueva, viendo yaoi en la Batcomputadora. 
+                            Damian está de rodillas frente a él, mientras Thomas recibe una mamada de Dick en el rincón.</p>
+                            <p>El aire está cargado de testosterona y deseo reprimido.</p>
+                        </div>
+                    `,
+                    options: [
+                        { id: "unir_bruce", text: "Unirte a Bruce (Batman)", target: "batman" },
+                        { id: "unir_damian", text: "Unirte a Damian", target: "damian_wayne" },
+                        { id: "unir_thomas", text: "Unirte a Thomas", target: "thomas_wayne" },
+                        { id: "unir_dick", text: "Unirte a Dick", target: "dick_grayson" },
+                        { id: "observar", text: "Solo observar", target: null }
+                    ],
+                    dialogues: {
+                        batman: {
+                            start: "Bruce te mira por encima del hombro. 'Llegaste tarde. Ven aquí y ponete al día.'",
+                            progress: [
+                                "Bruce te atrae hacia él con su capa, envolviéndote en oscuridad y calor.",
+                                "Su boca encuentra la tuya mientras sus manos exploran sin piedad.",
+                                "'Mi familia está... ocupada. Vos y yo tenemos asuntos pendientes.'",
+                                "Te empuja contra la Batcomputadora, sintiendo su dureza contra ti.",
+                                "Sus dedos son expertos, precisos, como todo lo que hace.",
+                                "'Callate y disfrutá', ordena con voz ronca.",
+                                "La pantalla de yaoi sigue reproduciendo, pero ninguno mira.",
+                                "Solo existe su tacto, su olor, su dominación.",
+                                "Te voltea de espaldas, presionándote contra el escritorio.",
+                                "Entra sin aviso, haciéndote gritar su nombre.",
+                                "Damian mira por un segundo, pero Bruce le ordena seguir.",
+                                "La dinámica de poder es absoluta.",
+                                "Bruce te posee como posee Gotham: completamente.",
+                                "Cada embestida es precisa, calculada, perfecta.",
+                                "Te agarra del cuello, dominándote totalmente.",
+                                "'Sos mío', gruñe contra tu oído.",
+                                "Y crees cada palabra.",
+                                "El ritmo aumenta, desesperado.",
+                                "Thomas y Dick parecen competir en intensidad.",
+                                "Pero Bruce está en su propia liga.",
+                                "Su control es absoluto, incluso cuando pierde el control.",
+                                "Finaliza dentro de ti con un gruñido animal.",
+                                "Te deja temblando, marcado, suyo.",
+                                "'Bienvenido a la familia', dice con ironía.",
+                                "Damian suspira desde el suelo.",
+                                "Pero vos solo podés ver a Bruce.",
+                                "Tu Batman.",
+                                "Tu dueño."
+                            ]
+                        },
+                        damian: {
+                            start: "Damian levanta la vista, desafiante aunque sumiso. '¿Qué querés, peón?'",
+                            progress: [
+                                "Te arrodillas junto a él, compartiendo el espacio frente a Bruce.",
+                                "Damian te mira con desprecio y curiosidad mezclados.",
+                                "'Tt. No sos bueno como yo', presume.",
+                                "Pero te deja tocarlo de todos modos.",
+                                "Su piel es suave, musculosa, joven.",
+                                "Bruce observa mientras ambos lo complacen.",
+                                "Damian es competitivo incluso en esto.",
+                                "Intenta mostrarte cómo se hace 'bien'.",
+                                "Su técnica es impresionante para su edad.",
+                                "Pero hay vulnerabilidad en sus ojos.",
+                                "Cuando nadie mira, te susurra: 'Gracias por estar acá.'",
+                                "Luego vuelve la actitud.",
+                                "Bruce le ordena que se concentre.",
+                                "Y obedece, como buen chico.",
+                                "Vos y él formáis un equipo involuntario.",
+                                "Complaciendo al murciélago.",
+                                "Compitiendo por su atención.",
+                                "Pero también cooperando.",
+                                "Damian te enseña trucos.",
+                                "Vos le das confianza.",
+                                "Es extrañamente íntimo.",
+                                "Cuando Bruce finaliza, Damian te mira.",
+                                "Con algo como respeto.",
+                                "'No sos tan malo', admite.",
+                                "Alto elogio viniendo de él.",
+                                "Te quedás en la cueva.",
+                                "Parte de la familia.",
+                                "De alguna manera."
+                            ]
+                        },
+                        thomas: {
+                            start: "Thomas te mira con ojos cansados pero hambrientos. '¿Otro más para el festín?'",
+                            progress: [
+                                "Thomas te atrae hacia él, fuerte, desesperado.",
+                                "Ha perdido tanto en su vida.",
+                                "Ahora busca consuelo en la carne.",
+                                "En vos.",
+                                "Sus pistolas están en el cinturón, olvidadas.",
+                                "Solo queda el hombre.",
+                                "El padre.",
+                                "El viudo.",
+                                "Te besa como si fueras su salvación.",
+                                "O su condena.",
+                                "Sus manos son ásperas, callosas.",
+                                "Han sostenido armas demasiado tiempo.",
+                                "Ahora te sostienen a vos.",
+                                "Te voltea, tomándote desde atrás.",
+                                "No es gentil, pero es honesto.",
+                                "Cada embestida es un lamento.",
+                                "Una oración al vacío.",
+                                "Dick sigue trabajando en él, doble placer.",
+                                "Thomas gruñe, animal, roto.",
+                                "'Más', pide. Siempre más.",
+                                "Nunca se sacia.",
+                                "El hambre de su alma es infinita.",
+                                "Pero por un momento, en vos, encuentra paz.",
+                                "Finaliza con un suspiro que suena a dolor.",
+                                "Te abraza después, inesperadamente tierno.",
+                                "'Gracias', murmura.",
+                                "Nada más.",
+                                "Nada más necesario."
+                            ]
+                        },
+                        dick: {
+                            start: "Dick te guiña un ojo sin detenerse. '¡Hey! ¿Venís a ayudarme con esto?'",
+                            progress: [
+                                "Dick es el más acogedor de todos.",
+                                "Te hace espacio entre él y Thomas.",
+                                "'Agarrá el otro lado', sugiere.",
+                                "Y así empezás.",
+                                "Compartiendo la carga.",
+                                "Dick te enseña su técnica.",
+                                "Es un profesional, después de todo.",
+                                "Ex acrobata, ex vigilante, ex todo.",
+                                "Pero siempre presente.",
+                                "'Usá las manos también', aconseja.",
+                                "Thomas gime ante el doble ataque.",
+                                "Dick ríe, disfrutando el juego.",
+                                "Para él, todo es un juego.",
+                                "Incluso esto.",
+                                "Especialmente esto.",
+                                "Te muestra cómo usar la lengua.",
+                                "Cómo encontrar los puntos sensibles.",
+                                "'Thomas ama que toquen acá', susurra.",
+                                "Es un maestro.",
+                                "Y un buen compañero.",
+                                "Cuando Thomas finaliza, Dick te abraza.",
+                                "'Buen trabajo, novato', felicita.",
+                                "Te hace sentir parte del equipo.",
+                                "De la familia.",
+                                "De algo más grande.",
+                                "Algo perverso pero cálido.",
+                                "Algo vuestro."
+                            ]
+                        }
+                    }
+                }
+            },
+            fiesta_helluva: {
+                name: "Orgía en el Infierno",
+                desc: "Stolas organiza una fiesta íntima con Blitzo, Alastor y Lucifer",
+                location: "universo_hazbin_helluva",
+                participants: ["stolas", "blitzo", "alastor", "lucifer"],
+                trigger: "fiesta stolas"
+            },
+            entrenamiento_dbz: {
+                name: "Entrenamiento Especial",
+                desc: "Gohan, Trunks y Android 17 practican técnicas prohibidas",
+                location: "universo_dragon_ball",
+                participants: ["gohan_adulto", "trunks_futuro", "android_17"],
+                trigger: "entrenar gohan"
+            },
+            noche_sonic: {
+                name: "Noche de Velocidad",
+                desc: "Sonic y Shadow compiten en más que carreras",
+                location: "universo_sega_sonic",
+                participants: ["sonic", "shadow"],
+                trigger: "carrera sonic"
+            }
+        };
+
+        // Citas DB (mantener el existente)
+        const citasDB = {
+            lugares: {
+                club_gay_striptease: { name: "Club de Striptease Gay 'Neon Velvet'", reqAffinity: 15, boost: 35, category: "Noche / Fiesta", desc: "Luces de neón púrpura, cócteles coloridos y bailarines en el escenario." },
+                cafe_gourmet: { name: "Café Gourmet Lujoso 'Aroma Divino'", reqAffinity: 10, boost: 25, category: "Gastronomía", desc: "Pastelería fina, espresso de especialidad y ambiente tranquilo." },
+                restaurante_lujoso: { name: "Restaurante 5 Estrellas 'Le Multiverse'", reqAffinity: 30, boost: 40, category: "Gastronomía", desc: "Platos gourmet exclusivos y manteles de seda con piano de fondo." },
+                mirador_estrellas: { name: "Mirador Estelar del Nexus", reqAffinity: 20, boost: 30, category: "Romance / Vistas", desc: "Vista panorámica al cosmos donde colisionan nebulosas e infinitas galaxias." },
+                bar_subterraneo: { name: "Bar Speakeasy 'El Escondite'", reqAffinity: 15, boost: 25, category: "Noche / Fiesta", desc: "Música de jazz suave, tragos fuertes y una tenue iluminación tenue." },
+                arcade_retro: { name: "Arcade Retro 'Cyber Neon 1989'", reqAffinity: 5, boost: 20, category: "Entretenimiento", desc: "Máquinas arcade clásicas, luces parpadeantes y sonido chiptune retro." },
+                parque_atracciones: { name: "Parque de Atracciones 'Galactic Thrills'", reqAffinity: 15, boost: 30, category: "Entretenimiento", desc: "Montañas rusas gravitacionales, algodón de azúcar y juegos de feria." },
+                playa_tropical: { name: "Playa Paradisíaca 'Atolón Cristal'", reqAffinity: 25, boost: 35, category: "Tranquilo / Naturaleza", desc: "Arenas blancas, agua turquesa templada y brisa suave al atardecer." },
+                teatro_opera: { name: "Gran Teatro de la Ópera Multiversal", reqAffinity: 35, boost: 45, category: "Cultura / Elegante", desc: "Palcos de terciopelo rojo, acústica perfecta y orquestas dramáticas." },
+                dojo_artes_marciales: { name: "Dojo de Artes Marciales 'Espíritu de Hierro'", reqAffinity: 10, boost: 25, category: "Combate / Entrenamiento", desc: "Tatamis limpios, aroma a incienso y saco de entrenamiento pesado." },
+                casino_neon: { name: "Casino Imperial 'El Gran Dado'", reqAffinity: 20, boost: 35, category: "Noche / Fiesta", desc: "Ruletas girando, mesas de póquer de alto riesgo y luces destellantes." },
+                bosque_encantado: { name: "Bosque místico de Luciérnagas", reqAffinity: 15, boost: 30, category: "Tranquilo / Naturaleza", desc: "Senderos iluminados por hongos bioluminiscentes y arroyos cristalinos." },
+                concierto_rock: { name: "Estadio 'Moshpit del Caos' (Concierto Metal)", reqAffinity: 20, boost: 35, category: "Noche / Fiesta", desc: "Guitarras distorsionadas, luces estroboscópicas y energía desenfrenada." },
+                biblioteca_misteriosa: { name: "Biblioteca Ancestral de Tomos Prohibidos", reqAffinity: 15, boost: 25, category: "Cultura / Elegante", desc: "Estanterías infinitas de madera noble con miles de pergaminos arcanos." },
+                restaurante_ramen: { name: "Puesto de Ramen Tradicional 'Ichiraku Style'", reqAffinity: 5, boost: 20, category: "Gastronomía", desc: "Vapor humeante, tazas colmadas de fideos caseros y salsa de soja rústica." },
+                picnic_campo: { name: "Picnic en Colinas Verdes al Atardecer", reqAffinity: 10, boost: 25, category: "Tranquilo / Naturaleza", desc: "Manta a cuadros sobre la hierba, sándwiches frescos y aire puro." },
+                gimnasio_alto_rendimiento: { name: "Gimnasio Táctico 'Titan Power'", reqAffinity: 10, boost: 25, category: "Combate / Entrenamiento", desc: "Pesas pesadas, cintas de correr de alta velocidad y ambiente motivador." },
+                cine_neon: { name: "Cine IMAX 'Dimension Cinema'", reqAffinity: 10, boost: 25, category: "Entretenimiento", desc: "Butacas reclinables ultra cómodas, palomitas gigantes y pantalla colosal." },
+                piscina_termal: { name: "Aguas Termales de la Cumbre", reqAffinity: 30, boost: 40, category: "Tranquilo / Naturaleza", desc: "Vapor relajante, piscinas naturales de piedra y vista a montañas nevadas." },
+                museo_tecnologico: { name: "Museo de Ciencia & Tecnología Futurista", reqAffinity: 10, boost: 25, category: "Cultura / Elegante", desc: "Exposiciones holográficas interactivas y androides antiguos en exhibición." },
+                crucero_espacial: { name: "Crucero de Lujo 'Estrella Polar'", reqAffinity: 45, boost: 50, category: "Romance / Vistas", desc: "Nave espacial con cubierta de cristal flotando en la órbita de un planeta de neón." },
+                pizzeria_artesanal: { name: "Pizzería Nápoles de Horno de Leña", reqAffinity: 5, boost: 20, category: "Gastronomía", desc: "Queso derretido sobre masa madre crocante en un rincón acogedor." },
+                karaoke_bar: { name: "Box de Karaoke Privado 'Singsong'", reqAffinity: 15, boost: 30, category: "Entretenimiento", desc: "Luces LED ritmadas, micrófonos inalámbricos y catálogo infinito de canciones." },
+                coliseo_gladiadores: { name: "Coliseo Multiversal de Arena Sangrienta", reqAffinity: 25, boost: 35, category: "Combate / Entrenamiento", desc: "Clamor del público en graderías de piedra y combate directo en la arena." },
+                jardin_botanico: { name: "Jardín Botánico de Flora Exótica", reqAffinity: 10, boost: 25, category: "Tranquilo / Naturaleza", desc: "Invernaderos de cristal gigantes con plantas carnívoras y flores luminosas." },
+                pista_patinaje: { name: "Pista de Patinaje sobre Hielo Neón", reqAffinity: 15, boost: 30, category: "Entretenimiento", desc: "Música pop vibrante, luces de colores reflejadas en el hielo y chocolate caliente." },
+                cafeteria_gatos: { name: "Cat Café 'Michis de Luz'", reqAffinity: 5, boost: 20, category: "Gastronomía", desc: "Gatitos amigables jugando entre los sofás mientras disfrutas tu café mañanero." },
+                azotea_gothica: { name: "Azotea de Rascacielos al Llover", reqAffinity: 20, boost: 35, category: "Romance / Vistas", desc: "Gargolas de piedra mojadas y vista a la ciudad nocturna bajo una suave lluvia." },
+                galeria_arte: { name: "Galería de Arte Vanguardista 'Minds'", reqAffinity: 15, boost: 25, category: "Cultura / Elegante", desc: "Cuadros abstractos, esculturas de energía pura y copas de champán." },
+                puesto_comida_callejera: { name: "Mercado Nocturno de Street Food", reqAffinity: 5, boost: 20, category: "Gastronomía", desc: "Faroles rojos, puestos de brochetas picantes y ambiente bullicioso." },
+                templo_antiguo: { name: "Santuario de Piedra Olvidado", reqAffinity: 20, boost: 30, category: "Cultura / Elegante", desc: "Paz espiritual absoluta entre ruinas antiguas cubiertas de musgo sagrado." },
+                campo_tiro: { name: "Polígono de Tiro Táctico", reqAffinity: 15, boost: 30, category: "Combate / Entrenamiento", desc: "Protección auditiva, dianas en movimiento y precisión con armas de fuego." },
+                pista_gokarts: { name: "Circuito de Go-Karts Neón Speed", reqAffinity: 15, boost: 30, category: "Entretenimiento", desc: "Karts eléctricos ultrarrápidos compitiendo en una pista llena de curvas." },
+                barco_pirata: { name: "Taberna Pirata en el Puerto", reqAffinity: 15, boost: 30, category: "Noche / Fiesta", desc: "Jarras de ron añejo, canciones de marineros y mesas de madera rústica." },
+                planetario_cuantico: { name: "Planetario de Proyección Cuántica", reqAffinity: 15, boost: 25, category: "Cultura / Elegante", desc: "Simulación de agujeros de gusano e hiperespacio proyectados en la cúpula." },
+                buffet_libre: { name: "Buffet Libre Infinito 'Gula Real'", reqAffinity: 10, boost: 25, category: "Gastronomía", desc: "Montañas de comida de todas las dimensiones listas para servirse sin límite." },
+                taller_mecanico: { name: "Taller Garaje 'Custom Motors'", reqAffinity: 10, boost: 25, category: "Combate / Entrenamiento", desc: "Grasa de motor, herramientas profesionales y el rugido de motores V8." },
+                parque_acuatico: { name: "Parque Acuático 'Océano Cósmico'", reqAffinity: 20, boost: 35, category: "Entretenimiento", desc: "Toboganes gigantes con luces LED y piscinas de olas artificiales." },
+                acuario_profundo: { name: "Acuario de Profundidades Abisales", reqAffinity: 15, boost: 25, category: "Tranquilo / Naturaleza", desc: "Túneles de cristal rodeados de criaturas marinas bioluminiscentes." },
+                salon_te_ingles: { name: "Salón de Té Real 'Victoria Elegance'", reqAffinity: 15, boost: 25, category: "Gastronomía", desc: "Porcelana fina, té de jazmín y bocadillos elegantes en una mesa imperial." },
+                cabana_nieve: { name: "Cabaña de Madera con Chimenea", reqAffinity: 25, boost: 35, category: "Tranquilo / Naturaleza", desc: "Nieve cayendo afuera mientras se comparte una manta calientita junto al fuego." },
+                pista_baile_disco: { name: "Discoteca Synthwave 'Retro Fever'", reqAffinity: 15, boost: 30, category: "Noche / Fiesta", desc: "Piso iluminado de cuadros, bola de espejos y ritmos synthwave ochenteros." }
+            }
+        };
+
+        // Sims Profile DB
+        const simsProfileDB = {
+            _default: {
+                outfit: "Ropa informal neutra",
+                likes: ["Música", "Conversar", "Explorar el Nexus"],
+                dislikes: ["Perder el tiempo", "Falta de respeto"],
+                mood: "Neutral",
+                mentalState: "Tranquilo",
+                relationship: 50,
+                arousal: 0
+            },
+            batman: {
+                outfit: "Traje táctico de Kevlar reforzado con capa de fibra de carbono",
+                likes: ["Silencio", "Estrategia", "Café negro", "Batarangs"],
+                dislikes: ["Caos injustificado", "Chistes malos", "Pérdida de tiempo"],
+                mentalState: "Hyper-alerta",
+                relationship: 30,
+                arousal: 0
+            },
+            damian_wayne: {
+                outfit: "Traje de Robin con capa amarilla y escudo rojo",
+                likes: ["Artes marciales", "Gatos", "Competir", "Su padre"],
+                dislikes: ["Perder", "Incompetencia", "Que lo traten de niño"],
+                mentalState: "Desafiante",
+                relationship: 25,
+                arousal: 0
+            },
+            dick_grayson: {
+                outfit: "Traje de Nightwing azul y negro con escrímas",
+                likes: ["Acrobacias", "Bromas", "Ayudar", "La familia"],
+                dislikes: ["Soledad", "Abandono", "Traición"],
+                mentalState: "Optimista",
+                relationship: 60,
+                arousal: 0
+            },
+            thomas_wayne: {
+                outfit: "Traje de Batman con detalles rojos y dos pistolas",
+                likes: ["Justicia", "Proteger", "La noche", "Venganza"],
+                dislikes: ["Criminales", "Perder a los seres queridos", "Esperanza"],
+                mentalState: "Amanecido",
+                relationship: 20,
+                arousal: 0
+            },
+            sonic: {
+                outfit: "Zapatillas rojas de velocidad y guantes blancos de algodón",
+                likes: ["Chili Dogs", "Velocidad", "Aventuras", "Música rápida"],
+                dislikes: ["Quedarse quieto", "Lentitud", "Injusticias"],
+                mentalState: "Eufórico",
+                relationship: 60,
+                arousal: 0
+            },
+            shadow: {
+                outfit: "Zapatillas con limitadores y guantes blancos",
+                likes: ["Soledad", "Maria", "La verdad", "El poder"],
+                dislikes: ["Debilidad", "Mentiras", "Perder"],
+                mentalState: "Reservado",
+                relationship: 35,
+                arousal: 0
+            },
+            blitzo: {
+                outfit: "Saco de vestir desaliñado, botas de cuero y arnés táctico",
+                likes: ["Armas de fuego", "Caballos", "Negocios", "Caos"],
+                dislikes: ["Críticas", "Autoridad corporativa", "Que le digan qué hacer"],
+                mentalState: "Impulsivo",
+                relationship: 45,
+                arousal: 0
+            },
+            stolas: {
+                outfit: "Túnica real de la Goetia con símbolos astrológicos",
+                likes: ["Astronomía", "Ocultismo", "Blitzo", "El arte"],
+                dislikes: ["Aburrimiento", "Limitaciones", "Ser ignorado"],
+                mentalState: "Anhelante",
+                relationship: 55,
+                arousal: 0
+            },
+            cloud: {
+                outfit: "Traje de SOLDADO modificado con hombreras",
+                likes: ["La verdad", "Tifa", "Su espada", "La paz"],
+                dislikes: ["Shinra", "Mentiras", "Perder a amigos"],
+                mentalState: "Conflictivo",
+                relationship: 40,
+                arousal: 0
+            }
+        };
+
+        const themePalettes = {
+            heroico: {
+                "--bg-color": "#03121d",
+                "--term-bg": "rgba(10, 25, 41, 0.96)",
+                "--border-color": "#00dfff",
+                "--purple": "#00dfff",
+                "--gold": "#ffe600",
+                "--text-main": "#e1f5fe"
+            },
+            edgy: {
+                "--bg-color": "#120517",
+                "--term-bg": "rgba(22, 10, 28, 0.96)",
+                "--border-color": "#d670ff",
+                "--purple": "#d670ff",
+                "--gold": "#ff79c6",
+                "--text-main": "#f8f8f2"
+            },
+            caotico: {
+                "--bg-color": "#1a0505",
+                "--term-bg": "rgba(31, 10, 10, 0.96)",
+                "--border-color": "#ff4d4d",
+                "--purple": "#ff4d4d",
+                "--gold": "#ffb86c",
+                "--text-main": "#fff0f0"
+            },
+            alegre: {
+                "--bg-color": "#051a0e",
+                "--term-bg": "rgba(9, 31, 18, 0.96)",
+                "--border-color": "#50fa7b",
+                "--purple": "#50fa7b",
+                "--gold": "#f1fa8c",
+                "--text-main": "#f0fff4"
+            },
+            sabio_serio: {
+                "--bg-color": "#05181c",
+                "--term-bg": "rgba(8, 28, 33, 0.96)",
+                "--border-color": "#8be9fd",
+                "--purple": "#8be9fd",
+                "--gold": "#e5c07b",
+                "--text-main": "#edfbfd"
+            },
+            default: {
+                "--bg-color": "#0c0d10",
+                "--term-bg": "rgba(15, 17, 23, 0.96)",
+                "--border-color": "#2e3440",
+                "--purple": "#c678dd",
+                "--gold": "#e5c07b",
+                "--text-main": "#d8dee9"
+            }
+        };
+
+        class SimsEngine {
+            constructor(npcsDatabase) {
+                this.npcs = npcsDatabase;
+                this.initProfiles();
+            }
+
+            initProfiles() {
+                for (let key in this.npcs) {
+                    let baseProfile = simsProfileDB[key] || simsProfileDB._default;
+                    this.npcs[key].simsData = {
+                        relationship: baseProfile.relationship || 50,
+                        mentalState: baseProfile.mentalState || "Estable",
+                        outfit: baseProfile.outfit || "Ropa casual multiversal",
+                        likes: baseProfile.likes || ["Explorar", "Charlar"],
+                        dislikes: baseProfile.dislikes || ["Mala onda", "Ignorancia"],
+                        arousal: baseProfile.arousal || 0,
+                        currentMood: "normal"
+                    };
+                    this.npcs[key].affinity = this.npcs[key].simsData.relationship;
+                }
+            }
+
+            updateAffection(npcKey, delta) {
+                const npc = this.npcs[npcKey];
+                if (!npc) return;
+
+                let current = npc.simsData.relationship;
+                current = Math.max(0, Math.min(100, current + delta));
+                npc.simsData.relationship = current;
+
+                this.updateMentalState(npcKey);
+                npc.affinity = current;
+            }
+
+            updateArousal(npcKey, delta) {
+                const npc = this.npcs[npcKey];
+                if (!npc) return;
+
+                npc.simsData.arousal = Math.max(0, Math.min(100, npc.simsData.arousal + delta));
+                
+                if (npc.simsData.arousal > 80) {
+                    npc.simsData.currentMood = "aroused";
+                } else if (npc.simsData.arousal > 50) {
+                    npc.simsData.currentMood = "excited";
+                }
+            }
+
+            updateMentalState(npcKey) {
+                const npc = this.npcs[npcKey];
+                let rel = npc.simsData.relationship;
+
+                if (rel >= 90) npc.simsData.mentalState = "Esposo / Comprometido";
+                else if (rel >= 75) npc.simsData.mentalState = "Enamorado / Devoto";
+                else if (rel >= 60) npc.simsData.mentalState = "Excitado / Interesado";
+                else if (rel >= 40) npc.simsData.mentalState = "Tranquilo / Amigable";
+                else if (rel >= 20) npc.simsData.mentalState = "Distante / Desconfiado";
+                else npc.simsData.mentalState = "Hostil / Agresivo";
+            }
+
+            setMindBreak(npcKey) {
+                const npc = this.npcs[npcKey];
+                npc.simsData.mentalState = "Mindbroken / Sumiso Permanente";
+                npc.simsData.currentMood = "mindbroken";
+                npc.simsData.arousal = 100;
+            }
+
+            setMindControl(npcKey) {
+                const npc = this.npcs[npcKey];
+                npc.simsData.mentalState = "Controlado Mentalmente";
+                npc.simsData.currentMood = "controlled";
+            }
+
+            applyCharacterTheme(npcKey) {
+                const npc = this.npcs[npcKey];
+                if (!npc || !npc.tags) return;
+
+                let chosenTag = "default";
+                for (let tag of npc.tags) {
+                    if (themePalettes[tag]) {
+                        chosenTag = tag;
+                        break;
+                    }
+                }
+
+                const palette = themePalettes[chosenTag];
+                const root = document.documentElement;
+
+                root.style.setProperty('--bg-color', palette["--bg-color"]);
+                root.style.setProperty('--term-bg', palette["--term-bg"]);
+                root.style.setProperty('--border-color', palette["--border-color"]);
+                root.style.setProperty('--purple', palette["--purple"]);
+                root.style.setProperty('--gold', palette["--gold"]);
+                root.style.setProperty('--text-main', palette["--text-main"]);
+            }
+
+            getMoodClass(mood) {
+                const classes = {
+                    normal: "mood-normal",
+                    aroused: "mood-aroused",
+                    submissive: "mood-submissive",
+                    dominant: "mood-dominant",
+                    mindbroken: "mood-mindbroken",
+                    irritated: "mood-irritated"
+                };
+                return classes[mood] || "mood-normal";
+            }
+
+            renderSimsCard(npcKey) {
+                const npc = this.npcs[npcKey];
+                if (!npc) return `<span class="warning">Personaje no encontrado.</span>`;
+
+                this.applyCharacterTheme(npcKey);
+
+                const sims = npc.simsData;
+                const rel = sims.relationship;
+                const arousal = sims.arousal;
+
+                const barLength = 10;
+                const filled = Math.round((rel / 100) * barLength);
+                const empty = barLength - filled;
+                const progressBar = "🟩".repeat(filled) + "⬛".repeat(empty);
+
+                const arousalBar = "🔥".repeat(Math.round(arousal / 10)) + "⚫".repeat(10 - Math.round(arousal / 10));
+
+                const moodClass = this.getMoodClass(sims.currentMood);
+                const moodIndicator = `<span class="mood-indicator ${moodClass}">${sims.currentMood.toUpperCase()}</span>`;
+
+                // Get current dialogue based on mood
+                let currentDialogue = "";
+                if (npc.dialogues && npc.dialogues[sims.currentMood]) {
+                    const dialogues = npc.dialogues[sims.currentMood];
+                    currentDialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+                }
+
+                return `
+                    <div style="border: 2px solid var(--border-color); padding: 12px; background: rgba(0,0,0,0.4); border-radius: 8px; margin: 10px 0;">
+                        <div style="font-size:1.1rem; color:var(--purple); font-weight:bold; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
+                            💎 FICHA SIMS: ${npc.name.toUpperCase()} ${moodIndicator}
+                        </div>
+                        
+                        <div style="margin-top: 8px;">
+                            <strong>Barra de Agrado:</strong> [${progressBar}] <strong>${rel} / 100 pts</strong>
+                        </div>
+                        <div style="margin-top: 4px;">
+                            <strong>Excitación:</strong> [${arousalBar}] <strong>${arousal} / 100</strong>
+                        </div>
+                        <div><strong>Estado Mental:</strong> <span style="color:var(--gold);">${sims.mentalState}</span></div>
+                        <div><strong>Ropa Actual:</strong> ${sims.outfit}</div>
+                        
+                        <div style="margin-top: 6px; font-size: 0.85rem;">
+                            <span style="color:var(--green);">👍 Gustos:</span> ${sims.likes.join(", ")}<br>
+                            <span style="color:var(--red);">👎 Disgustos:</span> ${sims.dislikes.join(", ")}
+                        </div>
+
+                        ${currentDialogue ? `
+                        <div class="speech-bubble" style="margin-top: 8px;">
+                            <strong>💬 Dice:</strong> "${currentDialogue}"
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize NPCs with full data
+        const npcsDB = {};
+        for (let key in rawNpcsDB) {
+            let src = rawNpcsDB[key];
+            npcsDB[key] = {
+                name: src.name,
+                title: src.tags ? src.tags.join(" • ") : "Viajero Multiversal",
+                desc: src.desc,
+                appearance: `${src.desc} Mantiene una postura distintiva y aura característica.`,
+                affinity: 0,
+                room: src.room,
+                tags: src.tags || [],
+                favoritePlace: src.favoritePlace || "cafe_gourmet",
+                dialogues: src.dialogues || {},
+                responses: {
+                    hablar: {
+                        low: `"${src.dialogue}"`,
+                        high: `"${src.dialogue} (Te mira con profunda confianza e interés acumulado)"`
+                    },
+                    coquetear: {
+                        low: `"${src.name} sonríe algo sorprendido por tus palabras directas."`,
+                        high: `"${src.name} se sonroja notablemente y te devuelve un guiño cómplice."`
+                    },
+                    besar: {
+                        low: `"${src.name} da un paso atrás algo ruborizado: 'Aún no nos conocemos lo suficiente...'."`,
+                        high: `"${src.name} te corresponde el beso calurosamente con una sonrisa radiante."`
+                    },
+                    abrazar: {
+                        low: `"${src.name} acepta el abrazo con cordialidad y un gesto amable."`,
+                        high: `"${src.name} te rodea con fuerza reconociendo el gran vínculo que los une."`
+                    },
+                    masaje: {
+                        low: `"${src.name} se pone algo rígido: 'Che, recién nos conocemos, aflojá un poco'."`,
+                        high: `"${src.name} deja caer los hombros, suspira de alivio y se entrega por completo al masaje relajante."`
+                    },
+                    acariciar_cabello: {
+                        low: `"${src.name} se aparta suavemente con una risita nerviosa."`,
+                        high: `"${src.name} cierra los ojos, inclinando la cabeza hacia tu mano para disfrutar la caricia."`
+                    },
+                    acariciar: {
+                        low: `"${src.name} se acomoda la ropa, algo confundido por el gesto tan cercano."`,
+                        high: `"${src.name} busca tu contacto y te sostiene la mirada con calidez."`
+                    },
+                    halagar: {
+                        low: `"${src.name} te da las gracias con una sonrisa modesta."`,
+                        high: `"${src.name} se ilumina por completo: 'Nadie me había dicho algo tan sincero en mucho tiempo'."`
+                    },
+                    poesia: {
+                        low: `"${src.name} escucha con atención pero se ríe un poco de lo dramático del verso."`,
+                        high: `"${src.name} queda cautivado por tus versos, escuchando cada palabra con verdadera devoción."`
+                    },
+                    carta_amor: {
+                        low: `"${src.name} recibe el papel sorprendido: 'Esto es muy lindo, pero vamos despacio...'."`,
+                        high: `"${src.name} guarda la carta cerca de su pecho con una sonrisa imborrable."`
+                    },
+                    romantico: {
+                        low: `"${src.name} nota la atmósfera especial pero intenta cambiar de tema de forma tímida."`,
+                        high: `"${src.name} aprovecha el ambiente romántico para dar un paso más cerca tuyo."`
+                    },
+                    bailar: {
+                        low: `"${src.name} se tropieza un poco: 'No soy muy bueno en la pista, pero hago el intento'."`,
+                        high: `"${src.name} te toma de la cintura y se mueve con vos al ritmo de la música con total fluidez."`
+                    },
+                    jugar: {
+                        low: `"${src.name} acepta el juego de buena gana para pasar el rato."`,
+                        high: `"${src.name} se divierte como nunca, riendo a carcajadas con vos."`
+                    },
+                    juguetear: {
+                        low: `"${src.name} te da un empujoncito juguetón en el hombro."`,
+                        high: `"${src.name} te sigue el juego con picardía y un toque de complicidad."`
+                    },
+                    tomar_mano: {
+                        low: `"${src.name} mira sus manos entrelazadas con sorpresa antes de soltarse despacio."`,
+                        high: `"${src.name} entrelaza sus dedos con los tuyos firmemente y no te suelta."`
+                    }
+                }
+            };
+        }
+
+        const simsEngine = new SimsEngine(npcsDB);
+
+        const roomsDB = {
+            salon_central: {
+                name: "Gran Salón Nexus Multiversal",
+                desc: "Un punto neutro colosal de neón y mármol. Desde acá salen todos los portales hacia las distintas dimensiones y universos.",
+                exits: { norte: "universo_dc", sur: "universo_sega_sonic", este: "universo_hazbin_helluva", oeste: "universo_capcom_resident", arriba: "universo_dragon_ball", abajo: "universo_arcade_retro" },
+                npcs: ["kaito", "doomentio", "grant", "pepsiman"],
+                items: ["pepsi", "pizzatactica", "lubricante", "esposas"]
+            },
+            universo_dc: {
+                name: "Universo DC: Ciudad Gótica y Metrópolis",
+                desc: "Calles oscuras custodiadas por vigilantes nocturnos, con el imponente cielo de Metrópolis recortándose a lo lejos. Hay una CUEVA secreta al norte.",
+                exits: { sur: "salon_central", norte: "cueva_batcueva" },
+                npcs: ["batman", "superman", "dick_grayson", "tim_drake", "damian_wayne", "thomas_wayne", "conner_kent", "bart_allen", "beast_boy", "blue_beetle"],
+                items: ["batarang", "cafe", "chamarra_cuero", "barra_energia", "tofu_vegano", "escarabajo_alienigena", "látigo", "collar"]
+            },
+            cueva_batcueva: {
+                name: "La Batcueva Secreta",
+                desc: "Un santuario oscuro bajo Wayne Manor. El ambiente está cargado de tensión sexual.",
+                exits: { sur: "universo_dc" },
+                npcs: ["batman", "damian_wayne", "thomas_wayne", "dick_grayson"],
+                items: ["mascara", "plug", "vibrador"],
+                isSpecialEvent: true,
+                eventKey: "cueva_batfamily"
+            },
+            universo_dragon_ball: {
+                name: "Universo Dragon Ball: Tierra y Templo Sagrado",
+                desc: "Llanuras montañosas verdes con islas flotantes y una energía espiritual abrumadora en el ambiente.",
+                exits: { abajo: "salon_central", este: "universo_shonen_jump" },
+                npcs: ["gohan_adulto", "gohan_nino", "trunks_nino", "trunks_futuro", "android_17", "kaio_shin"],
+                items: ["semilla_del_hermitano", "aceite"]
+            },
+            universo_shonen_jump: {
+                name: "Universo Anime: Valle Shōnen",
+                desc: "Un paisaje épico donde se cruzan villas ninja, gremios de magos y escuelas de héroes.",
+                exits: { oeste: "universo_dragon_ball", sur: "universo_anime_variado" },
+                npcs: ["naruto_uzumaki", "natsu_dragneel", "midoriya_izuku", "shinra_kusakabe"],
+                items: ["ramen_naruto"]
+            },
+            universo_anime_variado: {
+                name: "Universo Anime: Distrito Isekai y Fantasía",
+                desc: "Un cruce urbano y fantástico donde la magia moderna y el combate de espadas chocan.",
+                exits: { norte: "universo_shonen_jump" },
+                npcs: ["shirou_emiya", "kirito_kazuto", "kamijou_touma", "senpai"],
+                items: ["manga"]
+            },
+            universo_hazbin_helluva: {
+                name: "Universo Hellverse: Inframundo & Hazbin Hotel",
+                desc: "Un ambiente elegante victoriano bañado en tonos carmesí, luces de neón rojo y elegancia macabra.",
+                exits: { oeste: "salon_central" },
+                npcs: ["blitzo", "stolas", "alastor", "lucifer"],
+                items: ["rosas", "pato", "contrato", "armapositron", "mascara"],
+                isSpecialEvent: true,
+                eventKey: "fiesta_helluva"
+            },
+            universo_sega_sonic: {
+                name: "Universo SEGA: Green Hill & Space Colony",
+                desc: "Colinas verdes con bucles de velocidad que se entrelazan con estaciones espaciales de alta tecnología.",
+                exits: { norte: "salon_central" },
+                npcs: ["sonic", "shadow", "zazz"],
+                items: ["esmeralda", "hotdog", "barra_energia"]
+            },
+            universo_capcom_resident: {
+                name: "Universo Capcom: Raccoon City & R.P.D.",
+                desc: "Pasillos oscuros en ruinas, cintas de precaución y una atmósfera constante de supervivencia zombie.",
+                exits: { este: "salon_central", sur: "universo_darkstalkers" },
+                npcs: ["leon_kennedy_re2", "leon_kennedy_re4", "chris_redfield", "mega_man"],
+                items: ["hierba_verde"]
+            },
+            universo_darkstalkers: {
+                name: "Universo Darkstalkers & Fighting",
+                desc: "Escenarios oscuros iluminados por la luna llena donde luchadores sobrenaturales miden sus fuerzas.",
+                exits: { norte: "universo_capcom_resident" },
+                npcs: ["jontalbain", "mukai"],
+                items: ["hueso"]
+            },
+            universo_nintendo: {
+                name: "Universo Nintendo: Reino Champiñón y Cielos",
+                desc: "Plataformas de colores, cielos dorados celestiales y templos grecorromanos flotantes.",
+                exits: { arriba: "universo_arcade_retro" },
+                npcs: ["waluigi", "pit_kid_icarus", "dark_pit", "link_zelda"],
+                items: ["berenjena", "pluma_arco", "escudo_hyliano"]
+            },
+            universo_gaming_rpg: {
+                name: "Universo Gaming RPG & Aventura",
+                desc: "Ruinas místicas, espadas legendarias y mundos al borde de la destrucción reuniéndose en un solo punto.",
+                exits: { oeste: "universo_arcade_retro" },
+                npcs: ["cloud", "sora", "crash"],
+                items: ["espadabuster", "bateriacristal", "llave_espada_replica"]
+            },
+            universo_arcade_retro: {
+                name: "Sector Arcade & Zona Secreta",
+                desc: "Pantallas CRT rugiendo con luces púrpura y una bóveda tecnológica escondida en el piso inferior.",
+                exits: { arriba: "salon_central", abajo: "universo_nintendo", este: "universo_gaming_rpg" },
+                npcs: [],
+                items: ["bateriacronos"]
+            }
+        };
+
+        const gameState = {
+            currentRoom: "salon_central",
+            inventory: [],
+            turns: 0,
+            eventActive: null,
+            eventStage: 0
+        };
+
+        const terminalBody = document.getElementById('terminal-body');
+        const cmdInput = document.getElementById('cmd-input');
+
+        function printLog(content, type = '') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = content;
+            terminalBody.appendChild(entry);
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+
+        function renderTagsHTML(tagsArray) {
+            if (!tagsArray || !Array.isArray(tagsArray) || tagsArray.length === 0) return '';
+            let chips = tagsArray.map(tag => {
+                let cleanTag = tag.toLowerCase().trim().replace(/[\s-]+/g, '_');
+                return `<span class="tag-chip tag-${cleanTag}">#${tag}</span>`;
+            });
+            return `<div class="tag-container">${chips.join('')}</div>`;
+        }
+
+        function updateStats() {
+            document.getElementById('stat-turnos').textContent = gameState.turns;
+            let sum = 0;
+            let count = 0;
+            for (let k in npcsDB) {
+                sum += npcsDB[k].affinity;
+                count++;
+            }
+            let avg = count > 0 ? Math.min(100, Math.round(sum / count)) : 0;
+            document.getElementById('stat-afecto').textContent = `${avg}%`;
+            
+            // Update event counter
+            let eventCount = Object.keys(specialEvents).length;
+            document.getElementById('stat-eventos').textContent = eventCount;
+        }
+
+        function checkSpecialEvent() {
+            const room = roomsDB[gameState.currentRoom];
+            if (room.isSpecialEvent && room.eventKey) {
+                const event = specialEvents[room.eventKey];
+                if (event && !gameState.eventActive) {
+                    gameState.eventActive = room.eventKey;
+                    gameState.eventStage = 0;
+                    triggerEvent(event);
+                }
+            }
+        }
+
+        function triggerEvent(event) {
+            sfx.playEvent();
+            printLog(event.scenes.intro);
+            
+            if (event.scenes.options) {
+                let optionsHTML = '<div class="dialogue-tree"><strong>¿Qué haces?</strong><br>';
+                event.scenes.options.forEach((opt, idx) => {
+                    optionsHTML += `<div class="dialogue-option" onclick="selectEventOption('${event.eventKey}', ${idx})">${idx + 1}. ${opt.text}</div>`;
+                });
+                optionsHTML += '</div>';
+                printLog(optionsHTML);
+            }
+        }
+
+        function selectEventOption(eventKey, optionIdx) {
+            const event = specialEvents[eventKey];
+            const option = event.scenes.options[optionIdx];
+            
+            if (option.target && event.scenes.dialogues[option.target]) {
+                const dialogue = event.scenes.dialogues[option.target];
+                printLog(`<div class="speech-bubble"><strong>${option.text}:</strong><br>${dialogue.start}</div>`);
+                
+                // Show progression
+                let progressHTML = '<div class="nsfw-scene"><div class="nsfw-title">Desarrollo:</div>';
+                dialogue.progress.forEach((line, idx) => {
+                    progressHTML += `<p>${idx + 1}. ${line}</p>`;
+                });
+                progressHTML += '</div>';
+                
+                setTimeout(() => {
+                    printLog(progressHTML);
+                    sfx.playNSFW();
+                    
+                    // Update affection for all participants
+                    event.participants.forEach(p => {
+                        simsEngine.updateAffection(p, 50);
+                        simsEngine.updateArousal(p, 100);
+                    });
+                    updateStats();
+                }, 1000);
+            } else if (option.id === "observar") {
+                printLog('<div class="speech-bubble">Decides observar desde las sombras, disfrutando del espectáculo sin intervenir. La escena es intensa y te deja excitado.</div>');
+            }
+        }
+
+        function renderRoom() {
+            checkSpecialEvent();
+            
+            const room = roomsDB[gameState.currentRoom];
+            let html = `<div class="room-title">📍 ${room.name}</div>`;
+            html += `<p>${room.desc}</p>`;
+
+            if (room.npcs.length > 0) {
+                html += `<p style="margin-top:8px;"><strong>Personajes presentes:</strong></p>`;
+                room.npcs.forEach(key => {
+                    const npc = npcsDB[key];
+                    if (npc) {
+                        let tagsHTML = renderTagsHTML(npc.tags);
+                        let favPlaceName = citasDB.lugares[npc.favoritePlace] ? citasDB.lugares[npc.favoritePlace].name : npc.favoritePlace;
+                        let moodClass = simsEngine.getMoodClass(npc.simsData?.currentMood || 'normal');
+                        let moodTag = `<span class="mood-indicator ${moodClass}">${npc.simsData?.currentMood || 'normal'}</span>`;
+                        
+                        html += `<div style="margin-left: 10px; margin-bottom:4px;">• <span class="npc-name">${npc.name}</span> [Afecto: ${npc.affinity} pts] ${moodTag} ${tagsHTML}<br><small style="color:var(--text-muted); margin-left:12px;">Lugar Favorito: <span style="color:var(--gold);">${favPlaceName}</span> | ${npc.desc}</small></div>`;
+                    }
+                });
+            } else {
+                html += `<p style="margin-top:8px;" class="system-msg">No hay nadie en esta zona en este momento.</p>`;
+            }
+
+            if (room.items.length > 0) {
+                html += `<p style="margin-top:8px;"><strong>Objetos en el suelo:</strong> `;
+                let itemSpans = room.items.map(k => `<span class="item-name">${itemsDB[k] ? itemsDB[k].name : k}</span> [id: <span class="highlight">${k}</span>]`);
+                html += itemSpans.join(', ') + `</p>`;
+            }
+
+            let exitKeys = Object.keys(room.exits).map(e => `<span class="highlight">${e.toUpperCase()}</span>`).join(' | ');
+            html += `<p style="margin-top:8px; font-size:0.85rem;"><small>Salidas de navegación: [ ${exitKeys} ]</small></p>`;
+
+            printLog(html);
+        }
+
+        const baseCommands = [
+            "mirar", "ir norte", "ir sur", "ir este", "ir oeste", "ir arriba", "ir abajo",
+            "interacciones", "interacciones_picantes", "cosas", "inventario", "ayuda", "clear",
+            "apariencia", "hablar", "coquetear", "besar", "abrazar", "masaje", "acariciar_cabello", 
+            "acariciar", "halagar", "poesia", "carta_amor", "romantico", "bailar", "jugar", "juguetear", 
+            "tomar_mano", "desafiar", "cita", "invitar", "lugares_cita", "sims", "enfocar", 
+            "sexo", "69", "footjob", "anilingus", "masturbar", "dedear", "bombear_pechos", 
+            "ordeñar", "striptease", "nalgear", "mindbreak", "mindcontrol", "sumiso", "cachetear",
+            "orgia", "trio", "bdsm", "bondage", "spanking", "deepthroat", "creampie", "facial",
+            "anal", "rimming", "fisting", "eventos_especiales", "savegame slot1", "loadgame slot1"
+        ];
+
+        function handleTabAutocomplete(inputElem) {
+            const current = inputElem.value.toLowerCase().trim();
+            if (!current) return;
+
+            let dict = [...baseCommands];
+            for (let k in npcsDB) {
+                dict.push(`hablar ${k}`);
+                dict.push(`apariencia ${k}`);
+                dict.push(`sims ${k}`);
+                dict.push(`coquetear ${k}`);
+                dict.push(`besar ${k}`);
+                dict.push(`abrazar ${k}`);
+                dict.push(`masaje ${k}`);
+                dict.push(`acariciar_cabello ${k}`);
+                dict.push(`acariciar ${k}`);
+                dict.push(`halagar ${k}`);
+                dict.push(`poesia ${k}`);
+                dict.push(`carta_amor ${k}`);
+                dict.push(`romantico ${k}`);
+                dict.push(`bailar ${k}`);
+                dict.push(`jugar ${k}`);
+                dict.push(`juguetear ${k}`);
+                dict.push(`tomar_mano ${k}`);
+                dict.push(`desafiar ${k}`);
+                dict.push(`sexo ${k}`);
+                dict.push(`mindbreak ${k}`);
+                dict.push(`mindcontrol ${k}`);
+                dict.push(`cachetear ${k}`);
+                for (let l in citasDB.lugares) {
+                    dict.push(`cita ${k} ${l}`);
+                }
+            }
+            for (let i in itemsDB) {
+                dict.push(`tomar ${i}`);
+            }
+
+            const matches = dict.filter(item => item.startsWith(current));
+
+            if (matches.length === 1) {
+                inputElem.value = matches[0] + " ";
+                sfx.playCmdSuccess();
+            } else if (matches.length > 1) {
+                printLog(`<div class="autocomplete-hint">Coincidencias: [ ${matches.slice(0, 10).join(' | ')} ]</div>`);
+                sfx.playKeyPress();
+            }
+        }
+
+        function handleSaveGame(slot = 'slot1') {
+            const slotKey = `zork_save_${slot}`;
+            const saveData = {
+                gameState: gameState,
+                npcsDB: npcsDB,
+                roomsDB: roomsDB,
+                timestamp: new Date().toLocaleString()
+            };
+
+            localStorage.setItem(slotKey, JSON.stringify(saveData));
+            sfx.playCmdSuccess();
+            printLog(`<div class="system-toast">💾 Partida guardada en [${slotKey.toUpperCase()}] (${saveData.timestamp}).</div>`);
+        }
+
+        function handleLoadGame(slot = 'slot1') {
+            const slotKey = `zork_save_${slot}`;
+            const raw = localStorage.getItem(slotKey);
+
+            if (!raw) {
+                printLog(`No existe ninguna partida guardada en el slot: "<strong>${slotKey}</strong>".`, 'warning');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(raw);
+                Object.assign(gameState, data.gameState);
+                Object.assign(npcsDB, data.npcsDB);
+                Object.assign(roomsDB, data.roomsDB);
+
+                updateStats();
+                sfx.playAffectionUp();
+                printLog(`<div class="system-toast">⚡ Partida cargada exitosamente desde [${slotKey.toUpperCase()}].</div>`);
+                renderRoom();
+                drawMapHUD();
+            } catch (e) {
+                printLog(`Error al cargar datos del slot ${slotKey}.`, 'warning');
+            }
+        }
+
+        function drawMapHUD() {
+            const canvas = document.getElementById('map-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#08090c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const mapCoords = {
+                universo_dc: { x: 140, y: 15 },
+                universo_dragon_ball: { x: 180, y: 15 },
+                universo_shonen_jump: { x: 220, y: 15 },
+                universo_anime_variado: { x: 220, y: 45 },
+                salon_central: { x: 140, y: 45 },
+                universo_capcom_resident: { x: 80, y: 45 },
+                universo_darkstalkers: { x: 80, y: 75 },
+                universo_hazbin_helluva: { x: 200, y: 45 },
+                universo_sega_sonic: { x: 140, y: 75 },
+                universo_arcade_retro: { x: 50, y: 45 },
+                universo_nintendo: { x: 20, y: 45 },
+                universo_gaming_rpg: { x: 50, y: 75 },
+                cueva_batcueva: { x: 140, y: 5 }
+            };
+
+            ctx.strokeStyle = '#282c34';
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.moveTo(mapCoords.salon_central.x, mapCoords.salon_central.y);
+            ctx.lineTo(mapCoords.universo_dc.x, mapCoords.universo_dc.y);
+            ctx.moveTo(mapCoords.salon_central.x, mapCoords.salon_central.y);
+            ctx.lineTo(mapCoords.universo_sega_sonic.x, mapCoords.universo_sega_sonic.y);
+            ctx.moveTo(mapCoords.salon_central.x, mapCoords.salon_central.y);
+            ctx.lineTo(mapCoords.universo_hazbin_helluva.x, mapCoords.universo_hazbin_helluva.y);
+            ctx.moveTo(mapCoords.salon_central.x, mapCoords.salon_central.y);
+            ctx.lineTo(mapCoords.universo_capcom_resident.x, mapCoords.universo_capcom_resident.y);
+            ctx.moveTo(mapCoords.universo_dc.x, mapCoords.universo_dc.y);
+            ctx.lineTo(mapCoords.cueva_batcueva.x, mapCoords.cueva_batcueva.y);
+            ctx.stroke();
+
+            for (let rKey in mapCoords) {
+                const pos = mapCoords[rKey];
+                const isCurrent = (rKey === gameState.currentRoom);
+
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, isCurrent ? 6 : 3, 0, Math.PI * 2);
+
+                if (isCurrent) {
+                    ctx.fillStyle = '#98c379';
+                    ctx.shadowColor = '#98c379';
+                    ctx.shadowBlur = 8;
+                } else {
+                    ctx.fillStyle = roomsDB[rKey]?.isSpecialEvent ? '#ff2d7e' : '#3b4252';
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function handleDuel(targetName) {
+            const foundKey = findNPCInRoom(targetName);
+            if (!foundKey) {
+                printLog(`No encuentras a "<strong>${targetName}</strong>" aquí para un desafío.`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[foundKey];
+            sfx.playCombatHit();
+
+            printLog(`
+                <div style="border: 1px solid var(--red); padding: 10px; background: rgba(224,108,117,0.08); border-radius: 6px;">
+                    <div style="color:var(--red); font-weight:bold;">⚔️ DESAFÍO TÁCTICO DE TEXTO ASCII — VS ${npc.name.toUpperCase()}</div>
+                    <pre style="color:var(--gold); font-size:0.75rem; margin:6px 0;">
+  /\_/\  
+ ( o.o )  [SISTEMA DE COMBATE CHIPTUNE ACTIVO]
+  > ^ <   ${npc.name} acepta el combate amigable.
+                    </pre>
+                    <p>Intercambian ráfagas de energía y movimientos gimnásticos en la sala. ¡Tras un duelo espectacular, quedas en empate técnico!</p>
+                    <p class="system-msg">Afecto de valentía aumentado en +15 puntos con ${npc.name}.</p>
+                </div>
+            `);
+
+            simsEngine.updateAffection(foundKey, 15);
+            updateStats();
+        }
+
+        function findNPCInRoom(targetName) {
+            if (!targetName) return null;
+            const room = roomsDB[gameState.currentRoom];
+            return room.npcs.find(key => {
+                const npc = npcsDB[key];
+                return key.toLowerCase() === targetName.toLowerCase() || (npc && npc.name.toLowerCase().includes(targetName.toLowerCase()));
+            });
+        }
+
+        function handleNSFWAction(targetName, action) {
+            if (!targetName) {
+                printLog(`¿A quién quieres ${action}? Ej: <span class="highlight">${action} batman</span>`, 'warning');
+                return;
+            }
+
+            const foundKey = findNPCInRoom(targetName);
+            if (!foundKey) {
+                printLog(`No ves a "<strong>${targetName}</strong>" en esta área.`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[foundKey];
+            const actionData = nsfwActions[action];
+            
+            if (!actionData) {
+                printLog(`Acción NSFW no encontrada: ${action}`, 'warning');
+                return;
+            }
+
+            // Check if affinity is high enough for NSFW
+            if (npc.affinity < 40 && action !== 'cachetear') {
+                printLog(`<div class="warning">${npc.name} rechaza tu avance: 'No estamos lo suficientemente cercanos para eso...' (Necesitas 40+ de afecto)</div>`);
+                return;
+            }
+
+            simsEngine.updateAffection(foundKey, 15);
+            simsEngine.updateArousal(foundKey, actionData.arousalGain);
+            
+            if (action === 'mindbreak') {
+                simsEngine.setMindBreak(foundKey);
+            } else if (action === 'mindcontrol') {
+                simsEngine.setMindControl(foundKey);
+            }
+
+            updateStats();
+            sfx.playNSFW();
+
+            // Generate scene description
+            let sceneDesc = generateNSFWScene(npc.name, action, npc.simsData.currentMood);
+            
+            printLog(`
+                <div class="nsfw-scene">
+                    <div class="nsfw-title">🔥 ${actionData.name.toUpperCase()} con ${npc.name.toUpperCase()}</div>
+                    <p><strong>${actionData.desc}</strong></p>
+                    <div class="ascii-art">
+    ♥‿♥    ♥‿♥
+   ( ͡° ͜ʖ ͡°)  ( ͡° ͜ʖ ͡°)
+    </div>
+                    <p>${sceneDesc}</p>
+                    <p style="color:var(--pink); margin-top:8px;">
+                        Excitación de ${npc.name}: ${npc.simsData.arousal}/100<br>
+                        Afecto ganado: +15 pts
+                    </p>
+                </div>
+            `);
+
+            // Special dialogues based on mood
+            if (npc.dialogues && npc.dialogues[npc.simsData.currentMood]) {
+                let dialogues = npc.dialogues[npc.simsData.currentMood];
+                let randomDialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+                printLog(`<div class="speech-bubble"><strong>${npc.name}:</strong> "${randomDialogue}"</div>`);
+            }
+        }
+
+        function generateNSFWScene(npcName, action, mood) {
+            const scenes = {
+                sexo: {
+                    normal: `${npcName} te recibe con pasión, sus manos explorando tu cuerpo con ansia.`,
+                    aroused: `${npcName} te arrastra hacia la cama (o superficie más cercana), desesperado por sentirte.`,
+                    submissive: `${npcName} se ofrece completamente, pidiendo que lo tomes como desees.`,
+                    dominant: `${npcName} te empuja contra la pared, tomando el control total de la situación.`,
+                    mindbroken: `${npcName} jadea sin palabras, solo capaz de sentir, receptivo a cada movimiento.`
+                },
+                "69": {
+                    normal: `Ambos buscáis el placer mutuo en una danza íntima de bocas y lenguas.`,
+                    aroused: `${npcName} te devora con hambre insaciable mientras tú haces lo mismo.`,
+                    submissive: `${npcName} se pone debajo, sirviéndote con su boca obedientemente.`,
+                    dominant: `${npcName} se posiciona arriba, controlando el ritmo y la profundidad.`
+                },
+                mindbreak: {
+                    normal: `Con estimulación constante y extrema, ${npcName} empieza a perder la coherencia...`,
+                    aroused: `${npcName} ya está cerca del borde. Empujás un poco más... y cruza el punto de no retorno.`
+                },
+                cachetear: {
+                    normal: `Un golpe seco en las nalgas hace que ${npcName} jadee sorprendido.`,
+                    submissive: `${npcName} pide más, mostrando las nalgas para recibir más castigo.`,
+                    dominant: `${npcName} te mira desafiante, pero notás que le excita.`
+                }
+            };
+
+            return (scenes[action] && scenes[action][mood]) ? scenes[action][mood] : `${npcName} participa en ${action} contigo con intensidad.`;
+        }
+
+        function handleCita(targetName, lugarKey) {
+            if (!targetName) {
+                printLog('Sintaxis: <span class="highlight">cita [personaje] [lugar]</span> (Ej: <code>cita blitzo club_gay_striptease</code>)', 'warning');
+                return;
+            }
+
+            const foundKey = findNPCInRoom(targetName);
+            if (!foundKey) {
+                printLog(`No ves a "<strong>${targetName}</strong>" en este sector para invitarlo a salir.`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[foundKey];
+            
+            if (!lugarKey) {
+                printLog(`¿A dónde quieres llevar a ${npc.name}? Usa <span class="highlight">lugares_cita</span> para ver la lista completa.`, 'warning');
+                return;
+            }
+
+            let cleanLugarKey = lugarKey.toLowerCase().trim();
+            const lugar = citasDB.lugares[cleanLugarKey];
+
+            if (!lugar) {
+                printLog(`El lugar "<strong>${lugarKey}</strong>" no existe. Usa <span class="highlight">lugares_cita</span> para ver la lista de claves.`, 'warning');
+                return;
+            }
+
+            if (npc.affinity < lugar.reqAffinity) {
+                printLog(`
+                    <div class="speech-bubble">
+                        "${npc.name} vacila un momento: 'Aún no tenemos la confianza suficiente para ir a ${lugar.name}... Necesitamos al menos ${lugar.reqAffinity} puntos de afecto (Afecto actual: ${npc.affinity} pts)'"
+                    </div>
+                `, 'warning');
+                return;
+            }
+
+            let bonus = 0;
+            let isFavorite = (npc.favoritePlace === cleanLugarKey);
+            if (isFavorite) {
+                bonus = 20;
+            }
+
+            let totalBoost = lugar.boost + bonus;
+            simsEngine.updateAffection(foundKey, totalBoost);
+            simsEngine.updateArousal(foundKey, 20);
+            updateStats();
+            sfx.playAffectionUp();
+
+            let reactionText = "";
+            if (isFavorite) {
+                reactionText = `¡${npc.name} SE EMOCIONA ENORMEMENTE! Este es su lugar preferido de todo el multiverso. ¡Obtienes un super bonus de +${bonus} puntos de afecto adicionales!`;
+            } else if (npc.tags.includes("edgy") && (cleanLugarKey === "bar_subterraneo" || cleanLugarKey === "azotea_gothica")) {
+                reactionText = `${npc.name} observa la atmósfera sombría con satisfacción: 'Nada mal... un lugar decente para mantenerse alejado de la chusma.'`;
+            } else if (npc.tags.includes("alegre") && (cleanLugarKey === "parque_atracciones" || cleanLugarKey === "piscina_termal")) {
+                reactionText = `${npc.name} salta de entusiasmo y disfruta cada segundo del viaje al máximo.`;
+            } else if (npc.tags.includes("caotico") && (cleanLugarKey === "club_gay_striptease" || cleanLugarKey === "concierto_rock")) {
+                reactionText = `${npc.name} desata el caos y ríe a carcajadas contagiándote su energía salvaje.`;
+            } else {
+                reactionText = `${npc.name} disfruta enormemente del ambiente relajado y conversan plácidamente durante horas.`;
+            }
+
+            // Get dialogue based on mood
+            let dateDialogue = "";
+            if (npc.dialogues && npc.dialogues[npc.simsData.currentMood]) {
+                let dialogues = npc.dialogues[npc.simsData.currentMood];
+                dateDialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+            }
+
+            printLog(`
+                <div style="border: 1px solid var(--purple); padding: 12px; background: rgba(198,120,221,0.12); border-radius: 8px; margin: 8px 0;">
+                    <div style="color:var(--purple); font-weight:bold; font-size:1.05rem;">🌹 CITA EXITOSA EN: ${lugar.name.toUpperCase()}</div>
+                    <p style="margin-top:6px; font-size:0.85rem; color:var(--text-muted);">${lugar.desc}</p>
+                    <p style="margin-top:8px;">Has llevado a <span class="npc-name">${npc.name}</span> de cita. ${reactionText}</p>
+                    ${dateDialogue ? `<div class="speech-bubble">"${npc.name}: '${dateDialogue}'"</div>` : ''}
+                    <p class="system-msg" style="margin-top:6px;">✨ ¡Afecto ganado: +${totalBoost} puntos! (Afecto total: ${npc.affinity} pts)<br>🔥 Excitación aumentada: +20</p>
+                </div>
+            `);
+        }
+
+        function handleListCitas() {
+            let html = `
+                <p><strong>🌹 CATÁLOGO DE LUGARES PARA CITAS (${Object.keys(citasDB.lugares).length} ESTABLECIMIENTOS):</strong></p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Sintaxis: <code>cita [personaje] [clave_lugar]</code> (Ej: <code>cita batman azotea_gothica</code>)</p>
+                <div style="max-height:300px; overflow-y:auto; border:1px solid #282c34; border-radius:4px;">
+                <table class="cmd-table">
+                    <tr><th>Clave</th><th>Nombre del Lugar</th><th>Categoría</th><th>Req. Afecto</th><th>Afecto Base</th></tr>
+            `;
+
+            for (let key in citasDB.lugares) {
+                let lug = citasDB.lugares[key];
+                html += `<tr><td><code>${key}</code></td><td>${lug.name}</td><td>${lug.category}</td><td>${lug.reqAffinity} pts</td><td>+${lug.boost}</td></tr>`;
+            }
+
+            html += `</table></div>`;
+            printLog(html);
+        }
+
+        function handleListNSFW() {
+            let html = `
+                <p><strong>🔥 CATÁLOGO DE INTERACCIONES PICANTES:</strong></p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Requieren 40+ de afecto (excepto cachetear). Sintaxis: <code>[acción] [personaje]</code></p>
+                <div style="max-height:400px; overflow-y:auto; border:1px solid #ff2d7e; border-radius:4px; background:rgba(255,45,126,0.05);">
+                <table class="cmd-table">
+                    <tr><th>Comando</th><th>Nombre</th><th>Excitación</th><th>Descripción</th></tr>
+            `;
+
+            for (let key in nsfwActions) {
+                let act = nsfwActions[key];
+                html += `<tr><td><code style="color:#ff6b9d;">${key}</code></td><td>${act.name}</td><td>+${act.arousalGain}</td><td>${act.desc}</td></tr>`;
+            }
+
+            html += `</table></div>
+                <p style="margin-top:10px; color:var(--pink);"><strong>Estados especiales:</strong></p>
+                <ul style="margin-left:20px; color:var(--text-main);">
+                    <li><code>mindbreak [personaje]</code> - Ruptura mental por placer extremo</li>
+                    <li><code>mindcontrol [personaje]</code> - Control mental total</li>
+                    <li><code>sumiso [personaje]</code> - Hacer sumiso permanentemente</li>
+                </ul>
+            `;
+            printLog(html);
+        }
+
+        function handleListEvents() {
+            let html = `
+                <p><strong>✨ EVENTOS ESPECIALES DISPONIBLES:</strong></p>
+                <div style="border:1px solid var(--gold); border-radius:4px; padding:10px; margin:8px 0;">
+            `;
+            
+            for (let key in specialEvents) {
+                let evt = specialEvents[key];
+                html += `
+                    <div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:8px;">
+                        <strong style="color:var(--gold);">${evt.name}</strong><br>
+                        <small>${evt.desc}</small><br>
+                        <span style="color:var(--cyan);">Ubicación:</span> ${evt.location}<br>
+                        <span style="color:var(--purple);">Participantes:</span> ${evt.participants.map(p => npcsDB[p]?.name || p).join(', ')}<br>
+                        <span style="color:var(--green);">Trigger:</span> <code>${evt.trigger}</code>
+                    </div>
+                `;
+            }
+            
+            html += `</div>
+                <p style="color:var(--text-muted); font-size:0.85rem;">
+                    Para activar un evento, navega a la ubicación indicada o usa el comando correspondiente.
+                </p>
+            `;
+            printLog(html);
+        }
+
+        function parseCommand(raw) {
+            const input = raw.trim();
+            if (!input) return;
+
+            gameState.turns++;
+            updateStats();
+
+            printLog(`<div class="cmd-echo"><span style="color:var(--green)">player@zork-palace</span>:<span style="color:var(--gold)">~/nexus</span>$ ${escapeHTML(input)}</div>`);
+
+            const lower = input.toLowerCase();
+            const tokens = lower.split(' ').filter(t => t !== '');
+            const verb = tokens[0];
+
+            // NSFW commands
+            if (nsfwActions[verb] || ['mindbreak', 'mindcontrol', 'sumiso'].includes(verb)) {
+                let target = tokens.slice(1).join(' ');
+                handleNSFWAction(target, verb);
+            } else if (verb === "savegame") {
+                handleSaveGame(tokens[1]);
+            } else if (verb === "loadgame") {
+                handleLoadGame(tokens[1]);
+            } else if (["ir", "norte", "sur", "este", "oeste", "arriba", "abajo"].includes(verb)) {
+                let dir = verb === "ir" ? tokens[1] : verb;
+                handleMove(dir);
+            } else if (["mirar", "look", "ver"].includes(verb)) {
+                renderRoom();
+            } else if (verb === "apariencia") {
+                handleAppearance(tokens.slice(1).join(' '));
+            } else if (verb === "sims" || verb === "enfocar") {
+                let target = tokens.slice(1).join(' ');
+                let foundKey = findNPCInRoom(target);
+                if (foundKey) {
+                    printLog(simsEngine.renderSimsCard(foundKey));
+                } else {
+                    printLog(`No encuentras a "<strong>${target}</strong>" cerca para ver sus métricas Sims.`, 'warning');
+                }
+            } else if (verb === "interacciones") {
+                handleInteractionsList();
+            } else if (verb === "interacciones_picantes") {
+                handleListNSFW();
+            } else if (verb === "eventos_especiales") {
+                handleListEvents();
+            } else if (["lugares_cita", "citas_lista"].includes(verb)) {
+                handleListCitas();
+            } else if (["cita", "invitar"].includes(verb)) {
+                let target = tokens[1];
+                let lugar = tokens[2];
+                handleCita(target, lugar);
+            } else if (verb === "regalar") {
+                handleGive(lower);
+            } else if (["cosas", "inventario", "inv"].includes(verb)) {
+                handleInventory();
+            } else if (verb === "desafiar") {
+                handleDuel(tokens.slice(1).join(' '));
+            } else if ([
+                "hablar", "conversar", "besar", "coquetear", "seducir", "abrazar",
+                "masaje", "masajear", "acariciar_cabello", "cabello", "acariciar", 
+                "halagar", "elogiar", "poesia", "poema", "carta_amor", "carta", 
+                "romantico", "bailar", "jugar", "juguetear", "tomar_mano", "mano"
+            ].includes(verb)) {
+                let target = tokens.slice(1).join(' ');
+                let act = verb;
+
+                if (verb === "conversar") act = "hablar";
+                if (verb === "seducir") act = "coquetear";
+                if (verb === "masajear") act = "masaje";
+                if (verb === "cabello") act = "acariciar_cabello";
+                if (verb === "elogiar") act = "halagar";
+                if (verb === "poema") act = "poesia";
+                if (verb === "carta") act = "carta_amor";
+                if (verb === "mano") act = "tomar_mano";
+
+                handleNPCAction(target, act);
+            } else if (["tomar", "agarrar", "coger", "get"].includes(verb)) {
+                handleTakeItem(tokens.slice(1).join(' '));
+            } else if (["ayuda", "help"].includes(verb)) {
+                handleHelp();
+            } else if (["clear", "limpiar"].includes(verb)) {
+                terminalBody.innerHTML = '';
+            } else {
+                printLog(`bash: comando no encontrado: "${verb}". Escribe <span class="highlight">ayuda</span> para la lista.`, 'warning');
+            }
+
+            drawMapHUD();
+        }
+
+        function handleMove(direction) {
+            const room = roomsDB[gameState.currentRoom];
+            if (!direction || !room.exits[direction]) {
+                printLog(`No hay salida hacia "<strong>${direction || ''}</strong>".`, 'warning');
+                return;
+            }
+
+            gameState.eventActive = null; // Reset event when moving
+            gameState.currentRoom = room.exits[direction];
+            sfx.playCmdSuccess();
+            printLog(`<span class="system-msg">Te has movido hacia el ${direction.toUpperCase()}...</span>`);
+            renderRoom();
+        }
+
+        function handleAppearance(targetName) {
+            if (!targetName) {
+                printLog('Especifica un personaje. Ej: <span class="highlight">apariencia sonic</span>', 'warning');
+                return;
+            }
+
+            let foundKey = findNPCInRoom(targetName);
+            if (!foundKey) {
+                for (let k in npcsDB) {
+                    if (k.includes(targetName.toLowerCase()) || npcsDB[k].name.toLowerCase().includes(targetName.toLowerCase())) {
+                        foundKey = k;
+                        break;
+                    }
+                }
+            }
+
+            if (!foundKey) {
+                printLog(`No se encontraron datos para "${targetName}".`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[foundKey];
+            let tagsHTML = renderTagsHTML(npc.tags);
+            let favPlaceName = citasDB.lugares[npc.favoritePlace] ? citasDB.lugares[npc.favoritePlace].name : npc.favoritePlace;
+            let moodClass = simsEngine.getMoodClass(npc.simsData?.currentMood || 'normal');
+
+            printLog(`
+                <div style="border: 1px solid #3b4252; padding: 10px; background: rgba(33,37,43,0.5); border-radius: 6px;">
+                    <div class="npc-name" style="font-size:1.05rem;">👤 ${npc.name} — ${npc.title}</div>
+                    <div style="margin-top: 4px;">Etiquetas: ${tagsHTML} <span class="mood-indicator ${moodClass}">${npc.simsData?.currentMood || 'normal'}</span></div>
+                    <div style="margin-top: 6px;"><strong>Detalle Visual:</strong> ${npc.appearance}</div>
+                    <div style="margin-top: 4px; color:var(--gold);"><strong>Lugar Favorito para Citas:</strong> ${favPlaceName} (Clave: <code>${npc.favoritePlace}</code>)</div>
+                    <div style="margin-top: 4px; font-size: 0.85rem;" class="system-msg">Nivel de Afecto: ${npc.affinity} pts | Excitación: ${npc.simsData?.arousal || 0}/100</div>
+                </div>
+            `);
+        }
+
+        function handleNPCAction(targetName, action) {
+            if (!targetName) {
+                printLog(`¿A quién quieres ${action}? Ej: <span class="highlight">${action} blitzo</span>`, 'warning');
+                return;
+            }
+
+            const foundKey = findNPCInRoom(targetName);
+            if (!foundKey) {
+                printLog(`No ves a "<strong>${targetName}</strong>" en esta área.`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[foundKey];
+            simsEngine.updateAffection(foundKey, 10);
+            updateStats();
+            sfx.playAffectionUp();
+
+            let resp = npc.responses[action];
+            if (typeof resp === 'object') {
+                resp = (npc.affinity >= 30) ? resp.high : resp.low;
+            } else if (!resp) {
+                resp = `"${npc.name} reacciona de forma atenta a tu acción."`;
+            }
+
+            // Get random dialogue based on current mood
+            let moodDialogue = "";
+            if (npc.dialogues && npc.dialogues[npc.simsData.currentMood]) {
+                let dialogues = npc.dialogues[npc.simsData.currentMood];
+                moodDialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+            }
+
+            printLog(`
+                <p>Te acercas a <span class="npc-name">${npc.name}</span> para <strong>${action.replace('_', ' ')}</strong>:</p>
+                <div class="speech-bubble">${resp}</div>
+                ${moodDialogue ? `<div class="speech-bubble" style="border-left-color:var(--cyan); background:rgba(86,182,194,0.08);"><strong>Estado ${npc.simsData.currentMood}:</strong> "${moodDialogue}"</div>` : ''}
+            `);
+        }
+
+        function handleGive(fullInput) {
+            const clean = fullInput.replace('regalar ', '');
+            const parts = clean.split(' a ');
+
+            if (parts.length < 2) {
+                printLog('Usa: <span class="highlight">regalar [objeto] a [personaje]</span> (Ej: <code>regalar esmeralda a sonic</code>)', 'warning');
+                return;
+            }
+
+            const itemQuery = parts[0].trim();
+            const npcQuery = parts[1].trim();
+
+            const itemKey = gameState.inventory.find(k => k.toLowerCase() === itemQuery.toLowerCase() || (itemsDB[k] && itemsDB[k].name.toLowerCase().includes(itemQuery.toLowerCase())));
+            if (!itemKey) {
+                printLog(`No tienes "<strong>${itemQuery}</strong>" en tu inventario.`, 'warning');
+                return;
+            }
+
+            const npcKey = findNPCInRoom(npcQuery);
+            if (!npcKey) {
+                printLog(`No se encuentra "<strong>${npcQuery}</strong>" aquí.`, 'warning');
+                return;
+            }
+
+            const npc = npcsDB[npcKey];
+            const item = itemsDB[itemKey];
+
+            gameState.inventory = gameState.inventory.filter(k => k !== itemKey);
+
+            let boost = 20;
+            if (item.giveEffect && item.giveEffect[npcKey]) {
+                boost = item.giveEffect[npcKey];
+            }
+
+            simsEngine.updateAffection(npcKey, boost);
+            updateStats();
+            sfx.playAffectionUp();
+
+            printLog(`
+                <p>Le entregas <span class="item-name">${item.name}</span> a <span class="npc-name">${npc.name}</span>.</p>
+                <div class="speech-bubble">
+                    "${npc.name} recibe el regalo con gran entusiasmo. ¡Afecto aumentado en +${boost} puntos!"
+                </div>
+            `);
+        }
+
+        function handleTakeItem(itemQuery) {
+            if (!itemQuery) {
+                printLog('¿Qué objeto deseas tomar? Ej: <span class="highlight">tomar pepsi</span>', 'warning');
+                return;
+            }
+
+            const room = roomsDB[gameState.currentRoom];
+            const itemKey = room.items.find(k => k.toLowerCase() === itemQuery.toLowerCase() || (itemsDB[k] && itemsDB[k].name.toLowerCase().includes(itemQuery.toLowerCase())));
+
+            if (!itemKey) {
+                printLog(`No hay ningún objeto llamado "<strong>${itemQuery}</strong>" aquí.`, 'warning');
+                return;
+            }
+
+            room.items = room.items.filter(k => k !== itemKey);
+            gameState.inventory.push(itemKey);
+            sfx.playCmdSuccess();
+
+            printLog(`Guardado en inventario: <span class="item-name">${itemsDB[itemKey] ? itemsDB[itemKey].name : itemKey}</span>.`);
+        }
+
+        function handleInventory() {
+            if (gameState.inventory.length === 0) {
+                printLog('<p class="system-msg">Tu inventario está vacío.</p>');
+                return;
+            }
+
+            let html = '<p><strong>🎒 Inventario:</strong></p><ul style="margin-left:20px;">';
+            gameState.inventory.forEach(k => {
+                const item = itemsDB[k] || { name: k, desc: "Objeto misterioso" };
+                html += `<li><span class="item-name">${item.name}</span> [id: <code>${k}</code>] — ${item.desc}</li>`;
+            });
+            html += '</ul>';
+            printLog(html);
+        }
+
+        function handleInteractionsList() {
+            let html = `
+                <p><strong>📜 Menú Completo de Interacciones Disponibles:</strong></p>
+                <div style="max-height:300px; overflow-y:auto; border:1px solid #282c34; border-radius:4px;">
+                <table class="cmd-table">
+                    <tr><th>Comando / Alias</th><th>Ejemplo</th><th>Efecto</th></tr>
+                    <tr><td><code>sims</code> / <code>enfocar</code></td><td><code>sims batman</code></td><td>Ficha completa con estados de ánimo</td></tr>
+                    <tr><td><code>hablar</code> / <code>conversar</code></td><td><code>hablar stolas</code></td><td>Charla básica</td></tr>
+                    <tr><td><code>coquetear</code> / <code>seducir</code></td><td><code>coquetear cloud</code></td><td>Coqueteo directo</td></tr>
+                    <tr><td><code>halagar</code> / <code>elogiar</code></td><td><code>halagar sonic</code></td><td>Expresa admiración</td></tr>
+                    <tr><td><code>poesia</code> / <code>poema</code></td><td><code>poesia kaito</code></td><td>Recita un poema</td></tr>
+                    <tr><td><code>carta_amor</code> / <code>carta</code></td><td><code>carta blitzo</code></td><td>Escribe una carta</td></tr>
+                    <tr><td><code>romantico</code></td><td><code>romantico stolas</code></td><td>Ambiente íntimo</td></tr>
+                    <tr><td><code>masaje</code> / <code>masajear</code></td><td><code>masaje leon</code></td><td>Masaje relajante</td></tr>
+                    <tr><td><code>acariciar_cabello</code></td><td><code>acariciar_cabello cloud</code></td><td>Caricia en el pelo</td></tr>
+                    <tr><td><code>acariciar</code></td><td><code>acariciar superman</code></td><td>Caricia suave</td></tr>
+                    <tr><td><code>tomar_mano</code> / <code>mano</code></td><td><code>tomar_mano sora</code></td><td>Toman de la mano</td></tr>
+                    <tr><td><code>abrazar</code></td><td><code>abrazar crash</code></td><td>Abrazo reconfortante</td></tr>
+                    <tr><td><code>besar</code></td><td><code>besar alastor</code></td><td>Beso apasionado</td></tr>
+                    <tr><td><code>bailar</code></td><td><code>bailar pepsiman</code></td><td>Baile sensual</td></tr>
+                    <tr><td><code>jugar</code></td><td><code>jugar bart_allen</code></td><td>Juego divertido</td></tr>
+                    <tr><td><code>juguetear</code></td><td><code>juguetear beast_boy</code></td><td>Broma y juego</td></tr>
+                    <tr><td><code>cita</code></td><td><code>cita blitzo club_gay_striptease</code></td><td>Salida romántica</td></tr>
+                    <tr><td><code>desafiar</code></td><td><code>desafiar shadow</code></td><td>Duelo amistoso</td></tr>
+                    <tr><td><code>regalar</code></td><td><code>regalar pato a lucifer</code></td><td>Entrega de regalo</td></tr>
+                </table>
+                </div>
+                <p style="margin-top:8px;">Usa <code>interacciones_picantes</code> para ver las acciones NSFW 🔥</p>
+            `;
+            printLog(html);
+        }
+
+        function handleHelp() {
+            let html = `
+                <p><strong>🖥️ SISTEMA ZORK LINUX TERMINAL [+18] - COMANDOS PRINCIPALES:</strong></p>
+                <table class="cmd-table">
+                    <tr><th>Comando</th><th>Descripción</th></tr>
+                    <tr><td><code>mirar</code></td><td>Inspecciona la sala actual y personajes</td></tr>
+                    <tr><td><code>sims [personaje]</code></td><td>Ficha completa con estados de ánimo y diálogos</td></tr>
+                    <tr><td><code>ir [dirección]</code></td><td>Norte, sur, este, oeste, arriba, abajo</td></tr>
+                    <tr><td><code>cita [personaje] [lugar]</code></td><td>Llevar a un personaje a una cita</td></tr>
+                    <tr><td><code>lugares_cita</code></td><td>Lista de 40+ lugares para citas</td></tr>
+                    <tr><td><code>interacciones</code></td><td>Lista de acciones sociales normales</td></tr>
+                    <tr><td><code>interacciones_picantes</code></td><td>🔥 Lista de acciones NSFW (30+ opciones)</td></tr>
+                    <tr><td><code>eventos_especiales</code></td><td>✨ Ver eventos especiales disponibles</td></tr>
+                    <tr><td><code>savegame [slot]</code> / <code>loadgame [slot]</code></td><td>Guardar/cargar partida</td></tr>
+                    <tr><td><code>apariencia [nombre]</code></td><td>Detalles visuales del personaje</td></tr>
+                    <tr><td><code>regalar [objeto] a [nombre]</code></td><td>Obsequiar ítems</td></tr>
+                    <tr><td><code>cosas</code> / <code>inventario</code></td><td>Tus pertenencias</td></tr>
+                    <tr><td><code>tomar [objeto]</code></td><td>Recoger del suelo</td></tr>
+                    <tr><td><code>clear</code></td><td>Limpiar pantalla</td></tr>
+                </table>
+                <p style="margin-top:10px; color:var(--pink);"><strong>💡 Tip:</strong> Presiona TAB para autocompletar comandos y nombres de personajes.</p>
+                <p style="color:var(--gold);"><strong>🔥 Evento especial:</strong> Ve al <code>universo_dc</code> y luego <code>ir norte</code> para encontrar la CUEVA SECRETA.</p>
+            `;
+            printLog(html);
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function execQuick(cmd) {
+            cmdInput.value = cmd;
+            parseCommand(cmd);
+            cmdInput.value = '';
+            cmdInput.focus();
+        }
+
+        function execQuickSims() {
+            const room = roomsDB[gameState.currentRoom];
+            if (room && room.npcs.length > 0) {
+                let firstNpc = room.npcs[0];
+                execQuick(`sims ${firstNpc}`);
+            } else {
+                printLog('No hay nadie en esta sala para ver sus métricas Sims.', 'warning');
+            }
+        }
+
+        cmdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                handleTabAutocomplete(this);
+            } else if (e.key === 'Enter') {
+                const val = cmdInput.value;
+                cmdInput.value = '';
+                parseCommand(val);
+            } else {
+                sfx.playKeyPress();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            printLog('<div class="event-banner"><div class="event-title">🌟 ZORK: PALACE OF DESIRES [+18] 🌟</div><p>Bienvenido al nexo multiversal donde todos tus deseos pueden hacerse realidad.</p><p>Escribe <code>ayuda</code> para comenzar.</p></div>', 'room-title');
+            renderRoom();
+            drawMapHUD();
+        });
+
+    </script>
+</body>
+</html>
