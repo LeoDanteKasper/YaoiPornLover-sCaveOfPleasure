@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZORK - Multiverse Terminal OS v3.0</title>
+    
+    <!-- Tipografías de alta densidad visual -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #08090c;
+            --term-bg: rgba(13, 16, 23, 0.96);
+            --border-color: #2e3440;
+            --border-focus: #61afef;
+            --text-main: #d8dee9;
+            --text-muted: #4c566a;
+            --gold: #e5c07b;
+            --cyan: #56b6c2;
+            --green: #98c379;
+            --red: #e06c75;
+            --purple: #c678dd;
+            --blue: #61afef;
+            --orange: #d19a66;
+            --font-stack: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20, 28, 45, 0.6) 0%, rgba(8, 9, 12, 1) 100%),
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        /* EFECTO SCANLINE CRT RETRO */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .terminal-window {
+            width: 100%;
+            max-width: 1100px;
+            height: 92vh;
+            background: var(--term-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(97, 175, 239, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            position: relative;
+            z-index: 10;
+        }
+
+        .terminal-header {
+            background: #161922;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #212631;
+            user-select: none;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .control-btn:hover { transform: scale(1.15); }
+        .btn-close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .btn-minimize { background-color: #ffbd2e; border: 1px solid #fea028; }
+        .btn-maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        .window-title {
+            color: var(--blue);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .system-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.78rem;
+        }
+
+        .stat-badge {
+            background: #1e222b;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #282d39;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-badge span {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .map-hud-container {
+            background: #0b0d12;
+            border-bottom: 1px solid #1e222b;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .map-hud-title {
+            font-size: 0.78rem;
+            color: var(--gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 22px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #2b303c #0b0d12;
+        }
+
+        .terminal-body::-webkit-scrollbar { width: 6px; }
+        .terminal-body::-webkit-scrollbar-track { background: #0b0d12; }
+        .terminal-body::-webkit-scrollbar-thumb { background: #2b303c; border-radius: 3px; }
+
+        .log-entry {
+            line-height: 1.6;
+            font-size: 0.92rem;
+            animation: fadeIn 0.12s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cmd-echo {
+            color: var(--blue);
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .room-title {
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-bottom: 1px dashed var(--gold);
+            padding-bottom: 4px;
+            margin: 8px 0 6px 0;
+            display: inline-block;
+        }
+
+        .npc-name { color: var(--purple); font-weight: bold; }
+        .item-name { color: var(--green); font-weight: bold; }
+        .highlight { color: var(--cyan); }
+        .warning { color: var(--red); }
+        .system-msg { color: var(--text-muted); font-style: italic; }
+
+        .speech-bubble {
+            background: rgba(198, 120, 221, 0.08);
+            border-left: 3px solid var(--purple);
+            padding: 10px 14px;
+            margin: 6px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .input-line {
+            padding: 14px 20px;
+            background: #11131a;
+            border-top: 1px solid #1c202a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prompt {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .prompt .user { color: var(--green); }
+        .prompt .at { color: var(--text-muted); }
+        .prompt .host { color: var(--blue); }
+        .prompt .path { color: var(--gold); }
+        .prompt .symbol { color: var(--purple); }
+
+        .cmd-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            font-size: 0.95rem;
+        }
+
+        .quick-bar {
+            padding: 8px 16px;
+            background: #0d0f15;
+            border-top: 1px solid #181b24;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .btn-action {
+            background: #181b24;
+            border: 1px solid #282d39;
+            color: var(--text-main);
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-family: var(--font-stack);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background: #232834;
+            border-color: var(--blue);
+            color: var(--blue);
+            transform: translateY(-1px);
+        }
+
+        /* TAG CHIPS */
+        .tag-container {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 4px 0;
+            vertical-align: middle;
+        }
+
+        .tag-chip {
+            font-size: 0.68rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 3px 8px !important;
+            border-radius: 4px !important;
+            display: inline-block;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+            line-height: 1 !important;
+        }
+
+        .tag-chip.tag-heroico { color: #00dfff !important; background-color: #051e2b !important; border: 1px solid #00dfff !important; }
+        .tag-chip.tag-edgy { color: #d670ff !important; background-color: #21092b !important; border: 1px solid #d670ff !important; }
+        .tag-chip.tag-caotico { color: #ff4d4d !important; background-color: #2b0909 !important; border: 1px solid #ff4d4d !important; }
+        .tag-chip.tag-alegre { color: #50fa7b !important; background-color: #0a2612 !important; border: 1px solid #50fa7b !important; }
+        .tag-chip.tag-default { color: #f1fa8c !important; background-color: #232519 !important; border: 1px solid #f1fa8c !important; }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-window">
+        <header class="terminal-header">
+            <div class="window-controls">
+                <span class="control-btn btn-close" title="Cerrar Terminal"></span>
+                <span class="control-btn btn-minimize" title="Minimizar"></span>
+                <span class="control-btn btn-maximize" title="Pantalla Completa"></span>
+            </div>
+            <div class="window-title">
+                <span>⚡</span> zork@multiverse-nexus: ~/palace_of_desires (bash v5.2)
+            </div>
+            <div class="system-stats">
+                <div class="stat-badge">AFECTO: <span id="stat-afecto">0%</span></div>
+                <div class="stat-badge">TURNOS: <span id="stat-turnos">0</span></div>
+            </div>
+        </header>
+
+        <section class="map-hud-container">
+            <div class="map-hud-title">📡 RADAR MULTIVERSAL TÁCTICO</div>
+            <canvas id="map-canvas" width="280" height="75" style="background: #050608; border: 1px solid #282d39; border-radius: 6px;"></canvas>
+        </section>
+
+        <main class="terminal-body" id="terminal-body"></main>
+
+        <footer class="input-line">
+            <div class="prompt">
+                <span class="user">player</span><span class="at">@</span><span class="host">zork-palace</span>:<span class="path">~/nexus</span><span class="symbol">$</span>
+            </div>
+            <input type="text" id="cmd-input" class="cmd-input" placeholder="Escribe un comando... (TAB para autocompletar)" autofocus autocomplete="off" spellcheck="false">
+        </footer>
+
+        <nav class="quick-bar">
+            <button class="btn-action" onclick="execQuick('mirar')">👁️ mirar</button>
+            <button class="btn-action" onclick="execQuick('sims')">💎 info sims</button>
+            <button class="btn-action" onclick="execQuick('lugares')">🌹 lugares de cita</button>
+            <button class="btn-action" onclick="execQuick('inventario')">🎒 inventario</button>
+            <button class="btn-action" onclick="execQuick('ir norte')">⬆️ norte</button>
+            <button class="btn-action" onclick="execQuick('ir sur')">⬇️ sur</button>
+            <button class="btn-action" onclick="execQuick('ir este')">➡️ este</button>
+            <button class="btn-action" onclick="execQuick('ir oeste')">⬅️ oeste</button>
+            <button class="btn-action" onclick="execQuick('guardar')">💾 guardar</button>
+            <button class="btn-action" onclick="execQuick('cargar')">📂 cargar</button>
+            <button class="btn-action" onclick="execQuick('ayuda')">❓ ayuda</button>
+            <button class="btn-action" onclick="execQuick('limpiar')">🧹 limpiar</button>
+        </nav>
+    </div>
+
+<script>
+/**
+ * MOTOR ZORK MULTIVERSE TERMINAL ENGINE v3.0
+ * Arquitectura Modular - WebAudio Synth - Radar Canvas Engine
+ */
+
+// SINTETIZADOR WEB AUDIO API (SFX RETRO)
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+    }
+
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    playKeyClick() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800 + Math.random() * 400, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.03);
+    }
+
+    playEnter() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+    }
+}
+
+const sfx = new SoundEngine();
+
+// ESTADO GLOBAL DE LA APLICACIÓN
+const GameState = {
+    turnos: 0,
+    afectoGlobal: 15,
+    posicion: { x: 0, y: 0 },
+    ubicacionActual: "Gran Vestíbulo del Palacio",
+    inventario: ["Tarjeta de Acceso Cyberpunk", "Pistola de Plasma"],
+    historialComandos: [],
+    indiceHistorial: -1,
+    comandosValidos: ["mirar", "sims", "lugares", "inventario", "ir norte", "ir sur", "ir este", "ir oeste", "guardar", "cargar", "ayuda", "limpiar"]
+};
+
+// RENDERIZADOR DEL RADAR CANVA
+class RadarEngine {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.angle = 0;
+        this.blips = [
+            { x: 40, y: 30, label: 'Kaito', color: '#00dfff' },
+            { x: -50, y: -20, label: 'Batman', color: '#d670ff' },
+            { x: 20, y: -40, label: 'Blitzo', color: '#ff4d4d' }
+        ];
+        this.animate = this.animate.bind(this);
+        requestAnimationFrame(this.animate);
+    }
+
+    animate() {
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+
+        this.ctx.fillStyle = 'rgba(5, 6, 8, 0.2)';
+        this.ctx.fillRect(0, 0, w, h);
+
+        // Grid militar
+        this.ctx.strokeStyle = 'rgba(40, 45, 57, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+        this.ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+        this.ctx.moveTo(cx, 0); this.ctx.lineTo(cx, h);
+        this.ctx.moveTo(0, cy); this.ctx.lineTo(w, cy);
+        this.ctx.stroke();
+
+        // Línea de Escaneo Circular
+        this.angle += 0.03;
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 0);
+        this.ctx.arc(0, 0, 40, this.angle, this.angle + 0.4);
+        this.ctx.closePath();
+        this.ctx.fillStyle = 'rgba(86, 182, 194, 0.15)';
+        this.ctx.fill();
+
+        // Blips
+        this.blips.forEach(b => {
+            this.ctx.fillStyle = b.color;
+            this.ctx.shadowColor = b.color;
+            this.ctx.shadowBlur = 6;
+            this.ctx.beginPath();
+            this.ctx.arc(b.x + cx, b.y + cy, 3, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.shadowBlur = 0;
+        });
+
+        this.ctx.restore();
+        requestAnimationFrame(this.animate);
+    }
+}
+
+// LÓGICA DE INTERFAZ & COMANDOS
+const termBody = document.getElementById('terminal-body');
+const cmdInput = document.getElementById('cmd-input');
+
+function appendLog(htmlContent) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = htmlContent;
+    termBody.appendChild(entry);
+    termBody.scrollTop = termBody.scrollHeight;
+}
+
+function updateHUD() {
+    document.getElementById('stat-turnos').textContent = GameState.turnos;
+    document.getElementById('stat-afecto').textContent = `${GameState.afectoGlobal}%`;
+}
+
+function processCommand(cmd) {
+    const cleanCmd = cmd.trim().toLowerCase();
+    if (!cleanCmd) return;
+
+    sfx.playEnter();
+    GameState.turnos++;
+    GameState.historialComandos.push(cmd);
+    GameState.indiceHistorial = GameState.historialComandos.length;
+
+    appendLog(`<div class="cmd-echo">player@zork-palace:~$ ${cmd}</div>`);
+
+    switch (cleanCmd) {
+        case 'mirar':
+            appendLog(`
+                <div class="room-title">🏰 ${GameState.ubicacionActual}</div><br>
+                Te encuentras en la estancia central del palacio multiversal. Luces de neón se cruzan con mármol gótico.
+                A tu alrededor detectas la presencia de héroes, villanos y entidades de múltiples realidades.<br>
+                <div class="speech-bubble">
+                    <span class="npc-name">Kaito Kid:</span> <span class="tag-container"><span class="tag-chip tag-heroico">Elegante</span></span> "Un buen espectáculo requiere el escenario correcto, ¿no crees?"
+                </div>
+            `);
+            break;
+
+        case 'sims':
+            appendLog(`
+                <div class="room-title">💎 ESTADO DE RELACIONES & SIMS HUD</div><br>
+                <span class="npc-name">Kaito Kid</span> - Afecto: <span class="highlight">85%</span> (Amistad Estrecha)<br>
+                <span class="npc-name">Batman (Bruce Wayne)</span> - Afecto: <span class="highlight">42%</span> (Aliado Cauteloso)<br>
+                <span class="npc-name">Blitzo</span> - Afecto: <span class="highlight">60%</span> (Socio Caótico)
+            `);
+            break;
+
+        case 'lugares':
+            appendLog(`
+                <div class="room-title">🌹 LOCACIONES DISPONIBLES PARA CITAS</div><br>
+                1. 🏢 <strong>Piso Franco en Gotham:</strong> Oscuro, estratégico, vista a la ciudad.<br>
+                2. 🎪 <strong>Azotea de la Torre de Tokio:</strong> Iluminada por la luna, ideal para trucos de magia.<br>
+                3. 😈 <strong>Oficinas de I.M.P (Infierno):</strong> Ruidoso, caótico y con armas por todos lados.
+            `);
+            break;
+
+        case 'inventario':
+            appendLog(`
+                <div class="room-title">🎒 INVENTARIO DE OBJETOS</div><br>
+                ${GameState.inventario.map(item => `• <span class="item-name">${item}</span>`).join('<br>')}
+            `);
+            break;
+
+        case 'limpiar':
+            termBody.innerHTML = '';
+            break;
+
+        case 'ayuda':
+            appendLog(`
+                <div class="room-title">❓ COMANDOS DEL SISTEMA</div><br>
+                Escribe cualquiera de los siguientes comandos:<br>
+                • <span class="highlight">mirar</span> - Examina el entorno.<br>
+                • <span class="highlight">sims</span> - Revisa el nivel de afecto con los personajes.<br>
+                • <span class="highlight">lugares</span> - Muestra destinos para citas.<br>
+                • <span class="highlight">inventario</span> - Revisa tus objetos.<br>
+                • <span class="highlight">ir [norte/sur/este/oeste]</span> - Desplázate por el mapa.<br>
+                • <span class="highlight">limpiar</span> - Limpia la pantalla de la terminal.
+            `);
+            break;
+
+        default:
+            if (cleanCmd.startsWith('ir ')) {
+                const dir = cleanCmd.split(' ')[1];
+                appendLog(`<span class="warning">🧭 Te has desplazado hacia el ${dir.toUpperCase()}. El radar ha actualizado tu posición táctica.</span>`);
+            } else {
+                appendLog(`<span class="warning">Comando no reconocido: '${cleanCmd}'. Escribe 'ayuda' para ver comandos disponibles.</span>`);
+            }
+            break;
+    }
+
+    updateHUD();
+}
+
+function execQuick(cmd) {
+    cmdInput.value = cmd;
+    processCommand(cmd);
+    cmdInput.value = '';
+}
+
+// EVENT LISTENERS DE TECLADO Y TECLAS ESPECIALES
+cmdInput.addEventListener('keydown', (e) => {
+    sfx.init();
+    sfx.playKeyClick();
+
+    if (e.key === 'Enter') {
+        processCommand(cmdInput.value);
+        cmdInput.value = '';
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (GameState.indiceHistorial > 0) {
+            GameState.indiceHistorial--;
+            cmdInput.value = GameState.historialComandos[GameState.indiceHistorial];
+        }
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (GameState.indiceHistorial < GameState.historialComandos.length - 1) {
+            GameState.indiceHistorial++;
+            cmdInput.value = GameState.historialComandos[GameState.indiceHistorial];
+        } else {
+            GameState.indiceHistorial = GameState.historialComandos.length;
+            cmdInput.value = '';
+        }
+    } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const inputVal = cmdInput.value.toLowerCase();
+        const match = GameState.comandosValidos.find(c => c.startsWith(inputVal));
+        if (match) cmdInput.value = match;
+    }
+});
+
+// INICIALIZACIÓN DE COMPONENTES
+window.addEventListener('DOMContentLoaded', () => {
+    new RadarEngine('map-canvas');
+    processCommand('mirar');
+});
+</script>
+
+</body>
+</html>
