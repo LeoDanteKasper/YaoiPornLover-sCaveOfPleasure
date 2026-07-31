@@ -3,875 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade Matrix SWF - Player Tri-Engine</title>
-    <!-- Google Fonts & Ruffle Emulator Core -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>RETRO WORKSTATION '98 - SWF & VHS PLAYER</title>
+    <!-- Ruffle Flash Emulator -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=VT323&display=swap');
+
         :root {
-            --bg-base: #06080e;
-            --bg-surface: rgba(15, 20, 32, 0.65);
-            --bg-card: rgba(22, 29, 47, 0.7);
-            --accent-cyan: #00f0ff;
-            --accent-magenta: #ff0055;
-            --accent-purple: #7000ff;
-            --accent-yellow: #ffcc00;
-            --text-main: #f0f4fc;
-            --text-muted: #8e9bb4;
-            --border-glow: rgba(0, 240, 255, 0.25);
-            --glass-blur: blur(16px);
-            --font-title: 'Orbitron', sans-serif;
-            --font-mono: 'Fira Code', monospace;
-            --font-body: 'Inter', sans-serif;
-            --radius-main: 16px;
-            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+            --crt-bg: #0d1117;
+            --plastic-grey: #c3c7cb;
+            --plastic-shadow: #808080;
+            --vhs-green: #00ff66;
+            --marker-black: #1a1a1a;
         }
 
-        *, *::before, *::after {
+        * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            user-select: none;
         }
 
         body {
-            background-color: var(--bg-base);
+            background-color: #121015;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(112, 0, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-            color: var(--text-main);
-            font-family: var(--font-body);
+                radial-gradient(circle at 50% 30%, #2a2438 0%, #08070c 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 3px);
+            color: #fff;
+            font-family: 'VT323', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
         }
 
-        /* App Header */
-        .arcade-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 2rem;
-            background: var(--bg-surface);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .arcade-header__brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .arcade-header__logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border-radius: 8px;
+        /* --- MARCO CONTENEDOR PRINCIPAL --- */
+        .workspace-container {
+            width: 100%;
+            max-width: 1200px;
             display: grid;
-            place-items: center;
-            font-weight: 900;
-            font-family: var(--font-title);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
+            margin-top: 10px;
         }
 
-        .arcade-header__title {
-            font-family: var(--font-title);
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, var(--text-main), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @media (max-width: 1000px) {
+            .workspace-container { grid-template-columns: 1fr; }
         }
 
-        .arcade-header__status {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 20px;
-            color: var(--accent-cyan);
-        }
-
-        .status-badge__dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-cyan);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
-
-        /* Layout Main Grid */
-        .arcade-layout {
-            display: grid;
-            grid-template-columns: 360px 1fr;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            max-width: 1800px;
-            margin: 0 auto;
-            width: 100%;
-            flex: 1;
-        }
-
-        @media (max-width: 1024px) {
-            .arcade-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Sidebar Selector */
-        .arcade-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .sidebar-card {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-main);
-            padding: 1.25rem;
-        }
-
-        .sidebar-card__title {
-            font-family: var(--font-title);
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .game-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .game-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.25s var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* --- PANTALLA CRT / MONITOR DE TUBO --- */
+        .monitor-frame {
+            background: #2b2b2c;
+            border: 18px solid #d8d3c5;
+            border-bottom-width: 35px;
+            border-radius: 25px;
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.8),
+                0 10px 30px rgba(0,0,0,0.9),
+                0 0 0 4px #9e9a8e;
             position: relative;
+            aspect-ratio: 4/3;
             overflow: hidden;
-        }
-
-        .game-item:hover {
-            background: rgba(0, 240, 255, 0.06);
-            border-color: rgba(0, 240, 255, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .game-item--active {
-            background: linear-gradient(90deg, rgba(0, 240, 255, 0.12), rgba(112, 0, 255, 0.12));
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-        }
-
-        .game-item--active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--accent-cyan);
-            box-shadow: 0 0 10px var(--accent-cyan);
-        }
-
-        .game-item__info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .game-item__name {
-            font-family: var(--font-title);
-            font-size: 0.95rem;
-            font-weight: 700;
-        }
-
-        .game-item__meta {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-        }
-
-        .game-item__badge {
-            font-size: 0.65rem;
-            font-family: var(--font-mono);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .game-item--active .game-item__badge {
-            background: var(--accent-cyan);
-            color: #000;
-            font-weight: 700;
-        }
-
-        /* File Upload Zone */
-        .upload-zone {
-            border: 2px dashed rgba(0, 240, 255, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            background: rgba(0, 240, 255, 0.02);
-            cursor: pointer;
-            transition: all 0.25s var(--transition-smooth);
-            position: relative;
-        }
-
-        .upload-zone:hover, .upload-zone--drag {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 240, 255, 0.08);
-            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
-        }
-
-        .upload-zone__input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .upload-zone__text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
-
-        .upload-zone__highlight {
-            color: var(--accent-cyan);
-            font-weight: 600;
-        }
-
-        /* Screen Cabinet / Emulator Viewport */
-        .arcade-viewport {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-main);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            position: relative;
-        }
-
-        .screen-frame {
-            position: relative;
-            width: 100%;
-            height: 620px;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .screen-frame::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 10;
-            background-size: 100% 3px, 6px 100%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .crt-screen {
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            position: relative;
+            overflow: hidden;
+            border-radius: 80px / 20px; /* Curvatura tipo tubo CRT */
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
         }
 
-        .screen-frame--crt::after {
-            opacity: 1;
+        /* EFECTO VHS Y DISTORSIÓN DE CINTA */
+        .vhs-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 20;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.4) 50%
+            );
+            background-size: 100% 4px;
+        }
+
+        .vhs-tracking-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(2px);
+            animation: vhs-distortion 4s infinite linear;
+            z-index: 21;
+            pointer-events: none;
+        }
+
+        @keyframes vhs-distortion {
+            0% { transform: translateY(0) scaleY(1); opacity: 0.8; }
+            50% { opacity: 0.2; }
+            100% { transform: translateY(-400px) scaleY(2); opacity: 0; }
+        }
+
+        .vhs-osd {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            color: var(--vhs-green);
+            font-size: 1.5rem;
+            text-shadow: 0 0 5px var(--vhs-green), 2px 2px 0px #000;
+            z-index: 22;
+            letter-spacing: 2px;
+        }
+
+        .vhs-glitch-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 102, 0.4);
+            top: 20%;
+            animation: glitch 2.5s infinite;
+            z-index: 21;
+            pointer-events: none;
+        }
+
+        @keyframes glitch {
+            0% { top: 10%; opacity: 0; }
+            50% { top: 60%; opacity: 0.6; }
+            100% { top: 90%; opacity: 0; }
+        }
+
+        /* REFLEJO EN EL CRISTAL DEL MONITOR */
+        .glass-glare {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 40%);
+            pointer-events: none;
+            z-index: 23;
         }
 
         #ruffle-container {
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative;
+            z-index: 5;
         }
 
-        #ruffle-container ruffle-embed, 
-        #ruffle-container ruffle-player {
-            width: 100% !important;
-            height: 100% !important;
-            border: none;
-        }
-
-        /* Viewport Controls Toolbar */
-        .viewport-toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 0.75rem 1.25rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .toolbar-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .arcade-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s var(--transition-smooth);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .arcade-btn:hover {
-            background: rgba(0, 240, 255, 0.15);
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-        }
-
-        .arcade-btn--active {
-            background: var(--accent-cyan);
-            color: #000;
-            font-weight: 600;
-            border-color: var(--accent-cyan);
-        }
-
-        .arcade-btn--active:hover {
-            color: #000;
-        }
-
-        /* Dynamic Search Bar Component */
-        .search-cabinet-bar {
-            background: rgba(10, 14, 24, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.25);
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            flex-wrap: wrap;
-        }
-
-        .sticker-badge {
-            background: linear-gradient(135deg, var(--accent-yellow), #ff9900);
-            color: #000;
-            font-family: var(--font-title);
-            font-size: 0.7rem;
-            font-weight: 900;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 3px 3px 0px #000, 0 0 12px rgba(255, 204, 0, 0.4);
-            transform: rotate(-2deg);
-            white-space: nowrap;
-            user-select: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .search-input-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0.25rem 0.75rem;
-            transition: all 0.25s ease;
-            min-width: 240px;
-        }
-
-        .search-input-wrapper:focus-within {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-        }
-
-        .search-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--accent-cyan);
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            padding: 0.5rem 0;
-        }
-
-        .search-input::placeholder {
-            color: rgba(142, 155, 180, 0.5);
-        }
-
-        /* Placeholder Screen when no SWF loaded */
         .screen-placeholder {
+            position: absolute;
+            text-align: center;
+            color: #33ff66;
+            text-shadow: 0 0 8px #00ff66;
+        }
+
+        /* --- ORGANIZADOR DE DISKETTES / CASSETTES --- */
+        .disk-rack {
+            background: #222028;
+            border: 4px solid #383446;
+            border-radius: 12px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            color: var(--text-muted);
-            text-align: center;
-            padding: 2rem;
+            gap: 12px;
+            max-height: 580px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
 
-        .screen-placeholder__icon {
-            font-size: 3rem;
-            color: var(--accent-cyan);
-            opacity: 0.6;
-        }
+        .disk-rack::-webkit-scrollbar { width: 8px; }
+        .disk-rack::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 
-        /* Maximization proposals container */
-        .maximization-section {
-            grid-column: 1 / -1;
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: var(--radius-main);
-            padding: 2rem;
-            margin-top: 1rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .maximization-section__title {
-            font-family: var(--font-title);
-            font-size: 1.3rem;
-            color: var(--accent-cyan);
-            margin-bottom: 1.25rem;
+        .rack-header {
+            font-size: 1.4rem;
+            color: #e0d1b1;
+            border-bottom: 2px dashed #444;
+            padding-bottom: 5px;
+            margin: 0 0 5px 0;
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            justify-content: space-between;
         }
 
-        .maximization-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.25rem;
+        /* ESTILO DISKETTE 3.5" CASERO REALISTA */
+        .floppy-disk {
+            background: #2b2a2d; /* Color de plástico oscuro */
+            border-radius: 6px;
+            padding: 8px 10px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 0 #18171a,
+                inset 0 1px 1px rgba(255,255,255,0.1);
+            transition: transform 0.1s ease, background-color 0.2s;
+            border: 1px solid #1a191c;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .max-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1.25rem;
-            transition: transform 0.25s ease;
+        /* Colores de disquettes varios estilo casero */
+        .floppy-disk:nth-child(2n) { background: #1e2838; } /* Azul oscuro */
+        .floppy-disk:nth-child(3n) { background: #381e1e; } /* Rojo/Marrón */
+        .floppy-disk:nth-child(5n) { background: #233522; } /* Verde Oliva */
+
+        .floppy-disk:hover {
+            transform: translateX(-4px) scale(1.01);
+            filter: brightness(1.15);
         }
 
-        .max-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(112, 0, 255, 0.4);
+        .floppy-disk:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #18171a;
         }
 
-        .max-card__head {
-            font-family: var(--font-title);
-            font-size: 0.95rem;
-            color: var(--accent-magenta);
-            margin-bottom: 0.5rem;
+        /* Disco de metal protector deslizable superior */
+        .floppy-shutter {
+            width: 45%;
+            height: 22px;
+            background: linear-gradient(180deg, #d4d4d4 0%, #8c8c8c 50%, #b0b0b0 100%);
+            border-radius: 2px 2px 4px 4px;
+            margin-left: auto;
+            margin-right: 15px;
+            border: 1px solid #555;
+            position: relative;
+        }
+        
+        .floppy-shutter::after {
+            content: "";
+            position: absolute;
+            left: 8px; top: 4px;
+            width: 10px; height: 12px;
+            background: #222;
+            border-radius: 1px;
         }
 
-        .max-card__body {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.5;
+        /* Etiqueta Adhesiva de Papel con Escrito a Mano */
+        .floppy-label {
+            background: #f4efdb;
+            background-image: linear-gradient(#e2dac2 1px, transparent 1px);
+            background-size: 100% 12px;
+            border-radius: 3px;
+            padding: 6px 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            border: 1px solid #c7beaa;
+            position: relative;
         }
+
+        .floppy-title {
+            font-family: 'Caveat', cursive; /* Fuente estilo marcador a mano */
+            color: var(--marker-black);
+            font-size: 1.35rem;
+            line-height: 1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transform: rotate(-0.5deg);
+        }
+
+        .floppy-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #777;
+            margin-top: 4px;
+            font-family: 'VT323', monospace;
+        }
+
+        /* Muesca de protección contra escritura */
+        .write-protect {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 1px;
+        }
+
+        /* PANEL DE BOTONES DE CONTROL DE VIDEO */
+        .vhs-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            background: #18171c;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #2e2c36;
+        }
+
+        .vhs-btn {
+            background: #33313d;
+            border: 2px solid #484457;
+            color: #fff;
+            font-family: inherit;
+            padding: 6px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 3px 0 #1a1921;
+        }
+
+        .vhs-btn:hover { background: #4a475a; }
+        .vhs-btn:active { transform: translateY(2px); box-shadow: none; }
+        .vhs-btn--red { border-color: #a83232; background: #5c1e1e; }
+
+        .file-drop-area {
+            border: 2px dashed #666;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #aaa;
+            cursor: pointer;
+            background: rgba(0,0,0,0.2);
+        }
+        .file-drop-area:hover { border-color: var(--vhs-green); color: #fff; }
     </style>
 </head>
 <body>
 
-    <!-- Header Terminal -->
-    <header class="arcade-header">
-        <div class="arcade-header__brand">
-            <div class="arcade-header__logo-icon">M</div>
-            <h1 class="arcade-header__title">SWF MULTI-ENGINE ARCHITECTURE</h1>
-        </div>
-        <div class="arcade-header__status">
-            <div class="status-badge">
-                <span class="status-badge__dot"></span>
-                <span id="engine-status">RUFFLE READY</span>
+    <h1 style="margin: 0; color: #e0d1b1; font-size: 2.2rem; text-shadow: 2px 2px 0 #000;">
+        📼 PC-VHS SYSTEM '98 / DISKETTE RACK
+    </h1>
+
+    <div class="workspace-container">
+
+        <!-- MONITOR VHS / CRT -->
+        <div>
+            <div class="monitor-frame">
+                <div class="crt-screen" id="crt-screen">
+                    <div class="vhs-overlay"></div>
+                    <div class="vhs-tracking-bar"></div>
+                    <div class="vhs-glitch-line"></div>
+                    <div class="glass-glare"></div>
+                    
+                    <div class="vhs-osd" id="vhs-osd">PLAY &#9654; [00:00:00] <br><small style="font-size:0.9rem;">TRACKING OK</small></div>
+
+                    <div class="screen-placeholder" id="placeholder">
+                        <h2>SELECCIONA UN DISKETTE</h2>
+                        <p>Inserta un juego de la bandeja lateral para iniciar la lectura...</p>
+                    </div>
+
+                    <div id="ruffle-container"></div>
+                </div>
+            </div>
+
+            <!-- BOTONERA DE CONTROL VHS -->
+            <div class="vhs-controls">
+                <button class="vhs-btn" onclick="app.toggleTracking()">🎛️ FIX TRACKING</button>
+                <button class="vhs-btn" onclick="app.restartGame()">🔄 REINICIAR DISK</button>
+                <button class="vhs-btn vhs-btn--red" onclick="app.eject()">⏏️ EYECTAR</button>
+                <button class="vhs-btn" onclick="app.toggleFullscreen()">⛶ FULLSCREEN</button>
             </div>
         </div>
-    </header>
 
-    <!-- Main Engine Layout -->
-    <main class="arcade-layout">
-        
-        <!-- Sidebar Selection Panel -->
-        <aside class="arcade-sidebar">
-            <div class="sidebar-card">
-                <div class="sidebar-card__title">
-                    <span>Biblioteca de Juegos</span>
-                    <span style="color: var(--accent-cyan); font-family: var(--font-mono);">3 SLOTS</span>
-                </div>
-                
-                <div class="game-list">
-                    <!-- Slot 1: Diente -->
-                    <div class="game-item game-item--active" onclick="arcadeApp.loadGameSlot('diente', this)">
-                        <div class="game-item__info">
-                            <span class="game-item__name">1. Diente</span>
-                            <span class="game-item__meta">Archivo: diente.swf</span>
-                        </div>
-                        <span class="game-item__badge">Activo</span>
-                    </div>
-
-                    <!-- Slot 2: Juego SWF 2 -->
-                    <div class="game-item" onclick="arcadeApp.loadGameSlot('game2', this)">
-                        <div class="game-item__info">
-                            <span class="game-item__name">2. SWF Arcade #2</span>
-                            <span class="game-item__meta">Archivo: juego2.swf</span>
-                        </div>
-                        <span class="game-item__badge">Slot 2</span>
-                    </div>
-
-                    <!-- Slot 3: Juego SWF 3 -->
-                    <div class="game-item" onclick="arcadeApp.loadGameSlot('game3', this)">
-                        <div class="game-item__info">
-                            <span class="game-item__name">3. SWF Arcade #3</span>
-                            <span class="game-item__meta">Archivo: juego3.swf</span>
-                        </div>
-                        <span class="game-item__badge">Slot 3</span>
-                    </div>
-                </div>
+        <!-- BANDEJA DE DISKETTES INTERACTIVA -->
+        <div class="disk-rack">
+            <div class="rack-header">
+                <span>🖴 DISKS (3.5" HD)</span>
+                <span style="font-size: 0.9rem; color: var(--vhs-green);">1.44 MB</span>
             </div>
 
-            <!-- Custom SWF File Loader -->
-            <div class="sidebar-card">
-                <div class="sidebar-card__title">Carga Directa Local</div>
-                <div class="upload-zone" id="drop-zone">
-                    <input type="file" id="swf-input" class="upload-zone__input" accept=".swf" onchange="arcadeApp.handleFileSelect(event)">
-                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
-                    <div class="upload-zone__text">
-                        Arrastrá tu archivo <span class="upload-zone__highlight">.SWF</span> aquí o hacé clic para explorar
-                    </div>
-                </div>
+            <!-- CARGADOR DE ARCHIVOS PROPIOS -->
+            <div class="file-drop-area" onclick="document.getElementById('custom-file').click()">
+                ➕ Insertar Archivo SWF propio...
             </div>
-        </aside>
+            <input type="file" id="custom-file" accept=".swf" style="display:none;">
 
-        <!-- Main Viewport / Cabinet -->
-        <section class="arcade-viewport">
-            <div class="screen-frame" id="screen-frame">
-                <div id="ruffle-container">
-                    <div class="screen-placeholder">
-                        <div class="screen-placeholder__icon">🎮</div>
-                        <p>Inicializando motor Ruffle Flash Emulator...</p>
-                    </div>
-                </div>
-            </div>
+            <!-- BANDEJA DE JUEGOS DISKETTE CASEROS -->
+            <div id="disk-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
 
-            <!-- Control Bar Toolbar -->
-            <div class="viewport-toolbar">
-                <div class="toolbar-group">
-                    <button class="arcade-btn" onclick="arcadeApp.reloadCurrentGame()">
-                        <span>🔄</span> Reiniciar
-                    </button>
-                    <button class="arcade-btn" id="crt-toggle" onclick="arcadeApp.toggleCRT()">
-                        <span>📺</span> Filtro CRT
-                    </button>
-                </div>
-                <div class="toolbar-group">
-                    <button class="arcade-btn" onclick="arcadeApp.toggleFullscreen()">
-                        <span>⛶</span> Pantalla Completa
-                    </button>
-                </div>
-            </div>
+    </div>
 
-            <!-- Bottom Search Bar with Sticker -->
-            <div class="search-cabinet-bar">
-                <div class="sticker-badge">
-                    <span>🏷️</span> nombre de los juegos para buscar
-                </div>
-                <div class="search-input-wrapper">
-                    <input type="text" id="game-search-input" class="search-input" placeholder="Ej: El_Diente.swf, juego.swf..." onkeydown="if(event.key==='Enter') arcadeApp.searchAndLoadSwf()">
-                </div>
-                <button class="arcade-btn arcade-btn--active" onclick="arcadeApp.searchAndLoadSwf()">
-                    <span>🔍</span> Cargar
-                </button>
-            </div>
-        </section>
-
-        <!-- Propuestas de Maximización de Élite -->
-        <section class="maximization-section">
-            <h2 class="maximization-section__title">
-                <span>🚀</span> Propuestas de Maximización de Élite
-            </h2>
-            <div class="maximization-grid">
-                <div class="max-card">
-                    <div class="max-card__head">1. Auto-Completado & Detección de Index HTML</div>
-                    <div class="max-card__body">
-                        Implementar un parser automático vía `fetch()` a la carpeta local de assets para escanear y autocompletar la barra de búsqueda en tiempo real mediante un datalist interactivo.
-                    </div>
-                </div>
-                <div class="max-card">
-                    <div class="max-card__head">2. Visualizador 3D Three.js Arcade Cabinet</div>
-                    <div class="max-card__body">
-                        Montar el visor Ruffle dentro de una textura dinámica de un gabinete Arcade 3D renderizado en tiempo real con Three.js e iluminación reactiva según los colores del SWF.
-                    </div>
-                </div>
-                <div class="max-card">
-                    <div class="max-card__head">3. Mapeo Módulo Gamepad / Touch Virtual</div>
-                    <div class="max-card__body">
-                        Integración de la API de Gamepad HTML5 para mapear mandos físicos (PS5/Xbox) a las teclas analógicas de Flash, sumado a un D-Pad touch flotante personalizable.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Client-Side Engine Controller Script -->
     <script>
-        class ArcadeEngine {
+        // Lista de juegos definida
+        const gameList = [
+            "1.swf", "2.swf", "3.swf", "4.swf", "5.swf", "6.swf", "7.swf",
+            "El_Diente.swf", "Elfes.swf", "Humplex-Resident-Evil-5-Chris-Capture.swf",
+            "Link.swf", "Milking-Link.swf", "Sleeping-Eric.swf", "cloud2.swf",
+            "ddd.swf", "dontwhackyourteacher.swf", "e.swf", "save-your-ass.swf",
+            "whackthethief.swf"
+        ];
+
+        class RetroStation {
             constructor() {
-                this.container = document.getElementById('ruffle-container');
-                this.screenFrame = document.getElementById('screen-frame');
-                this.statusElement = document.getElementById('engine-status');
-                this.searchInput = document.getElementById('game-search-input');
-                this.rufflePlayer = null;
-                this.currentSource = null;
-                this.crtEnabled = false;
+                this.ruffle = window.RufflePlayer ? window.RufflePlayer.newest() : null;
+                this.player = null;
+                this.currentSwf = null;
+                this.audioCtx = null;
+                this.vhsTimer = null;
+                this.seconds = 0;
 
-                // Definición de las rutas predeterminadas de los 3 slots de juegos SWF
-                this.gameSlots = {
-                    'diente': { name: 'Diente', url: 'diente.swf' },
-                    'game2': { name: 'SWF Arcade #2', url: 'juego2.swf' },
-                    'game3': { name: 'SWF Arcade #3', url: 'juego3.swf' }
-                };
-
-                this.init();
+                this.renderDiskRack();
+                this.initEvents();
+                this.startVHSTimer();
             }
 
-            init() {
-                window.addEventListener('DOMContentLoaded', () => {
-                    this.loadGameSlot('diente');
-                    this.setupDragAndDrop();
-                });
-            }
-
-            // Instanciador del motor Ruffle
-            createPlayerInstance() {
-                this.container.innerHTML = '';
-                const ruffle = window.RufflePlayer ? window.RufflePlayer.newest() : null;
-                
-                if (!ruffle) {
-                    this.statusElement.textContent = 'ERROR: RUFFLE NO DETECTADO';
-                    this.statusElement.style.color = 'var(--accent-magenta)';
-                    return null;
-                }
-
-                this.rufflePlayer = ruffle.createPlayer();
-                this.container.appendChild(this.rufflePlayer);
-                return this.rufflePlayer;
-            }
-
-            // Cargar archivo SWF desde URL local o slot
-            loadSwfFromUrl(url, gameName) {
-                const player = this.createPlayerInstance();
-                if (!player) return;
-
-                this.currentSource = { type: 'url', value: url, name: gameName };
-                this.statusElement.textContent = `CARGANDO: ${gameName.toUpperCase()}`;
-                
-                player.load(url).then(() => {
-                    this.statusElement.textContent = `EJECUTANDO: ${gameName.toUpperCase()}`;
-                }).catch((err) => {
-                    console.warn('Ruffle load warning:', err);
-                    this.statusElement.textContent = `ONLINE: ${gameName.toUpperCase()}`;
-                });
-            }
-
-            // Cargar archivo SWF dinámico cargado por el usuario mediante FileReader
-            loadSwfBuffer(arrayBuffer, fileName) {
-                const player = this.createPlayerInstance();
-                if (!player) return;
-
-                this.currentSource = { type: 'buffer', value: arrayBuffer, name: fileName };
-                this.statusElement.textContent = `EJECUTANDO BINARIO: ${fileName}`;
-
-                player.load({ data: arrayBuffer }).catch(err => {
-                    console.error('Error al parsear el binario SWF:', err);
-                    this.statusElement.textContent = 'ERROR DE PARSEO SWF';
-                });
-            }
-
-            // Búsqueda dinámica desde la barra de texto por nombre de archivo
-            searchAndLoadSwf() {
-                let query = this.searchInput.value.trim();
-                if (!query) return;
-
-                // Formatear automáticamente extensión .swf si se omite
-                if (!query.toLowerCase().endsWith('.swf')) {
-                    query += '.swf';
-                }
-
-                // Normalizar nombre visual
-                const cleanName = query.replace('.swf', '').replace(/_/g, ' ');
-
-                // Desmarcar selección de slots estáticos
-                document.querySelectorAll('.game-item').forEach(item => {
-                    item.classList.remove('game-item--active');
-                    item.querySelector('.game-item__badge').textContent = 'Slot';
-                });
-
-                this.loadSwfFromUrl(query, cleanName);
-            }
-
-            // Selector de Slots
-            loadGameSlot(slotKey, element = null) {
-                if (element) {
-                    document.querySelectorAll('.game-item').forEach(item => {
-                        item.classList.remove('game-item--active');
-                        item.querySelector('.game-item__badge').textContent = 'Slot';
-                    });
-                    element.classList.add('game-item--active');
-                    element.querySelector('.game-item__badge').textContent = 'Activo';
-                }
-
-                const slot = this.gameSlots[slotKey];
-                if (slot) {
-                    this.searchInput.value = slot.url;
-                    this.loadSwfFromUrl(slot.url, slot.name);
+            initAudio() {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 }
             }
 
-            // Manejo de input file local (.swf)
-            handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (file && file.name.endsWith('.swf')) {
-                    this.searchInput.value = file.name;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.loadSwfBuffer(e.target.result, file.name);
-                    };
-                    reader.readAsArrayBuffer(file);
+            // Reproduce un sonido mecánico sintético de lectura de disquette
+            playDriveSound() {
+                this.initAudio();
+                const ctx = this.audioCtx;
+                const now = ctx.currentTime;
+
+                // Ruido blanco para el motor del disquetera
+                const bufferSize = ctx.sampleRate * 0.15;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
                 }
+
+                const whiteNoise = ctx.createBufferSource();
+                whiteNoise.buffer = buffer;
+
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(800, now);
+
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+                whiteNoise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+
+                whiteNoise.start(now);
             }
 
-            // Drag and Drop para archivos SWF
-            setupDragAndDrop() {
-                const dropZone = document.getElementById('drop-zone');
-                
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, (e) => {
-                        e.preventDefault();
-                        dropZone.classList.add('upload-zone--drag');
-                    }, false);
-                });
+            // Renderizar la lista de disquettes caseros con tipografía a mano
+            renderDiskRack() {
+                const container = document.getElementById('disk-list');
+                container.innerHTML = '';
 
-                ['dragleave', 'drop'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, (e) => {
-                        e.preventDefault();
-                        dropZone.classList.remove('upload-zone--drag');
-                    }, false);
-                });
+                gameList.forEach((game, index) => {
+                    const diskName = game.replace('.swf', '').replace(/-/g, ' ').replace(/_/g, ' ');
+                    
+                    const diskEl = document.createElement('div');
+                    diskEl.className = 'floppy-disk';
+                    diskEl.onclick = () => this.loadGame(game, diskName);
 
-                dropZone.addEventListener('drop', (e) => {
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    if (files.length && files[0].name.endsWith('.swf')) {
-                        this.searchInput.value = files[0].name;
-                        const reader = new FileReader();
-                        reader.onload = (evt) => {
-                            this.loadSwfBuffer(evt.target.result, files[0].name);
-                        };
-                        reader.readAsArrayBuffer(files[0]);
+                    diskEl.innerHTML = `
+                        <div class="floppy-shutter"></div>
+                        <div class="floppy-label">
+                            <div class="floppy-title">${diskName}</div>
+                            <div class="floppy-meta">
+                                <span>DISK ${index + 1}/19</span>
+                                <span>VER 1.0</span>
+                            </div>
+                        </div>
+                        <div class="write-protect"></div>
+                    `;
+                    container.appendChild(diskEl);
+                });
+            }
+
+            initEvents() {
+                document.getElementById('custom-file').addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const url = URL.createObjectURL(file);
+                        this.loadGame(url, file.name.replace('.swf', ''));
                     }
                 });
             }
 
-            // Reiniciar juego actual
-            reloadCurrentGame() {
-                if (!this.currentSource) return;
-                if (this.currentSource.type === 'url') {
-                    this.loadSwfFromUrl(this.currentSource.value, this.currentSource.name);
-                } else if (this.currentSource.type === 'buffer') {
-                    this.loadSwfBuffer(this.currentSource.value, this.currentSource.name);
+            // Cargar Juego en Ruffle
+            loadGame(src, title) {
+                this.playDriveSound();
+                this.currentSwf = { src, title };
+                
+                const container = document.getElementById('ruffle-container');
+                container.innerHTML = '';
+                document.getElementById('placeholder').style.display = 'none';
+
+                if (this.ruffle) {
+                    this.player = this.ruffle.createPlayer();
+                    this.player.style.width = '100%';
+                    this.player.style.height = '100%';
+                    container.appendChild(this.player);
+                    this.player.load(src);
+                }
+
+                // Actualizar OSD VHS
+                this.seconds = 0;
+                this.updateOSDText(`PLAY &#9654; [${title.toUpperCase()}]`);
+            }
+
+            eject() {
+                this.playDriveSound();
+                document.getElementById('ruffle-container').innerHTML = '';
+                document.getElementById('placeholder').style.display = 'block';
+                this.currentSwf = null;
+                this.updateOSDText('NO DISK &#9632;');
+            }
+
+            restartGame() {
+                if (this.currentSwf) {
+                    this.loadGame(this.currentSwf.src, this.currentSwf.title);
                 }
             }
 
-            // Conmutador de filtro retro CRT
-            toggleCRT() {
-                this.crtEnabled = !this.crtEnabled;
-                this.screenFrame.classList.toggle('screen-frame--crt', this.crtEnabled);
-                document.getElementById('crt-toggle').classList.toggle('arcade-btn--active', this.crtEnabled);
+            toggleTracking() {
+                const screen = document.getElementById('crt-screen');
+                screen.style.filter = 'hue-rotate(90deg)';
+                setTimeout(() => screen.style.filter = 'none', 300);
             }
 
-            // Modo pantalla completa
             toggleFullscreen() {
+                const screen = document.getElementById('crt-screen');
                 if (!document.fullscreenElement) {
-                    this.screenFrame.requestFullscreen().catch(err => {
-                        console.error(`Error al activar pantalla completa: ${err.message}`);
-                    });
+                    screen.requestFullscreen();
                 } else {
                     document.exitFullscreen();
                 }
             }
+
+            startVHSTimer() {
+                setInterval(() => {
+                    this.seconds++;
+                    if (this.currentSwf) {
+                        const hrs = String(Math.floor(this.seconds / 3600)).padStart(2, '0');
+                        const mins = String(Math.floor((this.seconds % 3600) / 60)).padStart(2, '0');
+                        const secs = String(this.seconds % 60).padStart(2, '0');
+                        this.updateOSDText(`PLAY &#9654; [${hrs}:${mins}:${secs}]`);
+                    }
+                }, 1000);
+            }
+
+            updateOSDText(text) {
+                document.getElementById('vhs-osd').innerHTML = `${text}<br><small style="font-size:0.8rem;">TRACKING OK</small>`;
+            }
         }
 
-        // Instanciación del Kernel del Arcade
-        const arcadeApp = new ArcadeEngine();
+        const app = new RetroStation();
     </script>
 </body>
 </html>
