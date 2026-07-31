@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RETRO WORKSTATION '98 - SWF & VHS PLAYER</title>
+    <title>RETRO WORKSTATION '98 - SWF & WEB GAME STATION</title>
     <!-- Ruffle Flash Emulator -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
@@ -15,6 +15,7 @@
             --plastic-shadow: #808080;
             --vhs-green: #00ff66;
             --marker-black: #1a1a1a;
+            --neon-pink: #ff007f;
         }
 
         * {
@@ -40,14 +41,14 @@
         /* --- MARCO CONTENEDOR PRINCIPAL --- */
         .workspace-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1250px;
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 420px;
             gap: 25px;
             margin-top: 10px;
         }
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1050px) {
             .workspace-container { grid-template-columns: 1fr; }
         }
 
@@ -75,7 +76,7 @@
             background: #050505;
             position: relative;
             overflow: hidden;
-            border-radius: 80px / 20px; /* Curvatura tipo tubo CRT */
+            border-radius: 80px / 20px;
             box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
         }
 
@@ -119,26 +120,9 @@
             text-shadow: 0 0 5px var(--vhs-green), 2px 2px 0px #000;
             z-index: 22;
             letter-spacing: 2px;
-        }
-
-        .vhs-glitch-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 255, 102, 0.4);
-            top: 20%;
-            animation: glitch 2.5s infinite;
-            z-index: 21;
             pointer-events: none;
         }
 
-        @keyframes glitch {
-            0% { top: 10%; opacity: 0; }
-            50% { top: 60%; opacity: 0.6; }
-            100% { top: 90%; opacity: 0; }
-        }
-
-        /* REFLEJO EN EL CRISTAL DEL MONITOR */
         .glass-glare {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -147,18 +131,28 @@
             z-index: 23;
         }
 
-        #ruffle-container {
+        #game-viewport {
             width: 100%;
             height: 100%;
             position: relative;
             z-index: 5;
         }
 
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
         .screen-placeholder {
             position: absolute;
+            top: 35%;
+            width: 100%;
             text-align: center;
             color: #33ff66;
             text-shadow: 0 0 8px #00ff66;
+            z-index: 6;
         }
 
         /* --- ORGANIZADOR DE DISKETTES / CASSETTES --- */
@@ -170,7 +164,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 580px;
+            max-height: 600px;
             overflow-y: auto;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
@@ -188,16 +182,14 @@
             justify-content: space-between;
         }
 
-        /* ESTILO DISKETTE 3.5" CASERO REALISTA */
+        /* ESTILO DISKETTE 3.5" CON MINIATURAS ADJUNTAS */
         .floppy-disk {
-            background: #2b2a2d; /* Color de plástico oscuro */
+            background: #2b2a2d;
             border-radius: 6px;
             padding: 8px 10px;
             position: relative;
             cursor: pointer;
-            box-shadow: 
-                0 4px 0 #18171a,
-                inset 0 1px 1px rgba(255,255,255,0.1);
+            box-shadow: 0 4px 0 #18171a;
             transition: transform 0.1s ease, background-color 0.2s;
             border: 1px solid #1a191c;
             display: flex;
@@ -205,25 +197,18 @@
             gap: 6px;
         }
 
-        /* Colores de disquettes varios estilo casero */
-        .floppy-disk:nth-child(2n) { background: #1e2838; } /* Azul oscuro */
-        .floppy-disk:nth-child(3n) { background: #381e1e; } /* Rojo/Marrón */
-        .floppy-disk:nth-child(5n) { background: #233522; } /* Verde Oliva */
+        .floppy-disk:nth-child(2n) { background: #1e2838; }
+        .floppy-disk:nth-child(3n) { background: #381e1e; }
+        .floppy-disk:nth-child(5n) { background: #233522; }
 
         .floppy-disk:hover {
             transform: translateX(-4px) scale(1.01);
             filter: brightness(1.15);
         }
 
-        .floppy-disk:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #18171a;
-        }
-
-        /* Disco de metal protector deslizable superior */
         .floppy-shutter {
             width: 45%;
-            height: 22px;
+            height: 20px;
             background: linear-gradient(180deg, #d4d4d4 0%, #8c8c8c 50%, #b0b0b0 100%);
             border-radius: 2px 2px 4px 4px;
             margin-left: auto;
@@ -235,57 +220,40 @@
         .floppy-shutter::after {
             content: "";
             position: absolute;
-            left: 8px; top: 4px;
+            left: 8px; top: 3px;
             width: 10px; height: 12px;
             background: #222;
-            border-radius: 1px;
         }
 
-        /* Etiqueta Adhesiva de Papel con Escrito a Mano */
         .floppy-label {
             background: #f4efdb;
-            background-image: linear-gradient(#e2dac2 1px, transparent 1px);
-            background-size: 100% 12px;
             border-radius: 3px;
             padding: 6px 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.5);
             border: 1px solid #c7beaa;
-            position: relative;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .floppy-thumb {
+            width: 50px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid #000;
         }
 
         .floppy-title {
-            font-family: 'Caveat', cursive; /* Fuente estilo marcador a mano */
+            font-family: 'Caveat', cursive;
             color: var(--marker-black);
-            font-size: 1.35rem;
-            line-height: 1rem;
+            font-size: 1.3rem;
+            line-height: 1.1rem;
             font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             transform: rotate(-0.5deg);
+            word-break: break-word;
         }
 
-        .floppy-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #777;
-            margin-top: 4px;
-            font-family: 'VT323', monospace;
-        }
-
-        /* Muesca de protección contra escritura */
-        .write-protect {
-            position: absolute;
-            bottom: 6px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: #000;
-            border-radius: 1px;
-        }
-
-        /* PANEL DE BOTONES DE CONTROL DE VIDEO */
         .vhs-controls {
             display: flex;
             gap: 8px;
@@ -328,76 +296,106 @@
 <body>
 
     <h1 style="margin: 0; color: #e0d1b1; font-size: 2.2rem; text-shadow: 2px 2px 0 #000;">
-        📼 PC-VHS SYSTEM '98 / DISKETTE RACK
+        📼 RETRO STATION '98 - SWF & WEB GAMES
     </h1>
 
     <div class="workspace-container">
 
-        <!-- MONITOR VHS / CRT -->
+        <!-- MONITOR CRT / IFRAME & SWF PLAYER -->
         <div>
             <div class="monitor-frame">
                 <div class="crt-screen" id="crt-screen">
                     <div class="vhs-overlay"></div>
                     <div class="vhs-tracking-bar"></div>
-                    <div class="vhs-glitch-line"></div>
                     <div class="glass-glare"></div>
                     
                     <div class="vhs-osd" id="vhs-osd">PLAY &#9654; [00:00:00] <br><small style="font-size:0.9rem;">TRACKING OK</small></div>
 
                     <div class="screen-placeholder" id="placeholder">
-                        <h2>SELECCIONA UN DISKETTE</h2>
-                        <p>Inserta un juego de la bandeja lateral para iniciar la lectura...</p>
+                        <h2>SELECCIONA UN DISKETTE O JUEGO WEB</h2>
+                        <p>Haz clic en cualquiera de los disquetes de la derecha...</p>
                     </div>
 
-                    <div id="ruffle-container"></div>
+                    <div id="game-viewport"></div>
                 </div>
             </div>
 
-            <!-- BOTONERA DE CONTROL VHS -->
+            <!-- CONTROLES VHS -->
             <div class="vhs-controls">
                 <button class="vhs-btn" onclick="app.toggleTracking()">🎛️ FIX TRACKING</button>
-                <button class="vhs-btn" onclick="app.restartGame()">🔄 REINICIAR DISK</button>
+                <button class="vhs-btn" onclick="app.restartGame()">🔄 REINICIAR</button>
                 <button class="vhs-btn vhs-btn--red" onclick="app.eject()">⏏️ EYECTAR</button>
                 <button class="vhs-btn" onclick="app.toggleFullscreen()">⛶ FULLSCREEN</button>
             </div>
         </div>
 
-        <!-- BANDEJA DE DISKETTES INTERACTIVA -->
+        <!-- BANDEJA DE DISKETTES CON JUEGOS Y8 / WEB Y SWF -->
         <div class="disk-rack">
             <div class="rack-header">
-                <span>🖴 DISKS (3.5" HD)</span>
-                <span style="font-size: 0.9rem; color: var(--vhs-green);">1.44 MB</span>
+                <span>🖴 CASSETTES & DISKS</span>
+                <span style="font-size: 0.9rem; color: var(--vhs-green);">1.44 MB / WEB</span>
             </div>
 
-            <!-- CARGADOR DE ARCHIVOS PROPIOS -->
+            <!-- CARGADOR DE ARCHIVOS SWF LOCALES -->
             <div class="file-drop-area" onclick="document.getElementById('custom-file').click()">
-                ➕ Insertar Archivo SWF propio...
+                ➕ Cargar SWF Local propio...
             </div>
             <input type="file" id="custom-file" accept=".swf" style="display:none;">
 
-            <!-- BANDEJA DE JUEGOS DISKETTE CASEROS -->
             <div id="disk-list" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
 
     </div>
 
     <script>
-        // Lista de juegos definida
-        const gameList = [
-            "1.swf", "2.swf", "3.swf", "4.swf", "5.swf", "6.swf", "7.swf",
-            "El_Diente.swf", "Elfes.swf", "Humplex-Resident-Evil-5-Chris-Capture.swf",
-            "Link.swf", "Milking-Link.swf", "Sleeping-Eric.swf", "cloud2.swf",
-            "ddd.swf", "dontwhackyourteacher.swf", "e.swf", "save-your-ass.swf",
-            "whackthethief.swf"
+        // Lista consolidada de juegos (Juegos Iframe Web Y8 + SWF Locales)
+        const gameLibrary = [
+            // JUEGOS DE Y8 SOLICITADOS
+            {
+                name: "CubiKill 2",
+                type: "iframe",
+                url: "https://es.y8.com/games/cubikill_2",
+                thumb: "https://cdn2.y8.com/cloudimage/124643/file/w180h135_webp-b0346c248fc06440ad3b33c41602eb0c.webp"
+            },
+            {
+                name: "Load Up And Kill",
+                type: "iframe",
+                url: "https://es.y8.com/games/load_up_and_kill",
+                thumb: "https://cdn2.y8.com/cloudimage/172191/file/w180h135_webp-5cba0d349b0b55d999e9bf2a571b3e32.webp"
+            },
+            {
+                name: "CubiKill 3",
+                type: "iframe",
+                url: "https://es.y8.com/games/cubikill_3",
+                thumb: "https://cdn2.y8.com/cloudimage/171187/file/w180h135_webp-b36dd94d1ceb7fe28f2d459b2b56f607.webp"
+            },
+            // JUEGOS SWF LOCALES
+            { name: "1.swf", type: "swf", url: "1.swf" },
+            { name: "2.swf", type: "swf", url: "2.swf" },
+            { name: "3.swf", type: "swf", url: "3.swf" },
+            { name: "4.swf", type: "swf", url: "4.swf" },
+            { name: "5.swf", type: "swf", url: "5.swf" },
+            { name: "6.swf", type: "swf", url: "6.swf" },
+            { name: "7.swf", type: "swf", url: "7.swf" },
+            { name: "El Diente", type: "swf", url: "El_Diente.swf" },
+            { name: "Elfes", type: "swf", url: "Elfes.swf" },
+            { name: "Resident Evil 5 Capture", type: "swf", url: "Humplex-Resident-Evil-5-Chris-Capture.swf" },
+            { name: "Link", type: "swf", url: "Link.swf" },
+            { name: "Milking Link", type: "swf", url: "Milking-Link.swf" },
+            { name: "Sleeping Eric", type: "swf", url: "Sleeping-Eric.swf" },
+            { name: "Cloud 2", type: "swf", url: "cloud2.swf" },
+            { name: "DDD", type: "swf", url: "ddd.swf" },
+            { name: "Whack Your Teacher", type: "swf", url: "dontwhackyourteacher.swf" },
+            { name: "E", type: "swf", url: "e.swf" },
+            { name: "Save Your Ass", type: "swf", url: "save-your-ass.swf" },
+            { name: "Whack The Thief", type: "swf", url: "whackthethief.swf" }
         ];
 
         class RetroStation {
             constructor() {
                 this.ruffle = window.RufflePlayer ? window.RufflePlayer.newest() : null;
-                this.player = null;
-                this.currentSwf = null;
+                this.currentGame = null;
                 this.audioCtx = null;
-                this.vhsTimer = null;
                 this.seconds = 0;
 
                 this.renderDiskRack();
@@ -411,14 +409,11 @@
                 }
             }
 
-            // Reproduce un sonido mecánico sintético de lectura de disquette
             playDriveSound() {
                 this.initAudio();
                 const ctx = this.audioCtx;
                 const now = ctx.currentTime;
-
-                // Ruido blanco para el motor del disquetera
-                const bufferSize = ctx.sampleRate * 0.15;
+                const bufferSize = ctx.sampleRate * 0.12;
                 const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
                 const output = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
@@ -430,41 +425,38 @@
 
                 const filter = ctx.createBiquadFilter();
                 filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(800, now);
+                filter.frequency.setValueAtTime(900, now);
 
                 const gain = ctx.createGain();
                 gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
 
                 whiteNoise.connect(filter);
                 filter.connect(gain);
                 gain.connect(ctx.destination);
-
                 whiteNoise.start(now);
             }
 
-            // Renderizar la lista de disquettes caseros con tipografía a mano
             renderDiskRack() {
                 const container = document.getElementById('disk-list');
                 container.innerHTML = '';
 
-                gameList.forEach((game, index) => {
-                    const diskName = game.replace('.swf', '').replace(/-/g, ' ').replace(/_/g, ' ');
-                    
+                gameLibrary.forEach((game, index) => {
                     const diskEl = document.createElement('div');
                     diskEl.className = 'floppy-disk';
-                    diskEl.onclick = () => this.loadGame(game, diskName);
+                    diskEl.onclick = () => this.loadGame(game);
+
+                    const imgHtml = game.thumb ? `<img src="${game.thumb}" class="floppy-thumb" alt="thumb">` : '';
 
                     diskEl.innerHTML = `
                         <div class="floppy-shutter"></div>
                         <div class="floppy-label">
-                            <div class="floppy-title">${diskName}</div>
-                            <div class="floppy-meta">
-                                <span>DISK ${index + 1}/19</span>
-                                <span>VER 1.0</span>
+                            ${imgHtml}
+                            <div>
+                                <div class="floppy-title">${game.name}</div>
+                                <small style="color:#888;">TYPE: ${game.type.toUpperCase()}</small>
                             </div>
                         </div>
-                        <div class="write-protect"></div>
                     `;
                     container.appendChild(diskEl);
                 });
@@ -475,44 +467,49 @@
                     if (e.target.files.length > 0) {
                         const file = e.target.files[0];
                         const url = URL.createObjectURL(file);
-                        this.loadGame(url, file.name.replace('.swf', ''));
+                        this.loadGame({ name: file.name, type: 'swf', url: url });
                     }
                 });
             }
 
-            // Cargar Juego en Ruffle
-            loadGame(src, title) {
+            loadGame(game) {
                 this.playDriveSound();
-                this.currentSwf = { src, title };
+                this.currentGame = game;
                 
-                const container = document.getElementById('ruffle-container');
-                container.innerHTML = '';
+                const viewport = document.getElementById('game-viewport');
+                viewport.innerHTML = '';
                 document.getElementById('placeholder').style.display = 'none';
 
-                if (this.ruffle) {
-                    this.player = this.ruffle.createPlayer();
-                    this.player.style.width = '100%';
-                    this.player.style.height = '100%';
-                    container.appendChild(this.player);
-                    this.player.load(src);
+                if (game.type === 'iframe') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = game.url;
+                    iframe.allow = "fullscreen";
+                    viewport.appendChild(iframe);
+                } else if (game.type === 'swf') {
+                    if (this.ruffle) {
+                        const player = this.ruffle.createPlayer();
+                        player.style.width = '100%';
+                        player.style.height = '100%';
+                        viewport.appendChild(player);
+                        player.load(game.url);
+                    }
                 }
 
-                // Actualizar OSD VHS
                 this.seconds = 0;
-                this.updateOSDText(`PLAY &#9654; [${title.toUpperCase()}]`);
+                this.updateOSDText(`PLAY &#9654; [${game.name.toUpperCase()}]`);
             }
 
             eject() {
                 this.playDriveSound();
-                document.getElementById('ruffle-container').innerHTML = '';
+                document.getElementById('game-viewport').innerHTML = '';
                 document.getElementById('placeholder').style.display = 'block';
-                this.currentSwf = null;
+                this.currentGame = null;
                 this.updateOSDText('NO DISK &#9632;');
             }
 
             restartGame() {
-                if (this.currentSwf) {
-                    this.loadGame(this.currentSwf.src, this.currentSwf.title);
+                if (this.currentGame) {
+                    this.loadGame(this.currentGame);
                 }
             }
 
@@ -534,7 +531,7 @@
             startVHSTimer() {
                 setInterval(() => {
                     this.seconds++;
-                    if (this.currentSwf) {
+                    if (this.currentGame) {
                         const hrs = String(Math.floor(this.seconds / 3600)).padStart(2, '0');
                         const mins = String(Math.floor((this.seconds % 3600) / 60)).padStart(2, '0');
                         const secs = String(this.seconds % 60).padStart(2, '0');
