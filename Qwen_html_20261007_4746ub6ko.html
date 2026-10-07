@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor SWF - CaveOfPleasure</title>
+    <!-- Cargar Ruffle (Emulador de Flash moderno, seguro y sin plugins) -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #ff4081;
+            --accent-hover: #c60055;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        .player-wrapper {
+            width: 100%;
+            min-height: 500px;
+            background-color: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+        ruffle-player {
+            width: 100%;
+            height: 500px;
+            display: block;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        select, input[type="text"], button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #2c2c2c;
+            color: #fff;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        select:focus, input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+        button {
+            background-color: var(--accent-color);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+        .note {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 25px;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .note a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .note a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎮 Reproductor de Juegos SWF 🎮</h1>
+    
+    <div class="container">
+        <div class="controls">
+            <label for="swfSelect"><strong>1. Selecciona un archivo de la lista:</strong></label>
+            <select id="swfSelect" onchange="document.getElementById('customUrl').value = this.value">
+                <option value="">-- Selecciona un juego --</option>
+                
+                <optgroup label="🔢 Numerados">
+                    <option value="1swf">1swf</option>
+                    <option value="2.swf">2.swf</option>
+                    <option value="3.swf">3.swf</option>
+                    <option value="4.swf">4.swf</option>
+                    <option value="5.swf">5.swf</option>
+                    <option value="6.swf">6.swf</option>
+                    <option value="7.swf">7.swf</option>
+                </optgroup>
+
+                <optgroup label="⚡ Serie Flash">
+                    <option value="flash1.swf">flash1.swf</option>
+                    <option value="flash2.swf">flash2.swf</option>
+                    <option value="flash3.swf">flash3.swf</option>
+                    <option value="flash4.swf">flash4.swf</option>
+                    <option value="flash5.swf">flash5.swf</option>
+                    <option value="flash6.swf">flash6.swf</option>
+                    <option value="flash7.swf">flash7.swf</option>
+                    <option value="flash8.swf">flash8.swf</option>
+                    <option value="flash9.swf">flash9.swf</option>
+                    <option value="flash10.swf">flash10.swf</option>
+                    <option value="flash11.swf">flash11.swf</option>
+                    <option value="flash12.swf">flash12.swf</option>
+                    <option value="flash13.swf">flash13.swf</option>
+                    <option value="flash14.swf">flash14.swf</option>
+                </optgroup>
+
+                <optgroup label="🎯 Acción / Whack">
+                    <option value="dontwhackyourteacher.swf">dontwhackyourteacher.swf</option>
+                    <option value="whackthethief.swf">whackthethief.swf</option>
+                    <option value="whackthetrump.swf">whackthetrump.swf</option>
+                    <option value="zombiewarriorman.swf">zombiewarriorman.swf</option>
+                    <option value="save-your-ass.swf">save-your-ass.swf</option>
+                </optgroup>
+
+                <optgroup label="🎲 Otros / Varios">
+                    <option value="cloud2.swf">cloud2.swf</option>
+                    <option value="ddd.swf">ddd.swf</option>
+                    <option value="e.swf">e.swf</option>
+                    <option value="El_Diente.swf">El_Diente.swf</option>
+                    <option value="Elfes.swf">Elfes.swf</option>
+                    <option value="Humplex-Resident-Evil-5-Chris-Capture.swf">Humplex-Resident-Evil-5-Chris-Capture.swf</option>
+                    <option value="Link.swf">Link.swf</option>
+                    <option value="Milking-Link.swf">Milking-Link.swf</option>
+                    <option value="Sleeping-Eric.swf">Sleeping-Eric.swf</option>
+                    <option value="trunks.swf">trunks.swf</option>
+                </optgroup>
+            </select>
+            
+            <label for="customUrl"><strong>2. O escribe el nombre exacto del archivo:</strong></label>
+            <input type="text" id="customUrl" placeholder="Ej: flash5.swf o trunks.swf">
+            
+            <button onclick="loadSelectedSWF()">▶ Cargar y Jugar</button>
+        </div>
+
+        <div class="player-wrapper">
+            <div id="placeholder-text" style="color: #666; text-align: center; padding: 20px;">
+                Selecciona un archivo y presiona "Cargar y Jugar"<br>
+                <small>El emulador Ruffle se iniciará automáticamente</small>
+            </div>
+        </div>
+
+        <div class="note">
+            <p>💡 <strong>Nota técnica:</strong> Este reproductor utiliza <a href="https://ruffle.rs/" target="_blank">Ruffle</a>, un emulador de Flash moderno y seguro que funciona en Chrome, Firefox, Edge y Safari <strong>sin instalar plugins</strong>.</p>
+            <p>⚠️ Algunos juegos creados con ActionScript 3 (AS3) podrían tener problemas de compatibilidad parcial, ya que Ruffle aún está en desarrollo activo. La mayoría de juegos en AS1/AS2 funcionan perfectamente.</p>
+        </div>
+    </div>
+
+    <script>
+        function loadSelectedSWF() {
+            const customUrl = document.getElementById('customUrl').value.trim();
+            
+            if (!customUrl) {
+                alert('Por favor, selecciona o escribe el nombre de un archivo .swf');
+                return;
+            }
+
+            const wrapper = document.querySelector('.player-wrapper');
+            wrapper.innerHTML = ''; // Limpiar contenido anterior
+            
+            // Crear el elemento reproductor de Ruffle
+            const player = document.createElement('ruffle-player');
+            player.style.width = '100%';
+            player.style.height = '500px';
+            player.setAttribute('src', customUrl);
+            player.setAttribute('autoplay', 'auto');
+            
+            wrapper.appendChild(player);
+        }
+
+        // Permitir cargar un archivo directamente desde la URL, ej: ?file=2.swf
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fileParam = urlParams.get('file');
+            
+            if (fileParam) {
+                document.getElementById('customUrl').value = fileParam;
+                loadSelectedSWF();
+            }
+        });
+    </script>
+</body>
+</html>
