@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reproductor SWF - CaveOfPleasure</title>
-    <!-- Cargar Ruffle (Emulador de Flash moderno, seguro y sin plugins) -->
+    <!-- Cargar Ruffle (Emulador de Flash moderno) -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
         :root {
@@ -74,6 +74,10 @@
         select:focus, input[type="text"]:focus {
             border-color: var(--accent-color);
         }
+        select:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
         button {
             background-color: var(--accent-color);
             color: #fff;
@@ -98,6 +102,12 @@
         .note a:hover {
             text-decoration: underline;
         }
+        .loading {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -106,57 +116,9 @@
     
     <div class="container">
         <div class="controls">
-            <label for="swfSelect"><strong>1. Selecciona un archivo de la lista:</strong></label>
-            <select id="swfSelect" onchange="document.getElementById('customUrl').value = this.value">
-                <option value="">-- Selecciona un juego --</option>
-                
-                <optgroup label="🔢 Numerados">
-                    <option value="1swf">1swf</option>
-                    <option value="2.swf">2.swf</option>
-                    <option value="3.swf">3.swf</option>
-                    <option value="4.swf">4.swf</option>
-                    <option value="5.swf">5.swf</option>
-                    <option value="6.swf">6.swf</option>
-                    <option value="7.swf">7.swf</option>
-                </optgroup>
-
-                <optgroup label="⚡ Serie Flash">
-                    <option value="flash1.swf">flash1.swf</option>
-                    <option value="flash2.swf">flash2.swf</option>
-                    <option value="flash3.swf">flash3.swf</option>
-                    <option value="flash4.swf">flash4.swf</option>
-                    <option value="flash5.swf">flash5.swf</option>
-                    <option value="flash6.swf">flash6.swf</option>
-                    <option value="flash7.swf">flash7.swf</option>
-                    <option value="flash8.swf">flash8.swf</option>
-                    <option value="flash9.swf">flash9.swf</option>
-                    <option value="flash10.swf">flash10.swf</option>
-                    <option value="flash11.swf">flash11.swf</option>
-                    <option value="flash12.swf">flash12.swf</option>
-                    <option value="flash13.swf">flash13.swf</option>
-                    <option value="flash14.swf">flash14.swf</option>
-                </optgroup>
-
-                <optgroup label="🎯 Acción / Whack">
-                    <option value="dontwhackyourteacher.swf">dontwhackyourteacher.swf</option>
-                    <option value="whackthethief.swf">whackthethief.swf</option>
-                    <option value="whackthetrump.swf">whackthetrump.swf</option>
-                    <option value="zombiewarriorman.swf">zombiewarriorman.swf</option>
-                    <option value="save-your-ass.swf">save-your-ass.swf</option>
-                </optgroup>
-
-                <optgroup label="🎲 Otros / Varios">
-                    <option value="cloud2.swf">cloud2.swf</option>
-                    <option value="ddd.swf">ddd.swf</option>
-                    <option value="e.swf">e.swf</option>
-                    <option value="El_Diente.swf">El_Diente.swf</option>
-                    <option value="Elfes.swf">Elfes.swf</option>
-                    <option value="Humplex-Resident-Evil-5-Chris-Capture.swf">Humplex-Resident-Evil-5-Chris-Capture.swf</option>
-                    <option value="Link.swf">Link.swf</option>
-                    <option value="Milking-Link.swf">Milking-Link.swf</option>
-                    <option value="Sleeping-Eric.swf">Sleeping-Eric.swf</option>
-                    <option value="trunks.swf">trunks.swf</option>
-                </optgroup>
+            <label for="swfSelect"><strong>1. Selecciona un archivo (Cargado automáticamente desde GitHub):</strong></label>
+            <select id="swfSelect" onchange="document.getElementById('customUrl').value = this.value" disabled>
+                <option value="">Cargando lista de juegos...</option>
             </select>
             
             <label for="customUrl"><strong>2. O escribe el nombre exacto del archivo:</strong></label>
@@ -173,12 +135,60 @@
         </div>
 
         <div class="note">
-            <p>💡 <strong>Nota técnica:</strong> Este reproductor utiliza <a href="https://ruffle.rs/" target="_blank">Ruffle</a>, un emulador de Flash moderno y seguro que funciona en Chrome, Firefox, Edge y Safari <strong>sin instalar plugins</strong>.</p>
-            <p>⚠️ Algunos juegos creados con ActionScript 3 (AS3) podrían tener problemas de compatibilidad parcial, ya que Ruffle aún está en desarrollo activo. La mayoría de juegos en AS1/AS2 funcionan perfectamente.</p>
+            <p>💡 <strong>Nota técnica:</strong> Este reproductor utiliza <a href="https://ruffle.rs/" target="_blank">Ruffle</a> y consulta la API de GitHub para listar automáticamente todos los archivos <code>.swf</code> presentes en la rama <code>main</code> de este repositorio.</p>
+            <p>⚠️ Si acabas de subir un juego nuevo y no aparece, espera 1-2 minutos (la caché de la API de GitHub) o escríbelo manualmente en el campo de texto.</p>
         </div>
     </div>
 
     <script>
+        // Configuración de tu repositorio
+        const GITHUB_OWNER = 'LeoDanteKasper';
+        const GITHUB_REPO = 'YaoiPornLover-sCaveOfPleasure';
+        const API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/`;
+
+        // Función para obtener y listar los archivos .swf automáticamente
+        async function loadSwfFiles() {
+            const select = document.getElementById('swfSelect');
+            
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Filtrar solo archivos que terminen en .swf (ignora carpetas y otros archivos)
+                const swfFiles = data
+                    .filter(file => file.type === 'file' && file.name.toLowerCase().endsWith('.swf'))
+                    .map(file => file.name)
+                    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); // Orden alfabético inteligente
+                
+                // Limpiar el select y agregar la opción por defecto
+                select.innerHTML = '<option value="">-- Selecciona un juego --</option>';
+                
+                if (swfFiles.length === 0) {
+                    select.innerHTML += '<option value="" disabled>No se encontraron archivos .swf</option>';
+                } else {
+                    swfFiles.forEach(fileName => {
+                        const option = document.createElement('option');
+                        option.value = fileName;
+                        option.textContent = fileName;
+                        select.appendChild(option);
+                    });
+                }
+                
+                // Habilitar el select una vez cargado
+                select.disabled = false;
+                
+            } catch (error) {
+                console.error('Error al cargar la lista de juegos:', error);
+                select.innerHTML = '<option value="" disabled>Error al cargar la lista. Usa el campo de texto manual.</option>';
+                select.disabled = false;
+            }
+        }
+
+        // Función para cargar el juego en Ruffle
         function loadSelectedSWF() {
             const customUrl = document.getElementById('customUrl').value.trim();
             
@@ -188,7 +198,7 @@
             }
 
             const wrapper = document.querySelector('.player-wrapper');
-            wrapper.innerHTML = ''; // Limpiar contenido anterior
+            wrapper.innerHTML = ''; // Limpiar contenido anterior (o mensaje de espera)
             
             // Crear el elemento reproductor de Ruffle
             const player = document.createElement('ruffle-player');
@@ -202,6 +212,10 @@
 
         // Permitir cargar un archivo directamente desde la URL, ej: ?file=2.swf
         window.addEventListener('DOMContentLoaded', () => {
+            // 1. Cargar la lista de juegos
+            loadSwfFiles();
+            
+            // 2. Comprobar si hay un parámetro ?file= en la URL
             const urlParams = new URLSearchParams(window.location.search);
             const fileParam = urlParams.get('file');
             
